@@ -16,18 +16,27 @@ using RiskOfOptions;
 using TMPro;
 using R2API.Networking.Interfaces;
 using EmotesAPI;
+using System.Collections;
+using UnityEngine.UI;
 
 public class EmoteWheel : MonoBehaviour
 {
-    public GameObject text;
+    internal GameObject text;
 
-    public List<GameObject> gameObjects = new List<GameObject>();
+    internal List<GameObject> gameObjects = new List<GameObject>();
+    internal Image joy;
 
-    public RoR2.UI.MPInput input = GameObject.Find("MPEventSystem Player0").GetComponent<RoR2.UI.MPInput>();
-    public RoR2.UI.MPEventSystem events;
+    internal RoR2.UI.MPInput input = GameObject.Find("MPEventSystem Player0").GetComponent<RoR2.UI.MPInput>();
+    internal RoR2.UI.MPEventSystem events;
 
-    public static KeyCode emoteButton = KeyCode.None;
-    public static KeyCode randomButton = KeyCode.None;
+    internal static KeyCode emoteButton = KeyCode.None;
+    internal static KeyCode leftClick = KeyCode.None;
+    internal static KeyCode rightClick = KeyCode.None;
+
+    internal string[] leftPage = new string[8];
+    internal string[] middlePage = new string[8];
+    internal string[] rightPage = new string[8];
+    int activePage = 1; //0 left, 1 middle, 2 right
 
     GameObject selected;
     float XScale = 1, YScale = 1;
@@ -36,7 +45,16 @@ public class EmoteWheel : MonoBehaviour
         selected = gameObjects[0];
         events = input.GetFieldValue<RoR2.UI.MPEventSystem>("eventSystem");
 
-        emoteButton = ModSettingsManager.GetOption("Emote Wheel", "Controls").GetKeyCode();
+        emoteButton = ModSettingsManager.GetOption("Emote Wheel", "Controls").GetValue<KeyCode>();
+        leftClick = ModSettingsManager.GetOption("left", "Controls").GetValue<KeyCode>();
+        rightClick = ModSettingsManager.GetOption("right", "Controls").GetValue<KeyCode>();
+
+        for (int i = 0; i < gameObjects.Count; i++)
+        {
+            rightPage[i] = CustomEmotesAPI.allClipNames[UnityEngine.Random.Range(0, CustomEmotesAPI.allClipNames.Count)];
+            leftPage[i] = CustomEmotesAPI.allClipNames[UnityEngine.Random.Range(0, CustomEmotesAPI.allClipNames.Count)];
+            middlePage[i] = gameObjects[i].GetComponentInChildren<TextMeshProUGUI>().text;
+        }
     }
     void Update()
     {
@@ -65,6 +83,66 @@ public class EmoteWheel : MonoBehaviour
             else
             {
                 selected.GetComponent<RectTransform>().localScale = new Vector3(0.6771638f, 0.6771638f, 0.6771638f);
+            }
+        }
+        //if (Input.GetKey(KeyCode.Mouse1) && !selected.GetComponent<RoR2.UI.MPDropdown>())
+        //{
+        //    DebugClass.Log($"----------doing the thing");
+        //    if (transform.localPosition == v)
+        //    {
+        //        //UnityEngine.UI.Dropdown
+        //        var drop = selected.AddComponent<RoR2.UI.MPDropdown>();
+        //        drop.AddOptions(CustomEmotesAPI.allClipNames);
+        //        //drop.template = GameObject.Instantiate(Resources.Load<GameObject>("prefabs/ui/PauseScreen")).transform.Find("Blur + Background Panel").Find("ValidScreenspacePanel").Find("SettingsPanel(Clone)").Find("SafeArea").Find("SubPanelArea").Find("SettingsSubPanel, Video").Find("Scroll View").Find("Viewport").Find("VerticalLayout").Find("Option, Resolution").Find("CarouselRect").Find("ResolutionDropdown").Find("Template").GetComponent<RectTransform>();
+        //    }
+        //}
+        switch (activePage)
+        {
+            case 0:
+                joy.color = Color.Lerp(joy.color, new Color(114f / 255f, 157f / 255f, 255f / 255f, .9f), Time.deltaTime * 4);
+                break;
+            case 1:
+                joy.color = Color.Lerp(joy.color, new Color(114f / 255f, 255f / 255f, 157f / 255f, .9f), Time.deltaTime * 4);
+                break;
+            case 2:
+                joy.color = Color.Lerp(joy.color, new Color(255f / 255f, 114f / 255f, 157f / 255f, .9f), Time.deltaTime * 4);
+                break;
+            default:
+                break;
+        }
+        //DebugClass.Log($"----------{activePage} ---  {joy.color} ---  {joy.sprite.name}");
+        if (Input.GetKeyDown(leftClick))
+        {
+            if (transform.localPosition == v)
+            {
+                //Event.current.Use();
+                if (activePage == 1)
+                {
+                    activePage = 0;
+                    StartCoroutine(SwitchPage(leftPage));
+                }
+                if (activePage == 2)
+                {
+                    activePage = 1;
+                    StartCoroutine(SwitchPage(middlePage));
+                }
+            }
+        }
+        if (Input.GetKeyDown(rightClick))
+        {
+            if (transform.localPosition == v)
+            {
+                //Event.current.Use();
+                if (activePage == 1)
+                {
+                    activePage = 2;
+                    StartCoroutine(SwitchPage(rightPage));
+                }
+                if (activePage == 0)
+                {
+                    activePage = 1;
+                    StartCoroutine(SwitchPage(middlePage));
+                }
             }
         }
         if (Input.GetKey(emoteButton))
@@ -128,6 +206,47 @@ public class EmoteWheel : MonoBehaviour
                 }
             }
             transform.localPosition = new Vector3(0, 2000, 0);
+            StartCoroutine(SwitchPage(middlePage));
+            activePage = 1;
         }
+    }
+
+    private IEnumerator SwitchPage(string[] newPage, bool instant = true)
+    {
+        if (instant)
+        {
+            for (int i = 0; i < gameObjects.Count; i++)
+            {
+                gameObjects[i].GetComponentInChildren<TextMeshProUGUI>().text = newPage[i];
+            }
+            yield break;
+        }
+        bool stay = true;
+        float longestLength = 0;
+        while (stay)
+        {
+            stay = false;
+            foreach (var item in gameObjects)
+            {
+                if (item.GetComponentInChildren<TextMeshProUGUI>().text.Length != 0)
+                {
+                    if (item.GetComponentInChildren<TextMeshProUGUI>().text.Length > longestLength)
+                        longestLength = item.GetComponentInChildren<TextMeshProUGUI>().text.Length;
+
+                    item.GetComponentInChildren<TextMeshProUGUI>().text = item.GetComponentInChildren<TextMeshProUGUI>().text.Remove(0, 1);
+                    stay = true;
+                }
+            }
+            if (longestLength != 0)
+            {
+                yield return new WaitForSeconds(.05f / longestLength);
+            }
+        }
+        for (int i = 0; i < gameObjects.Count; i++)
+        {
+            gameObjects[i].GetComponentInChildren<TextMeshProUGUI>().text = newPage[i];
+        }
+
+        yield break;
     }
 }

@@ -24,7 +24,7 @@ public class SyncAnimationToServer : INetMessage
 
     public void Deserialize(NetworkReader reader)
     {
-        //DebugClass.Log($"POSITION: {reader.Position}, SIZE: {reader.Length}");
+        DebugClass.Log($"POSITION: {reader.Position}, SIZE: {reader.Length}");
 
         netId = reader.ReadNetworkId();
         animation = reader.ReadString();

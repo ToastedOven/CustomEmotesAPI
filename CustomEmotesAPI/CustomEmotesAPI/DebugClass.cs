@@ -14,16 +14,16 @@ using System.Text;
 using BepInEx.Logging;
 
 
-    public static class DebugClass
-    {
-        private static ManualLogSource Logger;
+public static class DebugClass
+{
+    private static ManualLogSource Logger;
 
-        public static void SetLogger(ManualLogSource logSource)
-        {
-            Logger = logSource;
-        }
-        public static void Log(object message)
-        {
-            Logger.Log(LogLevel.Info, $"{message}");
-        }
+    public static void SetLogger(ManualLogSource logSource)
+    {
+        Logger = logSource;
     }
+    public static void Log(object message)
+    {
+        Logger.Log(LogLevel.Info, $"{message}");
+    }
+}
