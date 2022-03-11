@@ -13,43 +13,13 @@ namespace EmotesAPI
         private static readonly List<AssetBundle> AssetBundles = new List<AssetBundle>();
         private static readonly Dictionary<string, int> AssetIndices = new Dictionary<string, int>();
 
-        private static Material _prefab;
-
-
-        public static void PopulateAssets()
-        {
-            using (var bankStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("MoistureUpset.ImMoist.bnk"))
-            {
-                var bytes = new byte[bankStream.Length];
-                bankStream.Read(bytes, 0, bytes.Length);
-
-                SoundBanks.Add(bytes);
-            }
-
-            using (var bankStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("MoistureUpset.ImReallyMoist.bnk"))
-            {
-                var bytes = new byte[bankStream.Length];
-                bankStream.Read(bytes, 0, bytes.Length);
-
-                SoundBanks.Add(bytes);
-            }
-
-            using (var bankStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("MoistureUpset.Risk2GaySounds.bnk"))
-            {
-                var bytes = new byte[bankStream.Length];
-                bankStream.Read(bytes, 0, bytes.Length);
-
-                SoundBanks.Add(bytes);
-            }
-        }
-
         /// <summary>
         /// 
         /// </summary>
         /// <param name="assetBundleLocation"></param>
         public static void AddBundle(string assetBundleLocation)
         {
-            using var assetBundleStream = Assembly.GetExecutingAssembly().GetManifestResourceStream($"MoistureUpset.{assetBundleLocation}");
+            using var assetBundleStream = Assembly.GetExecutingAssembly().GetManifestResourceStream($"CustomEmotesAPI.{assetBundleLocation}");
             AssetBundle assetBundle = AssetBundle.LoadFromStream(assetBundleStream);
 
             int index = AssetBundles.Count;

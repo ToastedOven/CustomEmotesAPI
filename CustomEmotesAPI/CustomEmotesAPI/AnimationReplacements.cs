@@ -18,19 +18,19 @@ using R2API.Networking.Interfaces;
 using UnityEngine.Animations;
 using UnityEngine.UI;
 using EmotesAPI;
+using UnityEngine.AddressableAssets;
 
 internal static class AnimationReplacements
 {
     internal static void RunAll()
     {
-
         CustomEmotesAPI.LoadResource("customemotespackage");
         CustomEmotesAPI.LoadResource("enfucker");
         ChangeAnims();
         On.RoR2.UI.HUD.Awake += (orig, self) =>
         {
             orig(self);
-            GameObject g = GameObject.Instantiate(Resources.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/emotewheel.prefab"));
+            GameObject g = GameObject.Instantiate(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/emotewheel.prefab"));
             foreach (var item in g.GetComponentsInChildren<TextMeshProUGUI>())
             {
                 item.font = self.mainContainer.transform.Find("MainUIArea").Find("SpringCanvas").Find("UpperLeftCluster").Find("MoneyRoot").Find("ValueText").GetComponent<TextMeshProUGUI>().font;
@@ -77,14 +77,14 @@ internal static class AnimationReplacements
                 ApplyAnimationStuff(RoR2Content.Survivors.Commando, "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commando.prefab");
                 ApplyAnimationStuff(RoR2Content.Survivors.Huntress, "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/huntressBetterMaybeFixed.prefab");
                 ApplyAnimationStuff(RoR2Content.Survivors.Bandit2, "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/bandit.prefab");
-                ApplyAnimationStuff(Resources.Load<GameObject>("prefabs/characterbodies/HereticBody"), "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/heretic.prefab", 3);
+                ApplyAnimationStuff(Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Heretic/HereticBody.prefab").WaitForCompletion(), "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/heretic.prefab", 3);
             }
             foreach (var item in SurvivorCatalog.allSurvivorDefs)
             {
                 if (item.bodyPrefab.name == "EnforcerBody")
                 {
-                    var skele = Resources.Load<GameObject>("@CustomEmotesAPI_enfucker:assets/fbx/enfucker/enfucker.prefab");
-                    skele.GetComponent<Animator>().runtimeAnimatorController = GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commando.prefab")).GetComponent<Animator>().runtimeAnimatorController;
+                    var skele = Assets.Load<GameObject>("@CustomEmotesAPI_enfucker:assets/fbx/enfucker/enfucker.prefab");
+                    skele.GetComponent<Animator>().runtimeAnimatorController = GameObject.Instantiate<GameObject>(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commando.prefab")).GetComponent<Animator>().runtimeAnimatorController;
                     CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
                 }
                 //DebugClass.Log($"---{item.bodyPrefab.name}");
@@ -111,7 +111,7 @@ internal static class AnimationReplacements
     }
     internal static void ApplyAnimationStuff(GameObject bodyPrefab, string resource, int pos = 0)
     {
-        GameObject animcontroller = Resources.Load<GameObject>(resource);
+        GameObject animcontroller = Assets.Load<GameObject>(resource);
         ApplyAnimationStuff(bodyPrefab, animcontroller, pos);
     }
     internal static void ApplyAnimationStuff(GameObject bodyPrefab, GameObject animcontroller, int pos = 0)

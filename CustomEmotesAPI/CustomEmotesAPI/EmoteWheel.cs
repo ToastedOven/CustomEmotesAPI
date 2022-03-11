@@ -103,7 +103,7 @@ public class EmoteWheel : MonoBehaviour
                 break;
         }
         //DebugClass.Log($"----------{activePage} ---  {joy.color} ---  {joy.sprite.name}");
-        if (Settings.Left.Value.IsDown())
+        if (CustomEmotesAPI.GetKey(Settings.Left))
         {
             if (transform.localPosition == v)
             {
@@ -120,7 +120,7 @@ public class EmoteWheel : MonoBehaviour
                 }
             }
         }
-        if (Settings.Right.Value.IsDown())
+        if (CustomEmotesAPI.GetKey(Settings.Right))
         {
             if (transform.localPosition == v)
             {
@@ -137,7 +137,7 @@ public class EmoteWheel : MonoBehaviour
                 }
             }
         }
-        if (Settings.EmoteWheel.Value.IsDown())
+        if (CustomEmotesAPI.GetKey(Settings.EmoteWheel))
         {
             if (transform.localPosition != v)
             {

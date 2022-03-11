@@ -9,11 +9,11 @@ using System.Collections.Generic;
 using RoR2.UI;
 using RiskOfOptions;
 using UnityEngine.Rendering.PostProcessing;
-using LeTai.Asset.TranslucentImage;
 using R2API.Networking;
 using UnityEngine.Networking;
 using R2API.Networking.Interfaces;
 using System.Globalization;
+using BepInEx.Configuration;
 
 namespace EmotesAPI
 {
@@ -27,7 +27,18 @@ namespace EmotesAPI
         internal static List<string> allClipNames = new List<string>();
         internal static void LoadResource(string resource)
         {
-            Assets.AddBundle($"Models.{resource}");
+            Assets.AddBundle($"{resource}");
+        }
+        internal static bool GetKey(ConfigEntry<KeyboardShortcut> entry)
+        {
+            foreach (var item in entry.Value.Modifiers)
+            {
+                if (!Input.GetKey(item))
+                {
+                    return false;
+                }
+            }
+            return Input.GetKey(entry.Value.MainKey);
         }
         public const string VERSION = "1.0.0";
         internal static float Actual_MSX = 69;
@@ -124,8 +135,8 @@ namespace EmotesAPI
                                 flag = false;
                             }
                         }
-                        newState = player.GetButton(7) && !Settings.EmoteWheel.Value.IsDown(); //left click
-                        newState2 = player.GetButton(8) && !Settings.EmoteWheel.Value.IsDown(); //right click
+                        newState = player.GetButton(7) && !CustomEmotesAPI.GetKey(Settings.EmoteWheel); //left click
+                        newState2 = player.GetButton(8) && !CustomEmotesAPI.GetKey(Settings.EmoteWheel); //right click
                         newState3 = player.GetButton(9);
                         newState4 = player.GetButton(10);
                         newState5 = player.GetButton(5);

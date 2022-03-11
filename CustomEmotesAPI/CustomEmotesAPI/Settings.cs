@@ -39,31 +39,7 @@ namespace EmotesAPI
             ModSettingsManager.AddOption(new KeyBindOption(Left));
             ModSettingsManager.AddOption(new KeyBindOption(Right));
 
-            //AddKeyBind("Emote Wheel", "Displays the emote wheel.", KeyCode.C, "Controls");
 
-            //ModSettingsManager.AddListener(new UnityAction<KeyCode>(delegate (KeyCode keyCode) { EmoteWheel.emoteButton = keyCode; }), "Emote Wheel", "Controls");
-
-            //AddKeyBind("left", "Displays the emote wheel.", KeyCode.Mouse0, "Controls");
-
-            //ModSettingsManager.AddListener(new UnityAction<KeyCode>(delegate (KeyCode keyCode) { EmoteWheel.leftClick = keyCode; }), "left", "Controls");
-
-            //AddKeyBind("right", "Displays the emote wheel.", KeyCode.Mouse1, "Controls");
-
-            //ModSettingsManager.AddListener(new UnityAction<KeyCode>(delegate (KeyCode keyCode) { EmoteWheel.rightClick = keyCode; }), "right", "Controls");
-
-            //AddSlider("Ligma Balls", "It's so sad that steve jobs died of ligma", 69420, 0, 69420, "Controls", false);
         }
-
-        //private static void AddKeyBind(string name, string desc, KeyCode key, string category)
-        //{
-        //    var thing = new RiskOfOptions.OptionConstructors.KeyBind() { Name = name, Description = desc, DefaultValue = key, CategoryName = category };
-        //    ModSettingsManager.AddOption(thing);
-        //}
-        //private static void AddSlider(string name, string desc, int starting, int min, int max, string category, bool visible)
-        //{
-        //    //ModSettingsManager.AddSlider("HitMarker Volume", "This sound is also tied to SFX, but has a separate slider if you want it to be less noisy", 100, 0, 100, "Audio", survivorsSkinsOnlySlider);
-        //    var thing = new RiskOfOptions.OptionConstructors.Slider() { Name = name, Description = desc, CategoryName = category, DefaultValue = starting, Min = min, Max = max, IsVisible = visible };
-        //    ModSettingsManager.AddOption(thing);
-        //}
     }
 }
