@@ -29,10 +29,6 @@ public class EmoteWheel : MonoBehaviour
     internal RoR2.UI.MPInput input = GameObject.Find("MPEventSystem Player0").GetComponent<RoR2.UI.MPInput>();
     internal RoR2.UI.MPEventSystem events;
 
-    internal static KeyCode emoteButton = KeyCode.None;
-    internal static KeyCode leftClick = KeyCode.None;
-    internal static KeyCode rightClick = KeyCode.None;
-
     internal string[] leftPage = new string[8];
     internal string[] middlePage = new string[8];
     internal string[] rightPage = new string[8];
@@ -44,10 +40,6 @@ public class EmoteWheel : MonoBehaviour
     {
         selected = gameObjects[0];
         events = input.GetFieldValue<RoR2.UI.MPEventSystem>("eventSystem");
-
-        emoteButton = ModSettingsManager.GetOption("Emote Wheel", "Controls").GetValue<KeyCode>();
-        leftClick = ModSettingsManager.GetOption("left", "Controls").GetValue<KeyCode>();
-        rightClick = ModSettingsManager.GetOption("right", "Controls").GetValue<KeyCode>();
 
         for (int i = 0; i < gameObjects.Count; i++)
         {
@@ -111,7 +103,7 @@ public class EmoteWheel : MonoBehaviour
                 break;
         }
         //DebugClass.Log($"----------{activePage} ---  {joy.color} ---  {joy.sprite.name}");
-        if (Input.GetKeyDown(leftClick))
+        if (Settings.Left.Value.IsDown())
         {
             if (transform.localPosition == v)
             {
@@ -128,7 +120,7 @@ public class EmoteWheel : MonoBehaviour
                 }
             }
         }
-        if (Input.GetKeyDown(rightClick))
+        if (Settings.Right.Value.IsDown())
         {
             if (transform.localPosition == v)
             {
@@ -145,7 +137,7 @@ public class EmoteWheel : MonoBehaviour
                 }
             }
         }
-        if (Input.GetKey(emoteButton))
+        if (Settings.EmoteWheel.Value.IsDown())
         {
             if (transform.localPosition != v)
             {

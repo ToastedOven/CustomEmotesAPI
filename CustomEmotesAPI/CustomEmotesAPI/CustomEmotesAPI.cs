@@ -13,6 +13,7 @@ using LeTai.Asset.TranslucentImage;
 using R2API.Networking;
 using UnityEngine.Networking;
 using R2API.Networking.Interfaces;
+using System.Globalization;
 
 namespace EmotesAPI
 {
@@ -26,22 +27,23 @@ namespace EmotesAPI
         internal static List<string> allClipNames = new List<string>();
         internal static void LoadResource(string resource)
         {
-            //DebugClass.Log($"Loading {resource}");
-            using (var assetStream = Assembly.GetExecutingAssembly().GetManifestResourceStream($"CustomEmotesAPI.{resource}"))
-            {
-                var MainAssetBundle = AssetBundle.LoadFromStream(assetStream);
-
-                ResourcesAPI.AddProvider(new AssetBundleResourcesProvider($"@CustomEmotesAPI_{resource}", MainAssetBundle));
-            }
+            Assets.AddBundle($"Models.{resource}");
         }
         public const string VERSION = "1.0.0";
         internal static float Actual_MSX = 69;
+        public static CustomEmotesAPI instance;
         public void Awake()
         {
+            instance = this;
             DebugClass.SetLogger(base.Logger);
             Settings.RunAll();
             Register.Init();
             AnimationReplacements.RunAll();
+            float WhosSteveJobs = 69420;
+            if (Settings.DontTouchThis.Value < 101)
+            {
+                WhosSteveJobs = Settings.DontTouchThis.Value;
+            }
             On.RoR2.SceneCatalog.OnActiveSceneChanged += (orig, self, scene) =>
             {
                 orig(self, scene);
@@ -51,15 +53,23 @@ namespace EmotesAPI
                     item.Value.syncTimer = 0f;
                     item.Value.syncPlayerCount = 0;
                 }
+                if (scene.name == "title" && WhosSteveJobs < 101)
+                {
+                    AkSoundEngine.SetRTPCValue("Volume_MSX", WhosSteveJobs);
+                    Actual_MSX = WhosSteveJobs;
+                    WhosSteveJobs = 69420;
+                }
                 BoneMapper.allMappers.Clear();
             };
             On.RoR2.AudioManager.VolumeConVar.SetString += (orig, self, newValue) =>
             {
                 orig(self, newValue);
                 //Volume_MSX
-                if (self.GetFieldValue<string>("rtpcName") == "Volume_MSX")
+                if (self.GetFieldValue<string>("rtpcName") == "Volume_MSX" && WhosSteveJobs > 100)
                 {
-                    Actual_MSX = float.Parse(newValue);
+                    Actual_MSX = float.Parse(newValue, CultureInfo.InvariantCulture);
+                    BoneMapper.Current_MSX = Actual_MSX;
+                    Settings.DontTouchThis.Value = float.Parse(newValue, CultureInfo.InvariantCulture);
                 }
             };
             On.RoR2.PlayerCharacterMasterController.FixedUpdate += (orig, self) =>
@@ -114,8 +124,8 @@ namespace EmotesAPI
                                 flag = false;
                             }
                         }
-                        newState = player.GetButton(7) && !Input.GetKey(EmoteWheel.emoteButton); //left click
-                        newState2 = player.GetButton(8) && !Input.GetKey(EmoteWheel.emoteButton); //right click
+                        newState = player.GetButton(7) && !Settings.EmoteWheel.Value.IsDown(); //left click
+                        newState2 = player.GetButton(8) && !Settings.EmoteWheel.Value.IsDown(); //right click
                         newState3 = player.GetButton(9);
                         newState4 = player.GetButton(10);
                         newState5 = player.GetButton(5);
@@ -142,9 +152,9 @@ namespace EmotesAPI
                 }
             };
         }
-        public static void AddCustomAnimation(string name, AnimationClip animationClip, bool looping, string _wwiseEventName = "", string _wwiseStopEvent = "", HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip secondaryAnimation = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false)
+        public static void AddCustomAnimation(AnimationClip animationClip, bool looping, string _wwiseEventName = "", string _wwiseStopEvent = "", HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip secondaryAnimation = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true)
         {
-            if (BoneMapper.animClips.ContainsKey(name))
+            if (BoneMapper.animClips.ContainsKey(animationClip.name))
             {
                 //DebugClass.Log($"Error #1: [{name}] is already defined as a custom emote but is trying to be added. Skipping");
                 return;
@@ -153,9 +163,17 @@ namespace EmotesAPI
                 rootBonesToIgnore = new HumanBodyBones[0];
             if (soloBonesToIgnore == null)
                 soloBonesToIgnore = new HumanBodyBones[0];
-            CustomAnimationClip clip = new CustomAnimationClip(animationClip, looping, _wwiseEventName, _wwiseStopEvent, rootBonesToIgnore, soloBonesToIgnore, secondaryAnimation, dimWhenClose, stopWhenMove, stopWhenAttack);
-            allClipNames.Add(name);
-            BoneMapper.animClips.Add(name, clip);
+            CustomAnimationClip clip = new CustomAnimationClip(animationClip, looping, _wwiseEventName, _wwiseStopEvent, rootBonesToIgnore, soloBonesToIgnore, secondaryAnimation, dimWhenClose, stopWhenMove, stopWhenAttack, visible);
+            allClipNames.Add(animationClip.name);
+            BoneMapper.animClips.Add(animationClip.name, clip);
+        }
+
+        public static void AddCustomAnimation(Animator animator, bool[] looping, string[] _wwiseEventName = null, string[] _wwiseStopEvent = null, bool visible = true)
+        {
+            for (int i = 0; i < animator.runtimeAnimatorController.animationClips.Length; i++)
+            {
+                AddCustomAnimation(animator.runtimeAnimatorController.animationClips[i], looping[i], _wwiseEventName[i], _wwiseStopEvent[i], visible: visible);
+            }
         }
 
         public static void ImportArmature(GameObject bodyPrefab, GameObject rigToAnimate, int meshPos = 0, bool hideMeshes = true)

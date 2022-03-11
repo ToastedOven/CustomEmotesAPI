@@ -23,6 +23,7 @@ internal static class AnimationReplacements
 {
     internal static void RunAll()
     {
+
         CustomEmotesAPI.LoadResource("customemotespackage");
         CustomEmotesAPI.LoadResource("enfucker");
         ChangeAnims();
@@ -170,7 +171,8 @@ internal class CustomAnimationClip : MonoBehaviour
     internal bool dimAudioWhenClose;
     internal bool stopOnAttack;
     internal bool stopOnMove;
-    internal CustomAnimationClip(AnimationClip _clip, bool _loop/*, bool _shouldSyncronize = false*/, string _wwiseEventName = "", string _wwiseStopEvent = "", HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip _secondaryClip = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false)
+    internal bool visibility;
+    internal CustomAnimationClip(AnimationClip _clip, bool _loop/*, bool _shouldSyncronize = false*/, string _wwiseEventName = "", string _wwiseStopEvent = "", HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip _secondaryClip = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true)
     {
         if (rootBonesToIgnore == null)
             rootBonesToIgnore = new HumanBodyBones[0];
@@ -184,6 +186,7 @@ internal class CustomAnimationClip : MonoBehaviour
         dimAudioWhenClose = dimWhenClose;
         stopOnAttack = stopWhenAttack;
         stopOnMove = stopWhenMove;
+        visibility = visible;
         //int count = 0;
         //float timer = 0;
         if (_wwiseEventName != "" && _wwiseStopEvent == "")
@@ -239,7 +242,7 @@ internal class BoneMapper : MonoBehaviour
     bool twopart = false;
     public static Dictionary<string, CustomAnimationClip> animClips = new Dictionary<string, CustomAnimationClip>();
     public CustomAnimationClip currentClip = null;
-    private static float Current_MSX = 69;
+    internal static float Current_MSX = 69;
     internal static List<BoneMapper> allMappers = new List<BoneMapper>();
     private bool local = false;
     internal static bool moving = false;

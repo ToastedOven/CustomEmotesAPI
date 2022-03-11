@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>8</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -39,11 +40,23 @@
     <Reference Include="Chip">
       <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\dnspy\Chip.dll</HintPath>
     </Reference>
+    <Reference Include="com.unity.multiplayer-hlapi.Runtime">
+      <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\com.unity.multiplayer-hlapi.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="Decalicious">
+      <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\Decalicious.dll</HintPath>
+    </Reference>
     <Reference Include="DireseekerMod">
       <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\dnspy\DireseekerMod.dll</HintPath>
     </Reference>
+    <Reference Include="EOS">
+      <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\EOS.dll</HintPath>
+    </Reference>
     <Reference Include="Facepunch.Steamworks">
       <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\Facepunch.Steamworks.dll</HintPath>
+    </Reference>
+    <Reference Include="GenericIK">
+      <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\GenericIK.dll</HintPath>
     </Reference>
     <Reference Include="HGCSharpUtils">
       <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\HGCSharpUtils.dll</HintPath>
@@ -57,11 +70,20 @@
     <Reference Include="KdTreeLib">
       <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\KdTreeLib.dll</HintPath>
     </Reference>
+    <Reference Include="KinematicCharacterController">
+      <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\KinematicCharacterController.dll</HintPath>
+    </Reference>
+    <Reference Include="LegacyResourcesAPI">
+      <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\LegacyResourcesAPI.dll</HintPath>
+    </Reference>
     <Reference Include="Lemurian">
       <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\dnspy\Lemurian.dll</HintPath>
     </Reference>
-    <Reference Include="MMHOOK_Assembly-CSharp">
-      <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\BepInEx\plugins\MMHOOK\MMHOOK_Assembly-CSharp.dll</HintPath>
+    <Reference Include="MMHOOK_RoR2">
+      <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\BepInEx\plugins\MMHOOK\MMHOOK_RoR2.dll</HintPath>
+    </Reference>
+    <Reference Include="ModLoader">
+      <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\ModLoader.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Cecil">
       <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\BepInEx\core\Mono.Cecil.dll</HintPath>
@@ -86,6 +108,9 @@
     </Reference>
     <Reference Include="MonoMod.Utils">
       <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\BepInEx\core\MonoMod.Utils.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="pb_Stl">
       <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\pb_Stl.dll</HintPath>
@@ -120,11 +145,20 @@
     <Reference Include="Rewired_CSharp">
       <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\Rewired_CSharp.dll</HintPath>
     </Reference>
+    <Reference Include="Rewired_Windows">
+      <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\Rewired_Windows.dll</HintPath>
+    </Reference>
     <Reference Include="Rewired_Windows_Lib">
       <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\Rewired_Windows_Lib.dll</HintPath>
     </Reference>
     <Reference Include="RiskOfOptions">
       <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\BepInEx\plugins\RiskOfOptions.dll</HintPath>
+    </Reference>
+    <Reference Include="RoR2">
+      <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\RoR2.dll</HintPath>
+    </Reference>
+    <Reference Include="SimpleJSON">
+      <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\SimpleJSON.dll</HintPath>
     </Reference>
     <Reference Include="Starstorm2">
       <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\BepInEx\plugins\Starstorm2.dll</HintPath>
@@ -147,8 +181,26 @@
     <Reference Include="System.Xml.XPath.XDocument">
       <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\System.Xml.XPath.XDocument.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.Addressables">
+      <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\Unity.Addressables.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.Postprocessing.Runtime">
       <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\Unity.Postprocessing.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.ProBuilder">
+      <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\Unity.ProBuilder.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.ProBuilder.Csg">
+      <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\Unity.ProBuilder.Csg.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.ProBuilder.KdTree">
+      <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\Unity.ProBuilder.KdTree.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.ProBuilder.Poly2Tri">
+      <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\Unity.ProBuilder.Poly2Tri.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.ProBuilder.Stl">
+      <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\Unity.ProBuilder.Stl.dll</HintPath>
     </Reference>
     <Reference Include="Unity.RenderPipelines.Core.Runtime">
       <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\Unity.RenderPipelines.Core.Runtime.dll</HintPath>
@@ -156,8 +208,17 @@
     <Reference Include="Unity.RenderPipelines.Core.ShaderLibrary">
       <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\Unity.RenderPipelines.Core.ShaderLibrary.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.ResourceManager">
+      <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\Unity.ResourceManager.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.ScriptableBuildPipeline">
+      <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\Unity.ScriptableBuildPipeline.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.TextMeshPro">
       <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\Unity.TextMeshPro.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Timeline">
+      <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\Unity.Timeline.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine">
       <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\UnityEngine.dll</HintPath>
@@ -167,6 +228,9 @@
     </Reference>
     <Reference Include="UnityEngine.AIModule">
       <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\UnityEngine.AIModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AndroidJNIModule">
+      <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\UnityEngine.AndroidJNIModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AnimationModule">
       <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\UnityEngine.AnimationModule.dll</HintPath>
@@ -201,6 +265,9 @@
     <Reference Include="UnityEngine.DirectorModule">
       <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\UnityEngine.DirectorModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.DSPGraphModule">
+      <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\UnityEngine.DSPGraphModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.FileSystemHttpModule">
       <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\UnityEngine.FileSystemHttpModule.dll</HintPath>
     </Reference>
@@ -218,6 +285,9 @@
     </Reference>
     <Reference Include="UnityEngine.IMGUIModule">
       <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.InputLegacyModule">
+      <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.InputModule">
       <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\UnityEngine.InputModule.dll</HintPath>
@@ -269,6 +339,9 @@
     </Reference>
     <Reference Include="UnityEngine.SubstanceModule">
       <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\UnityEngine.SubstanceModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.SubsystemsModule">
+      <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\UnityEngine.SubsystemsModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.TerrainModule">
       <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\UnityEngine.TerrainModule.dll</HintPath>
@@ -348,6 +421,9 @@
     <Reference Include="UnityEngine.WindModule">
       <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\UnityEngine.WindModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.XR.LegacyInputHelpers">
+      <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\UnityEngine.XR.LegacyInputHelpers.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.XRModule">
       <HintPath>..\..\..\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2_Data\Managed\UnityEngine.XRModule.dll</HintPath>
     </Reference>
@@ -360,7 +436,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="copy /y &quot;I:\CustomEmotesAPI\CustomEmotesAPI\CustomEmotesAPI\bin\Debug\netstandard2.0\CustomEmotesAPI.dll&quot; &quot;I:\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\BepInEx\plugins\CustomEmotesAPI.dll&quot;&#xD;&#xA;&quot;I:\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2.exe&quot;" />
+    <Exec Command="copy /y &quot;G:\CustomEmotesAPI\CustomEmotesAPI\CustomEmotesAPI\bin\Debug\netstandard2.0\CustomEmotesAPI.dll&quot; &quot;G:\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\BepInEx\plugins\CustomEmotesAPI.dll&quot;&#xD;&#xA;&quot;G:\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2.exe&quot;" />
   </Target>
 
 </Project>
