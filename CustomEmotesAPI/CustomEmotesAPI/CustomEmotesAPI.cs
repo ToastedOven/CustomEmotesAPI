@@ -40,6 +40,17 @@ namespace EmotesAPI
             }
             return Input.GetKey(entry.Value.MainKey);
         }
+        internal static bool GetKeyPressed(ConfigEntry<KeyboardShortcut> entry)
+        {
+            foreach (var item in entry.Value.Modifiers)
+            {
+                if (!Input.GetKey(item))
+                {
+                    return false;
+                }
+            }
+            return Input.GetKeyDown(entry.Value.MainKey);
+        }
         public const string VERSION = "1.0.0";
         internal static float Actual_MSX = 69;
         public static CustomEmotesAPI instance;
@@ -47,6 +58,7 @@ namespace EmotesAPI
         {
             instance = this;
             DebugClass.SetLogger(base.Logger);
+            CustomEmotesAPI.LoadResource("customemotespackage");
             Settings.RunAll();
             Register.Init();
             AnimationReplacements.RunAll();
@@ -58,6 +70,10 @@ namespace EmotesAPI
             On.RoR2.SceneCatalog.OnActiveSceneChanged += (orig, self, scene) =>
             {
                 orig(self, scene);
+                if (allClipNames != null)
+                {
+                    ScrollManager.SetupButtons(allClipNames);
+                }
                 AkSoundEngine.SetRTPCValue("Volume_MSX", Actual_MSX);
                 foreach (var item in BoneMapper.animClips)
                 {

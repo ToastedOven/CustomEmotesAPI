@@ -34,7 +34,7 @@ namespace EmotesAPI
                 AssetIndices[path] = index;
             }
 
-            DebugClass.Log($"Loaded AssetBundle: {assetBundleLocation}");
+            //DebugClass.Log($"Loaded AssetBundle: {assetBundleLocation}");
         }
 
         public static T Load<T>(string assetName) where T : UnityEngine.Object

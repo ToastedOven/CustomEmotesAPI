@@ -40,12 +40,15 @@ public class EmoteWheel : MonoBehaviour
     {
         selected = gameObjects[0];
         events = input.GetFieldValue<RoR2.UI.MPEventSystem>("eventSystem");
-
+        RefreshWheels();
+    }
+    internal void RefreshWheels()
+    {
         for (int i = 0; i < gameObjects.Count; i++)
         {
-            rightPage[i] = CustomEmotesAPI.allClipNames[UnityEngine.Random.Range(0, CustomEmotesAPI.allClipNames.Count)];
-            leftPage[i] = CustomEmotesAPI.allClipNames[UnityEngine.Random.Range(0, CustomEmotesAPI.allClipNames.Count)];
-            middlePage[i] = gameObjects[i].GetComponentInChildren<TextMeshProUGUI>().text;
+            middlePage[i] = ScrollManager.circularButtons[i].GetComponentInChildren<TextMeshProUGUI>().text;
+            leftPage[i] = ScrollManager.circularButtons[i + 8].GetComponentInChildren<TextMeshProUGUI>().text;
+            rightPage[i] = ScrollManager.circularButtons[i + 16].GetComponentInChildren<TextMeshProUGUI>().text;
         }
     }
     void Update()
@@ -103,7 +106,7 @@ public class EmoteWheel : MonoBehaviour
                 break;
         }
         //DebugClass.Log($"----------{activePage} ---  {joy.color} ---  {joy.sprite.name}");
-        if (CustomEmotesAPI.GetKey(Settings.Left))
+        if (CustomEmotesAPI.GetKeyPressed(Settings.Left))
         {
             if (transform.localPosition == v)
             {
@@ -120,7 +123,7 @@ public class EmoteWheel : MonoBehaviour
                 }
             }
         }
-        if (CustomEmotesAPI.GetKey(Settings.Right))
+        if (CustomEmotesAPI.GetKeyPressed(Settings.Right))
         {
             if (transform.localPosition == v)
             {

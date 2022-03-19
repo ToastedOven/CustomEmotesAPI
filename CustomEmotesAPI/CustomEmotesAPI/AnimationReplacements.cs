@@ -22,15 +22,15 @@ using UnityEngine.AddressableAssets;
 
 internal static class AnimationReplacements
 {
+    internal static GameObject g;
     internal static void RunAll()
     {
-        CustomEmotesAPI.LoadResource("customemotespackage");
         CustomEmotesAPI.LoadResource("enfucker");
         ChangeAnims();
         On.RoR2.UI.HUD.Awake += (orig, self) =>
         {
             orig(self);
-            GameObject g = GameObject.Instantiate(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/emotewheel.prefab"));
+            g = GameObject.Instantiate(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/emotewheel.prefab"));
             foreach (var item in g.GetComponentsInChildren<TextMeshProUGUI>())
             {
                 item.font = self.mainContainer.transform.Find("MainUIArea").Find("SpringCanvas").Find("UpperLeftCluster").Find("MoneyRoot").Find("ValueText").GetComponent<TextMeshProUGUI>().font;
@@ -75,8 +75,10 @@ internal static class AnimationReplacements
                 ApplyAnimationStuff(RoR2Content.Survivors.Toolbot, "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/mult.prefab");
                 ApplyAnimationStuff(RoR2Content.Survivors.Treebot, "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/rex.prefab");
                 ApplyAnimationStuff(RoR2Content.Survivors.Commando, "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commando.prefab");
-                ApplyAnimationStuff(RoR2Content.Survivors.Huntress, "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/huntressBetterMaybeFixed.prefab");
+                ApplyAnimationStuff(RoR2Content.Survivors.Huntress, "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/huntress2022.prefab");
                 ApplyAnimationStuff(RoR2Content.Survivors.Bandit2, "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/bandit.prefab");
+                ApplyAnimationStuff(SurvivorCatalog.FindSurvivorDefFromBody(Addressables.LoadAssetAsync<GameObject>("RoR2/DLC1/VoidSurvivor/VoidSurvivorBody.prefab").WaitForCompletion()), "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/voidsurvivor.prefab");
+                ApplyAnimationStuff(SurvivorCatalog.FindSurvivorDefFromBody(Addressables.LoadAssetAsync<GameObject>("RoR2/DLC1/Railgunner/RailgunnerBody.prefab").WaitForCompletion()), "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/railgunner.prefab");
                 ApplyAnimationStuff(Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Heretic/HereticBody.prefab").WaitForCompletion(), "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/heretic.prefab", 3);
             }
             foreach (var item in SurvivorCatalog.allSurvivorDefs)
@@ -106,8 +108,7 @@ internal static class AnimationReplacements
     }
     internal static void ApplyAnimationStuff(SurvivorDef index, string resource, int pos = 0)
     {
-        var survivorDef = index;
-        ApplyAnimationStuff(survivorDef.bodyPrefab, resource, pos);
+        ApplyAnimationStuff(index.bodyPrefab, resource, pos);
     }
     internal static void ApplyAnimationStuff(GameObject bodyPrefab, string resource, int pos = 0)
     {
@@ -249,6 +250,12 @@ internal class BoneMapper : MonoBehaviour
     internal static bool attacking = false;
     public void PlayAnim(string s)
     {
+        bool footL = false;
+        bool footR = false;
+        bool upperLegR = false;
+        bool upperLegL = false;
+        bool lowerLegR = false;
+        bool lowerLegL = false;
         a2.enabled = true;
         List<string> dontAnimateUs = new List<string>();
         if (s != "none")
@@ -261,34 +268,107 @@ internal class BoneMapper : MonoBehaviour
             currentClip = animClips[s];
             foreach (var item in currentClip.soloIgnoredBones)
             {
+                if (item == HumanBodyBones.LeftFoot)
+                {
+                    footL = true;
+                }
+                if (item == HumanBodyBones.RightFoot)
+                {
+                    footR = true;
+                }
+                if (item == HumanBodyBones.LeftLowerLeg)
+                {
+                    lowerLegL = true;
+                }
+                if (item == HumanBodyBones.LeftUpperLeg)
+                {
+                    upperLegL = true;
+                }
+                if (item == HumanBodyBones.RightLowerLeg)
+                {
+                    lowerLegR = true;
+                }
+                if (item == HumanBodyBones.RightUpperLeg)
+                {
+                    upperLegR = true;
+                }
                 if (a2.GetBoneTransform(item))
                     dontAnimateUs.Add(a2.GetBoneTransform(item).name);
             }
             foreach (var item in currentClip.rootIgnoredBones)
             {
+
+                if (item == HumanBodyBones.LeftUpperLeg || item == HumanBodyBones.Hips)
+                {
+                    upperLegL = true;
+                    lowerLegL = true;
+                    footL = true;
+                }
+                if (item == HumanBodyBones.RightUpperLeg || item == HumanBodyBones.Hips)
+                {
+                    upperLegR = true;
+                    lowerLegR = true;
+                    footR = true;
+                }
                 if (a2.GetBoneTransform(item))
                     dontAnimateUs.Add(a2.GetBoneTransform(item).name);
                 foreach (var bone in a2.GetBoneTransform(item).GetComponentsInChildren<Transform>())
                 {
+
                     dontAnimateUs.Add(bone.name);
                 }
             }
         }
+        bool left = upperLegL && lowerLegL && footL;
+        bool right = upperLegR && lowerLegR && footR;
+        Transform LeftLegIK = null;
+        Transform RightLegIK = null;
+        //DebugClass.Log($"----------{smr2.gameObject.ToString()}");
         for (int i = 0; i < smr2.bones.Length; i++)
         {
             try
             {
+                if (right && (smr2.bones[i].gameObject.ToString() == "IKLegTarget.r (UnityEngine.GameObject)" || smr2.bones[i].gameObject.ToString() == "FootControl.r (UnityEngine.GameObject)"))
+                {
+                    RightLegIK = smr2.bones[i];
+                }
+                else if (left && (smr2.bones[i].gameObject.ToString() == "IKLegTarget.l (UnityEngine.GameObject)" || smr2.bones[i].gameObject.ToString() == "FootControl.l (UnityEngine.GameObject)"))
+                {
+                    LeftLegIK = smr2.bones[i];
+                }
                 if (smr2.bones[i].gameObject.GetComponent<ParentConstraint>() && !dontAnimateUs.Contains(smr2.bones[i].name))
                 {
+                    //DebugClass.Log($"-{i}---------{smr2.bones[i].gameObject}");
                     smr2.bones[i].gameObject.GetComponent<ParentConstraint>().constraintActive = true;
                 }
                 else if (dontAnimateUs.Contains(smr2.bones[i].name))
                 {
+                    //DebugClass.Log($"dontanimateme-{i}---------{smr2.bones[i].gameObject}");
                     smr2.bones[i].gameObject.GetComponent<ParentConstraint>().constraintActive = false;
                 }
             }
             catch (Exception)
             {
+            }
+        }
+        if (left && LeftLegIK)//we can leave ik for the legs
+        {
+            if (LeftLegIK.gameObject.GetComponent<ParentConstraint>())
+                LeftLegIK.gameObject.GetComponent<ParentConstraint>().constraintActive = false;
+            foreach (var item in LeftLegIK.gameObject.GetComponentsInChildren<Transform>())
+            {
+                if (item.gameObject.GetComponent<ParentConstraint>())
+                    item.gameObject.GetComponent<ParentConstraint>().constraintActive = false;
+            }
+        }
+        if (right && RightLegIK)
+        {
+            if (RightLegIK.gameObject.GetComponent<ParentConstraint>())
+                RightLegIK.gameObject.GetComponent<ParentConstraint>().constraintActive = false;
+            foreach (var item in RightLegIK.gameObject.GetComponentsInChildren<Transform>())
+            {
+                if (item.gameObject.GetComponent<ParentConstraint>())
+                    item.gameObject.GetComponent<ParentConstraint>().constraintActive = false;
             }
         }
         foreach (var item in stopEvents)
@@ -498,6 +578,11 @@ internal class BoneMapper : MonoBehaviour
                 {
                     AkSoundEngine.PostEvent("StopEmotes", gameObject);
                     AkSoundEngine.PostEvent("StopCaramell", gameObject);
+                    if (smr2.transform.parent.gameObject.name == "mdlVoidSurvivor" || smr2.transform.parent.gameObject.name == "mdlMage")
+                    {
+                        smr2.transform.parent.gameObject.SetActive(false);
+                        smr2.transform.parent.gameObject.SetActive(true);
+                    }
                     for (int i = 0; i < smr2.bones.Length; i++)
                     {
                         try
