@@ -6,7 +6,9 @@ using BepInEx.Configuration;
 using RiskOfOptions;
 using RiskOfOptions.Options;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 using UnityEngine.Events;
+using RoR2.UI;
 
 namespace EmotesAPI
 {
@@ -42,8 +44,12 @@ namespace EmotesAPI
         public static ConfigEntry<string> emote22;
         public static ConfigEntry<string> emote23;
 
+
+
+        public static GameObject NakedButton = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/UI/NakedButton.prefab").WaitForCompletion();
         public static void RunAll()
         {
+            UnityEngine.Object.DestroyImmediate(NakedButton.GetComponentInChildren<LanguageTextMeshController>());
             Setup();
             Yes();
         }
@@ -60,6 +66,30 @@ namespace EmotesAPI
             GameObject.DontDestroyOnLoad(picker);
             picker.GetComponent<Canvas>().scaleFactor = 2;
             picker.transform.Find("emotepicker").Find("EmoteContainer").gameObject.AddComponent<ScrollManager>();
+            var basedonwhatbasedonthehardwareinside = picker.transform.Find("emotepicker").Find("Wheels").transform.Find("Middle");
+            for (int i = 0; i < 8; i++)
+            {
+                GameObject nut = GameObject.Instantiate(Settings.NakedButton);
+                nut.transform.SetParent(basedonwhatbasedonthehardwareinside.Find($"Button ({i})"));
+                nut.transform.localPosition = new Vector3(-80, -20, 0);
+                nut.transform.localScale = new Vector3(.8f, .8f, .8f);
+            }
+            basedonwhatbasedonthehardwareinside = picker.transform.Find("emotepicker").Find("Wheels").transform.Find("Left");
+            for (int i = 0; i < 8; i++)
+            {
+                GameObject nut = GameObject.Instantiate(Settings.NakedButton);
+                nut.transform.SetParent(basedonwhatbasedonthehardwareinside.Find($"Button ({i})"));
+                nut.transform.localPosition = new Vector3(-80, -20, 0);
+                nut.transform.localScale = new Vector3(.8f, .8f, .8f);
+            }
+            basedonwhatbasedonthehardwareinside = picker.transform.Find("emotepicker").Find("Wheels").transform.Find("Right");
+            for (int i = 0; i < 8; i++)
+            {
+                GameObject nut = GameObject.Instantiate(Settings.NakedButton);
+                nut.transform.SetParent(basedonwhatbasedonthehardwareinside.Find($"Button ({i})"));
+                nut.transform.localPosition = new Vector3(-80, -20, 0);
+                nut.transform.localScale = new Vector3(.8f, .8f, .8f);
+            }
 
             EmoteWheel = CustomEmotesAPI.instance.Config.Bind<KeyboardShortcut>("Controls", "Emote Wheel", new KeyboardShortcut(KeyCode.C), "Displays the emote wheel");
             Left = CustomEmotesAPI.instance.Config.Bind<KeyboardShortcut>("Controls", "Cycle Wheel Left", new KeyboardShortcut(KeyCode.Mouse0), "Cycles the emote wheel left");
@@ -102,6 +132,9 @@ namespace EmotesAPI
             picker.SetActive(false);
             picker.SetActive(true);
             picker.transform.Find("emotepicker").gameObject.SetActive(true);
+            picker.transform.SetAsLastSibling();
+            picker.GetComponent<Canvas>().sortingOrder = 5;
+            
         }
     }
 }

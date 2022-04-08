@@ -18,6 +18,7 @@ using R2API.Networking.Interfaces;
 using EmotesAPI;
 using System.Collections;
 using UnityEngine.UI;
+using RoR2.UI;
 
 public class EmoteWheel : MonoBehaviour
 {
@@ -38,6 +39,16 @@ public class EmoteWheel : MonoBehaviour
     float XScale = 1, YScale = 1;
     void Start()
     {
+        foreach (var item in CustomEmotesAPI.nameTokenSpritePairs)
+        {
+            //DebugClass.Log($"{NetworkUser.readOnlyLocalPlayersList[0].master?.GetBody().baseNameToken}         {item.nameToken}");
+            if (NetworkUser.readOnlyLocalPlayersList[0].master?.GetBody().baseNameToken == item.nameToken)
+            {
+                //DebugClass.Log($"{item.nameToken}         {item.sprite}");
+                joy.sprite = item.sprite;
+                break;
+            }
+        }
         selected = gameObjects[0];
         events = input.GetFieldValue<RoR2.UI.MPEventSystem>("eventSystem");
         RefreshWheels();
@@ -46,9 +57,9 @@ public class EmoteWheel : MonoBehaviour
     {
         for (int i = 0; i < gameObjects.Count; i++)
         {
-            middlePage[i] = ScrollManager.circularButtons[i].GetComponentInChildren<TextMeshProUGUI>().text;
-            leftPage[i] = ScrollManager.circularButtons[i + 8].GetComponentInChildren<TextMeshProUGUI>().text;
-            rightPage[i] = ScrollManager.circularButtons[i + 16].GetComponentInChildren<TextMeshProUGUI>().text;
+            middlePage[i] = ScrollManager.circularButtons[i].GetComponentInChildren<HGTextMeshProUGUI>().text;
+            leftPage[i] = ScrollManager.circularButtons[i + 8].GetComponentInChildren<HGTextMeshProUGUI>().text;
+            rightPage[i] = ScrollManager.circularButtons[i + 16].GetComponentInChildren<HGTextMeshProUGUI>().text;
         }
     }
     void Update()
@@ -159,42 +170,18 @@ public class EmoteWheel : MonoBehaviour
                     YScale = Screen.height / 1080f;
                     if (Math.Abs(Input.mousePosition.x - (Screen.width / 2.0f)) < 30f * XScale && Math.Abs(Input.mousePosition.y - (Screen.height / 2.0f)) < 30f * YScale)
                     {
-                        var identity = NetworkUser.readOnlyLocalPlayersList[0].master?.GetBody().gameObject.GetComponent<NetworkIdentity>();
-
-                        if (!NetworkServer.active)
-                        {
-                            new SyncAnimationToServer(identity.netId, "none").Send(R2API.Networking.NetworkDestination.Server);
-                        }
-                        else
-                        {
-                            new SyncAnimationToClients(identity.netId, "none").Send(R2API.Networking.NetworkDestination.Clients);
-
-                            GameObject bodyObject = Util.FindNetworkObject(identity.netId);
-                            bodyObject.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>().PlayAnim("none");
-                        }
-
+                        CustomEmotesAPI.PlayAnimation("none");
                     }
                     else
                     {
-                        var identity = NetworkUser.readOnlyLocalPlayersList[0].master?.GetBody().gameObject.GetComponent<NetworkIdentity>();
-
-                        if (!NetworkServer.active)
-                        {
-                            new SyncAnimationToServer(identity.netId, selected.GetComponentInChildren<TextMeshProUGUI>().text).Send(R2API.Networking.NetworkDestination.Server);
-                        }
-                        else
-                        {
-                            new SyncAnimationToClients(identity.netId, selected.GetComponentInChildren<TextMeshProUGUI>().text).Send(R2API.Networking.NetworkDestination.Clients);
-                            GameObject bodyObject = Util.FindNetworkObject(identity.netId);
-                            bodyObject.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>().PlayAnim(selected.GetComponentInChildren<TextMeshProUGUI>().text);
-                        }
+                        CustomEmotesAPI.PlayAnimation(selected.GetComponentInChildren<TextMeshProUGUI>().text);
                     }
                 }
                 catch (Exception e)
                 {
                     DebugClass.Log(e);
                 }
-                if (events.cursorOpenerForGamepadCount != 0)
+                if (events.cursorOpenerForGamepadCount > 0)
                 {
                     events.cursorOpenerForGamepadCount -= 1;
                     events.cursorOpenerCount -= 1;

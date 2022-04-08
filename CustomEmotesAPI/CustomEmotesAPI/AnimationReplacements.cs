@@ -25,7 +25,6 @@ internal static class AnimationReplacements
     internal static GameObject g;
     internal static void RunAll()
     {
-        CustomEmotesAPI.LoadResource("enfucker");
         ChangeAnims();
         On.RoR2.UI.HUD.Awake += (orig, self) =>
         {
@@ -81,16 +80,16 @@ internal static class AnimationReplacements
                 ApplyAnimationStuff(SurvivorCatalog.FindSurvivorDefFromBody(Addressables.LoadAssetAsync<GameObject>("RoR2/DLC1/Railgunner/RailgunnerBody.prefab").WaitForCompletion()), "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/railgunner.prefab");
                 ApplyAnimationStuff(Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Heretic/HereticBody.prefab").WaitForCompletion(), "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/heretic.prefab", 3);
             }
-            foreach (var item in SurvivorCatalog.allSurvivorDefs)
-            {
-                if (item.bodyPrefab.name == "EnforcerBody")
-                {
-                    var skele = Assets.Load<GameObject>("@CustomEmotesAPI_enfucker:assets/fbx/enfucker/enfucker.prefab");
-                    skele.GetComponent<Animator>().runtimeAnimatorController = GameObject.Instantiate<GameObject>(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commando.prefab")).GetComponent<Animator>().runtimeAnimatorController;
-                    CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
-                }
-                //DebugClass.Log($"---{item.bodyPrefab.name}");
-            }
+            //foreach (var item in SurvivorCatalog.allSurvivorDefs)
+            //{
+            //    if (item.bodyPrefab.name == "EnforcerBody")
+            //    {
+            //        var skele = Assets.Load<GameObject>("@CustomEmotesAPI_enfucker:assets/fbx/enfucker/enfucker.prefab");
+            //        skele.GetComponent<Animator>().runtimeAnimatorController = GameObject.Instantiate<GameObject>(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commando.prefab")).GetComponent<Animator>().runtimeAnimatorController;
+            //        CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
+            //    }
+            //    //DebugClass.Log($"---{item.bodyPrefab.name}");
+            //}
             //bodyPrefab = survivorDef.displayPrefab;
             //animcontroller = Resources.Load<GameObject>(resource);
             //animcontroller.transform.parent = bodyPrefab.GetComponent<ModelLocator>().modelTransform;
@@ -159,9 +158,9 @@ internal static class AnimationReplacements
         test.model = bodyPrefab.GetComponent<ModelLocator>().modelTransform.gameObject;
     }
 }
-internal class CustomAnimationClip : MonoBehaviour
+public class CustomAnimationClip : MonoBehaviour
 {
-    internal AnimationClip clip, secondaryClip; //DONT SUPPORT MULTI CLIP ANIMATIONS TO SYNC
+    public AnimationClip clip, secondaryClip; //DONT SUPPORT MULTI CLIP ANIMATIONS TO SYNC
     internal bool looping;
     internal string wwiseEvent;
     //internal bool syncronizeAnimation;
@@ -206,10 +205,8 @@ internal class CustomAnimationClip : MonoBehaviour
             //}
             wwiseEvent = _wwiseEventName;
         }
-        //DebugClass.Log($"----------checking?");
         if (soloBonesToIgnore.Length != 0)
         {
-            //Debug.Log($"---woah it's here-------{ignoredBones[0]}");
             soloIgnoredBones = new List<HumanBodyBones>(soloBonesToIgnore);
         }
         else
@@ -219,7 +216,6 @@ internal class CustomAnimationClip : MonoBehaviour
 
         if (rootBonesToIgnore.Length != 0)
         {
-            //Debug.Log($"---woah it's here-------{ignoredBones[0]}");
             rootIgnoredBones = new List<HumanBodyBones>(rootBonesToIgnore);
         }
         else
@@ -228,7 +224,7 @@ internal class CustomAnimationClip : MonoBehaviour
         }
     }
 }
-internal class BoneMapper : MonoBehaviour
+public class BoneMapper : MonoBehaviour
 {
     public static List<string> stopEvents = new List<string>();
     public SkinnedMeshRenderer smr1, smr2;
@@ -262,10 +258,19 @@ internal class BoneMapper : MonoBehaviour
         {
             if (!animClips.ContainsKey(s))
             {
-                DebugClass.Log($"No animation bound to the name [{s}]");
+                DebugClass.Log($"No emote bound to the name [{s}]");
                 return;
             }
+            CustomEmotesAPI.Changed(s, this);
             currentClip = animClips[s];
+            try
+            {
+                currentClip.clip.ToString();
+            }
+            catch (Exception)
+            {
+                return;
+            }
             foreach (var item in currentClip.soloIgnoredBones)
             {
                 if (item == HumanBodyBones.LeftFoot)
@@ -319,6 +324,10 @@ internal class BoneMapper : MonoBehaviour
                 }
             }
         }
+        else
+        {
+            CustomEmotesAPI.Changed(s, this);
+        }
         bool left = upperLegL && lowerLegL && footL;
         bool right = upperLegR && lowerLegR && footR;
         Transform LeftLegIK = null;
@@ -347,8 +356,9 @@ internal class BoneMapper : MonoBehaviour
                     smr2.bones[i].gameObject.GetComponent<ParentConstraint>().constraintActive = false;
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                DebugClass.Log($"{e}");
             }
         }
         if (left && LeftLegIK)//we can leave ik for the legs
@@ -387,6 +397,7 @@ internal class BoneMapper : MonoBehaviour
             AkSoundEngine.PostEvent(currentClip.wwiseEvent, gameObject);
         }
         AnimatorOverrideController animController = new AnimatorOverrideController(a2.runtimeAnimatorController);
+
         if (currentClip.secondaryClip)
         {
             animController["Dab"] = currentClip.clip;
@@ -398,7 +409,14 @@ internal class BoneMapper : MonoBehaviour
         {
             animController["Floss"] = currentClip.clip;
             a2.runtimeAnimatorController = animController;
-            a2.Play("Loop", -1, currentClip.syncTimer / currentClip.clip.length);
+            if (currentClip.clip.length != 0)
+            {
+                a2.Play("Loop", -1, currentClip.syncTimer / currentClip.clip.length);
+            }
+            else
+            {
+                a2.Play("Loop", -1, 0);
+            }
         }
         else
         {
@@ -421,18 +439,11 @@ internal class BoneMapper : MonoBehaviour
     }
     void Start()
     {
-        try
-        {
-            var body = NetworkUser.readOnlyLocalPlayersList[0].master?.GetBody();
-            if (body && Vector3.Distance(transform.parent.position, body.transform.position) < 4f)
-            {
-                local = true;
-            }
-        }
-        catch (Exception)
-        {
-        }
         allMappers.Add(this);
+        foreach (var item in allMappers)
+        {
+            //DebugClass.Log($"----------{item.a1.name}");
+        }
         foreach (var item in model.GetComponents<DynamicBone>())
         {
             try
@@ -489,11 +500,17 @@ internal class BoneMapper : MonoBehaviour
             }
         }
     }
+    float interval = 0;
     void Update()
     {
         if (local)
         {
             float closestDimmingSource = 20f;
+            interval += Time.deltaTime;
+            if (interval > 5f)
+            {
+                interval -= 5f;
+            }
             foreach (var item in allMappers)
             {
                 try
@@ -522,35 +539,23 @@ internal class BoneMapper : MonoBehaviour
             }
             try
             {
-                if (attacking && currentClip.stopOnAttack)
+                if ((attacking && currentClip.stopOnAttack) || (moving && currentClip.stopOnMove))
                 {
-                    var identity = NetworkUser.readOnlyLocalPlayersList[0].master?.GetBody().gameObject.GetComponent<NetworkIdentity>();
-
-                    if (!NetworkServer.active)
-                    {
-                        new SyncAnimationToServer(identity.netId, "none").Send(R2API.Networking.NetworkDestination.Server);
-                    }
-                    else
-                    {
-                        new SyncAnimationToClients(identity.netId, "none").Send(R2API.Networking.NetworkDestination.Clients);
-                        GameObject bodyObject = Util.FindNetworkObject(identity.netId);
-                        bodyObject.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>().PlayAnim("none");
-                    }
+                    CustomEmotesAPI.PlayAnimation("none");
                 }
-                if (moving && currentClip.stopOnMove)
+            }
+            catch (Exception)
+            {
+            }
+        }
+        else
+        {
+            try
+            {
+                var body = NetworkUser.readOnlyLocalPlayersList[0].master?.GetBody();
+                if (body && Vector3.Distance(transform.parent.position, body.transform.position) < 4f)
                 {
-                    var identity = NetworkUser.readOnlyLocalPlayersList[0].master?.GetBody().gameObject.GetComponent<NetworkIdentity>();
-
-                    if (!NetworkServer.active)
-                    {
-                        new SyncAnimationToServer(identity.netId, "none").Send(R2API.Networking.NetworkDestination.Server);
-                    }
-                    else
-                    {
-                        new SyncAnimationToClients(identity.netId, "none").Send(R2API.Networking.NetworkDestination.Clients);
-                        GameObject bodyObject = Util.FindNetworkObject(identity.netId);
-                        bodyObject.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>().PlayAnim("none");
-                    }
+                    local = true;
                 }
             }
             catch (Exception)
@@ -559,11 +564,14 @@ internal class BoneMapper : MonoBehaviour
         }
         foreach (var item in animClips)
         {
-            if (item.Value.syncPlayerCount != 0)
+            if (item.Value != null)
             {
-                item.Value.syncTimer += Time.deltaTime;
-                item.Value.syncTimer = item.Value.syncTimer % item.Value.clip.length;
-                //DebugClass.Log($"----------adding to {item.Key}   [{item.Value.syncTimer}]");
+                if (item.Value.syncPlayerCount != 0)
+                {
+                    item.Value.syncTimer += Time.deltaTime;
+                    item.Value.syncTimer = item.Value.syncTimer % item.Value.clip.length;
+                    //DebugClass.Log($"----------adding to {item.Key}   [{item.Value.syncTimer}]");
+                }
             }
         }
         if (a2.GetCurrentAnimatorStateInfo(0).IsName("none"))
@@ -629,7 +637,7 @@ internal class BoneMapper : MonoBehaviour
         }
     }
 }
-internal class BonePair
+public class BonePair
 {
     public Transform original, newiginal;
     public BonePair(Transform n, Transform o)

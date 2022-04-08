@@ -7,12 +7,13 @@
 
   <ItemGroup>
     <None Remove="customemotespackage" />
-    <None Remove="enfucker" />
+    <None Remove="customemotespackage2" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="customemotespackage" />
-    <EmbeddedResource Include="enfucker" />
+    <EmbeddedResource Include="customemotespackage2" />
+    <EmbeddedResource Include="moisture_animationreplacements" />
   </ItemGroup>
 
   <ItemGroup>
@@ -388,7 +389,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="copy /y &quot;G:\CustomEmotesAPI\CustomEmotesAPI\CustomEmotesAPI\bin\Debug\netstandard2.0\CustomEmotesAPI.dll&quot; &quot;G:\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\BepInEx\plugins\CustomEmotesAPI.dll&quot;&#xD;&#xA;&quot;G:\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\Risk of Rain 2.exe&quot;" />
+    <Exec Command="copy /y &quot;G:\CustomEmotesAPI\CustomEmotesAPI\CustomEmotesAPI\bin\Debug\netstandard2.0\CustomEmotesAPI.dll&quot; &quot;G:\Windows.old.000\Program Files (x86)\Steam\steamapps\common\Risk of Rain 2\BepInEx\plugins\CustomEmotesAPI.dll&quot;" />
   </Target>
 
 </Project>

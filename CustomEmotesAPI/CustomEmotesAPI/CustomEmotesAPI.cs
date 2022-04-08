@@ -17,6 +17,7 @@ using BepInEx.Configuration;
 
 namespace EmotesAPI
 {
+    [BepInDependency("com.gemumoddo.MoistureUpset", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("com.bepis.r2api")]
     [BepInDependency("com.rune580.riskofoptions")]
     [BepInPlugin("com.weliveinasociety.CustomEmotesAPI", "Custom Emotes API", VERSION)]
@@ -24,6 +25,41 @@ namespace EmotesAPI
     [R2APISubmoduleDependency("PrefabAPI", "ResourcesAPI", "NetworkingAPI")]
     public class CustomEmotesAPI : BaseUnityPlugin
     {
+        public struct NameTokenWithSprite
+        {
+            public string nameToken;
+            public Sprite sprite;
+        }
+        public static List<NameTokenWithSprite> nameTokenSpritePairs = new List<NameTokenWithSprite>();
+        public static bool CreateNameTokenSpritePair(string nameToken, Sprite sprite)
+        {
+            NameTokenWithSprite temp = new NameTokenWithSprite();
+            temp.nameToken = nameToken;
+            temp.sprite = sprite;
+            if (nameTokenSpritePairs.Contains(temp))
+            {
+                return false;
+            }
+            nameTokenSpritePairs.Add(temp);
+            return true;
+        }
+        void CreateBaseNameTokenPairs()
+        {
+            CreateNameTokenSpritePair("CAPTAIN_BODY_NAME", Assets.Load<Sprite>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/captain.png"));
+            CreateNameTokenSpritePair("COMMANDO_BODY_NAME", Assets.Load<Sprite>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/commando.png"));
+            CreateNameTokenSpritePair("MERC_BODY_NAME", Assets.Load<Sprite>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/merc.png"));
+            CreateNameTokenSpritePair("ENGI_BODY_NAME", Assets.Load<Sprite>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/engi.png"));
+            CreateNameTokenSpritePair("HUNTRESS_BODY_NAME", Assets.Load<Sprite>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/huntress.png"));
+            CreateNameTokenSpritePair("MAGE_BODY_NAME", Assets.Load<Sprite>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/artificer.png"));
+            CreateNameTokenSpritePair("TOOLBOT_BODY_NAME", Assets.Load<Sprite>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/mult.png"));
+            CreateNameTokenSpritePair("TREEBOT_BODY_NAME", Assets.Load<Sprite>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/rex.png"));
+            CreateNameTokenSpritePair("LOADER_BODY_NAME", Assets.Load<Sprite>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/loader.png"));
+            CreateNameTokenSpritePair("CROCO_BODY_NAME", Assets.Load<Sprite>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/acrid.png"));
+            CreateNameTokenSpritePair("BANDIT2_BODY_NAME", Assets.Load<Sprite>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/bandit.png"));
+            CreateNameTokenSpritePair("VOIDSURVIVOR_BODY_NAME", Assets.Load<Sprite>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/voidfiend.png"));
+            CreateNameTokenSpritePair("RAILGUNNER_BODY_NAME", Assets.Load<Sprite>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/railgunner.png"));
+            //CreateNameTokenSpritePair("HERETIC_BODY_NAME", Assets.Load<Sprite>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/heretic.png"));
+        }
         internal static List<string> allClipNames = new List<string>();
         internal static void LoadResource(string resource)
         {
@@ -59,10 +95,15 @@ namespace EmotesAPI
             instance = this;
             DebugClass.SetLogger(base.Logger);
             CustomEmotesAPI.LoadResource("customemotespackage");
+            if (!BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("com.gemumoddo.MoistureUpset"))
+            {
+                CustomEmotesAPI.LoadResource("moisture_animationreplacements"); // I don't remember what's in here that makes importing emotes work, don't @ me
+            }
             Settings.RunAll();
             Register.Init();
             AnimationReplacements.RunAll();
             float WhosSteveJobs = 69420;
+            CreateBaseNameTokenPairs();
             if (Settings.DontTouchThis.Value < 101)
             {
                 WhosSteveJobs = Settings.DontTouchThis.Value;
@@ -77,8 +118,11 @@ namespace EmotesAPI
                 AkSoundEngine.SetRTPCValue("Volume_MSX", Actual_MSX);
                 foreach (var item in BoneMapper.animClips)
                 {
-                    item.Value.syncTimer = 0f;
-                    item.Value.syncPlayerCount = 0;
+                    if (item.Value != null)
+                    {
+                        item.Value.syncTimer = 0f;
+                        item.Value.syncPlayerCount = 0;
+                    }
                 }
                 if (scene.name == "title" && WhosSteveJobs < 101)
                 {
@@ -87,6 +131,7 @@ namespace EmotesAPI
                     WhosSteveJobs = 69420;
                 }
                 BoneMapper.allMappers.Clear();
+                localMapper = null;
             };
             On.RoR2.AudioManager.VolumeConVar.SetString += (orig, self, newValue) =>
             {
@@ -172,18 +217,26 @@ namespace EmotesAPI
                     self.GetFieldValue<InputBankTest>("bodyInputs").sprint.PushState(newState7);
                     self.GetFieldValue<InputBankTest>("bodyInputs").activateEquipment.PushState(newState8);
                     self.GetFieldValue<InputBankTest>("bodyInputs").ping.PushState(newState9);
-                    if (self.hasEffectiveAuthority && self.GetFieldValue<CharacterBody>("body") && self.GetFieldValue<InputBankTest>("bodyInputs") && self.GetFieldValue<InputBankTest>("bodyInputs").ping.justPressed)
-                    {
-                        self.GetFieldValue<PingerController>("pingerController").AttemptPing(new Ray(self.GetFieldValue<InputBankTest>("bodyInputs").aimOrigin, self.GetFieldValue<InputBankTest>("bodyInputs").aimDirection), self.GetFieldValue<CharacterBody>("body").gameObject);
-                    }
+                    self.InvokeMethod("CheckPinging");
                 }
             };
+        }
+        public static void AddNonAnimatingEmote(string emoteName, bool visible = true)
+        {
+            if (visible)
+                allClipNames.Add(emoteName);
+            BoneMapper.animClips.Add(emoteName, null);
         }
         public static void AddCustomAnimation(AnimationClip animationClip, bool looping, string _wwiseEventName = "", string _wwiseStopEvent = "", HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip secondaryAnimation = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true)
         {
             if (BoneMapper.animClips.ContainsKey(animationClip.name))
             {
-                //DebugClass.Log($"Error #1: [{name}] is already defined as a custom emote but is trying to be added. Skipping");
+                Debug.Log($"EmotesError: [{animationClip.name}] is already defined as a custom emote but is trying to be added. Skipping");
+                return;
+            }
+            if (!animationClip.isHumanMotion)
+            {
+                Debug.Log($"EmotesError: [{animationClip.name}] is not a humanoid animation!");
                 return;
             }
             if (rootBonesToIgnore == null)
@@ -191,7 +244,8 @@ namespace EmotesAPI
             if (soloBonesToIgnore == null)
                 soloBonesToIgnore = new HumanBodyBones[0];
             CustomAnimationClip clip = new CustomAnimationClip(animationClip, looping, _wwiseEventName, _wwiseStopEvent, rootBonesToIgnore, soloBonesToIgnore, secondaryAnimation, dimWhenClose, stopWhenMove, stopWhenAttack, visible);
-            allClipNames.Add(animationClip.name);
+            if (visible)
+                allClipNames.Add(animationClip.name);
             BoneMapper.animClips.Add(animationClip.name, clip);
         }
 
@@ -233,6 +287,28 @@ namespace EmotesAPI
 
                 GameObject bodyObject = Util.FindNetworkObject(identity.netId);
                 bodyObject.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>().PlayAnim(animationName);
+            }
+        }
+        static BoneMapper localMapper = null;
+        public static AnimationClip GetLocalBodyAnimationClip()
+        {
+            if (!localMapper)
+            {
+                localMapper = NetworkUser.readOnlyLocalPlayersList[0].master?.GetBody().gameObject.GetComponentInChildren<BoneMapper>();
+            }
+            return localMapper.currentClip.clip;
+        }
+        public static BoneMapper[] GetAllBoneMappers()
+        {
+            return BoneMapper.allMappers.ToArray();
+        }
+        public delegate void AnimationChanged(string newAnimation, BoneMapper mapper);
+        public static event AnimationChanged animChanged;
+        internal static void Changed(string newAnimation, BoneMapper mapper) //is a neat game made by a developer who endorses nsfw content while calling it a fine game for kids
+        {
+            if (animChanged != null)
+            {
+                animChanged(newAnimation, mapper);
             }
         }
     }
