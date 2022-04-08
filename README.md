@@ -12,6 +12,10 @@ First off, if you are at all confused about any of this, I made a repo with exam
 - Place `CustomEmotesAPI.AddCustomAnimation(AnimationClip, false);` somewhere in your awake call. Where AnimationClip is the animation clip you imported from unity.
 - If done correctly, this will load the animation into the list of available emotes. Feel free to change the bool to `true` and import a looping animation as well.
 
+- You can also import custom survivors with
+`CustomEmotesAPI.ImportArmature(bodyPrefab, underskeleton)`
+Underskeleton is a copy of the bodyPrefab which is setup as a humanoid skeleton
+
 ## AddCustomAnimation Params
             AnimationClip animationClip                     //Default animation
 			
