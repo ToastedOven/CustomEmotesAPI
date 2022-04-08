@@ -56,7 +56,7 @@ namespace EmotesAPI
         private static void Setup()
         {
             ModSettingsManager.SetModDescription($"Made by Metrosexual Fruitcake#6969\n\nVersion {CustomEmotesAPI.VERSION}");
-
+            ModSettingsManager.SetModIcon(Assets.Load<Sprite>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/icon.png"));
             //ModSettingsManager.CreateCategory("Controls");
         }
         internal static GameObject picker;
