@@ -87,7 +87,7 @@ namespace EmotesAPI
             }
             return Input.GetKeyDown(entry.Value.MainKey);
         }
-        public const string VERSION = "1.0.0";
+        public const string VERSION = "1.0.1";
         internal static float Actual_MSX = 69;
         public static CustomEmotesAPI instance;
         public void Awake()
@@ -270,6 +270,7 @@ namespace EmotesAPI
                     item.sharedMesh = null;
                 }
             }
+            rigToAnimate.GetComponent<Animator>().runtimeAnimatorController = GameObject.Instantiate<GameObject>(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commando.prefab")).GetComponent<Animator>().runtimeAnimatorController;
             AnimationReplacements.ApplyAnimationStuff(bodyPrefab, rigToAnimate, meshPos);
         }
 

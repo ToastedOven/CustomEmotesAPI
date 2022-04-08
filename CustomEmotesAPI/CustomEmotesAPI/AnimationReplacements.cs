@@ -80,16 +80,6 @@ internal static class AnimationReplacements
                 ApplyAnimationStuff(SurvivorCatalog.FindSurvivorDefFromBody(Addressables.LoadAssetAsync<GameObject>("RoR2/DLC1/Railgunner/RailgunnerBody.prefab").WaitForCompletion()), "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/railgunner.prefab");
                 ApplyAnimationStuff(Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Heretic/HereticBody.prefab").WaitForCompletion(), "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/heretic.prefab", 3);
             }
-            //foreach (var item in SurvivorCatalog.allSurvivorDefs)
-            //{
-            //    if (item.bodyPrefab.name == "EnforcerBody")
-            //    {
-            //        var skele = Assets.Load<GameObject>("@CustomEmotesAPI_enfucker:assets/fbx/enfucker/enfucker.prefab");
-            //        skele.GetComponent<Animator>().runtimeAnimatorController = GameObject.Instantiate<GameObject>(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commando.prefab")).GetComponent<Animator>().runtimeAnimatorController;
-            //        CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
-            //    }
-            //    //DebugClass.Log($"---{item.bodyPrefab.name}");
-            //}
             //bodyPrefab = survivorDef.displayPrefab;
             //animcontroller = Resources.Load<GameObject>(resource);
             //animcontroller.transform.parent = bodyPrefab.GetComponent<ModelLocator>().modelTransform;
