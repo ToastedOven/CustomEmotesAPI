@@ -39,19 +39,7 @@ public class EmoteWheel : MonoBehaviour
     float XScale = 1, YScale = 1;
     void Start()
     {
-        foreach (var item in CustomEmotesAPI.nameTokenSpritePairs)
-        {
-            //DebugClass.Log($"{NetworkUser.readOnlyLocalPlayersList[0].master?.GetBody().baseNameToken}         {item.nameToken}");
-            if (NetworkUser.readOnlyLocalPlayersList[0].master?.GetBody().baseNameToken == item.nameToken)
-            {
-                //DebugClass.Log($"{item.nameToken}         {item.sprite}");
-                joy.sprite = item.sprite;
-                break;
-            }
-        }
-        selected = gameObjects[0];
-        events = input.GetFieldValue<RoR2.UI.MPEventSystem>("eventSystem");
-        RefreshWheels();
+
     }
     internal void RefreshWheels()
     {
@@ -62,8 +50,33 @@ public class EmoteWheel : MonoBehaviour
             rightPage[i] = ScrollManager.circularButtons[i + 16].GetComponentInChildren<HGTextMeshProUGUI>().text;
         }
     }
+    bool started = false;
     void Update()
     {
+        if (!started)
+        {
+            try
+            {
+                foreach (var item in CustomEmotesAPI.nameTokenSpritePairs)
+                {
+                    //DebugClass.Log($"{NetworkUser.readOnlyLocalPlayersList[0].master?.GetBody().baseNameToken}         {item.nameToken}");
+                    if (NetworkUser.readOnlyLocalPlayersList[0].master?.GetBody().baseNameToken == item.nameToken)
+                    {
+                        //DebugClass.Log($"{item.nameToken}         {item.sprite}");
+                        joy.sprite = item.sprite;
+                        break;
+                    }
+                }
+                selected = gameObjects[0];
+                events = input.GetFieldValue<RoR2.UI.MPEventSystem>("eventSystem");
+                RefreshWheels();
+                started = true;
+            }
+            catch (Exception)
+            {
+                return;
+            }
+        }
         if (RoR2.PauseManager.isPaused)
             return;
 

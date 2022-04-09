@@ -116,13 +116,10 @@ namespace EmotesAPI
                     ScrollManager.SetupButtons(allClipNames);
                 }
                 AkSoundEngine.SetRTPCValue("Volume_MSX", Actual_MSX);
-                foreach (var item in BoneMapper.animClips)
+                for (int i = 0; i < CustomAnimationClip.syncPlayerCount.Count; i++)
                 {
-                    if (item.Value != null)
-                    {
-                        item.Value.syncTimer = 0f;
-                        item.Value.syncPlayerCount = 0;
-                    }
+                    CustomAnimationClip.syncTimer[i] = 0;
+                    CustomAnimationClip.syncPlayerCount[i] = 0;
                 }
                 if (scene.name == "title" && WhosSteveJobs < 101)
                 {
@@ -227,7 +224,7 @@ namespace EmotesAPI
                 allClipNames.Add(emoteName);
             BoneMapper.animClips.Add(emoteName, null);
         }
-        public static void AddCustomAnimation(AnimationClip animationClip, bool looping, string _wwiseEventName = "", string _wwiseStopEvent = "", HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip secondaryAnimation = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true)
+        public static void AddCustomAnimation(AnimationClip animationClip, bool looping, string _wwiseEventName = "", string _wwiseStopEvent = "", HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip secondaryAnimation = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true, bool syncAnim = false, bool syncAudio = false)
         {
             if (BoneMapper.animClips.ContainsKey(animationClip.name))
             {
@@ -243,17 +240,17 @@ namespace EmotesAPI
                 rootBonesToIgnore = new HumanBodyBones[0];
             if (soloBonesToIgnore == null)
                 soloBonesToIgnore = new HumanBodyBones[0];
-            CustomAnimationClip clip = new CustomAnimationClip(animationClip, looping, _wwiseEventName, _wwiseStopEvent, rootBonesToIgnore, soloBonesToIgnore, secondaryAnimation, dimWhenClose, stopWhenMove, stopWhenAttack, visible);
+            CustomAnimationClip clip = new CustomAnimationClip(animationClip, looping, _wwiseEventName, _wwiseStopEvent, rootBonesToIgnore, soloBonesToIgnore, secondaryAnimation, dimWhenClose, stopWhenMove, stopWhenAttack, visible, syncAnim, syncAudio);
             if (visible)
                 allClipNames.Add(animationClip.name);
             BoneMapper.animClips.Add(animationClip.name, clip);
         }
 
-        public static void AddCustomAnimation(Animator animator, bool[] looping, string[] _wwiseEventName = null, string[] _wwiseStopEvent = null, bool visible = true)
+        internal static void AddCustomAnimation(Animator animator, bool[] looping, string[] _wwiseEventName = null, string[] _wwiseStopEvent = null, bool[] visible = null, bool[] syncAnim = null, bool[] syncAudio = null)
         {
             for (int i = 0; i < animator.runtimeAnimatorController.animationClips.Length; i++)
             {
-                AddCustomAnimation(animator.runtimeAnimatorController.animationClips[i], looping[i], _wwiseEventName[i], _wwiseStopEvent[i], visible: visible);
+                AddCustomAnimation(animator.runtimeAnimatorController.animationClips[i], looping[i], _wwiseEventName[i], _wwiseStopEvent[i], visible: visible[i], syncAnim: syncAnim[i], syncAudio: syncAudio[i]);
             }
         }
 

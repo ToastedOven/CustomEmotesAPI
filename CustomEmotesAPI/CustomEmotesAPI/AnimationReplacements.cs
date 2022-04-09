@@ -150,19 +150,24 @@ internal static class AnimationReplacements
 }
 public class CustomAnimationClip : MonoBehaviour
 {
-    public AnimationClip clip, secondaryClip; //DONT SUPPORT MULTI CLIP ANIMATIONS TO SYNC
+    public AnimationClip clip, secondaryClip; //DONT SUPPORT MULTI CLIP ANIMATIONS TO SYNC     //but why not? how hard could it be, I'm sure I left that note for a reason....
     internal bool looping;
     internal string wwiseEvent;
-    //internal bool syncronizeAnimation;
-    internal float syncTimer = 0f;
-    internal int syncPlayerCount = 0;
+    internal bool syncronizeAudio;
     internal List<HumanBodyBones> soloIgnoredBones;
     internal List<HumanBodyBones> rootIgnoredBones;
     internal bool dimAudioWhenClose;
     internal bool stopOnAttack;
     internal bool stopOnMove;
     internal bool visibility;
-    internal CustomAnimationClip(AnimationClip _clip, bool _loop/*, bool _shouldSyncronize = false*/, string _wwiseEventName = "", string _wwiseStopEvent = "", HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip _secondaryClip = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true)
+
+
+
+    internal bool syncronizeAnimation;
+    internal int syncPos;
+    internal static List<float> syncTimer = new List<float>();
+    internal static List<int> syncPlayerCount = new List<int>();
+    internal CustomAnimationClip(AnimationClip _clip, bool _loop/*, bool _shouldSyncronize = false*/, string _wwiseEventName = "", string _wwiseStopEvent = "", HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip _secondaryClip = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true, bool syncAnim = false, bool syncAudio = false)
     {
         if (rootBonesToIgnore == null)
             rootBonesToIgnore = new HumanBodyBones[0];
@@ -212,6 +217,11 @@ public class CustomAnimationClip : MonoBehaviour
         {
             rootIgnoredBones = new List<HumanBodyBones>();
         }
+        syncronizeAnimation = syncAnim;
+        syncronizeAudio = syncAudio;
+        syncPos = syncTimer.Count;
+        syncTimer.Add(0);
+        syncPlayerCount.Add(0);
     }
 }
 public class BoneMapper : MonoBehaviour
@@ -244,6 +254,17 @@ public class BoneMapper : MonoBehaviour
         bool lowerLegL = false;
         a2.enabled = true;
         List<string> dontAnimateUs = new List<string>();
+        try
+        {
+            currentClip.clip.ToString();
+            if (currentClip.syncronizeAnimation)
+            {
+                CustomAnimationClip.syncPlayerCount[currentClip.syncPos]--;
+            }
+        }
+        catch (Exception)
+        {
+        }
         if (s != "none")
         {
             if (!animClips.ContainsKey(s))
@@ -388,12 +409,30 @@ public class BoneMapper : MonoBehaviour
         }
         AnimatorOverrideController animController = new AnimatorOverrideController(a2.runtimeAnimatorController);
 
+
+        if (currentClip.syncronizeAnimation)
+        {
+            CustomAnimationClip.syncPlayerCount[currentClip.syncPos]++;
+            if (CustomAnimationClip.syncPlayerCount[currentClip.syncPos] == 1)
+            {
+                CustomAnimationClip.syncTimer[currentClip.syncPos] = 0;
+            }
+        }
         if (currentClip.secondaryClip)
         {
-            animController["Dab"] = currentClip.clip;
-            animController["nobones"] = currentClip.secondaryClip;
-            a2.runtimeAnimatorController = animController;
-            a2.Play("PoopToLoop", -1, 0f);
+            if (CustomAnimationClip.syncTimer[currentClip.syncPos] > currentClip.clip.length)
+            {
+                animController["Floss"] = currentClip.secondaryClip;
+                a2.runtimeAnimatorController = animController;
+                a2.Play("Loop", -1, ((CustomAnimationClip.syncTimer[currentClip.syncPos] - currentClip.clip.length) % currentClip.secondaryClip.length) / currentClip.secondaryClip.length);
+            }
+            else
+            {
+                animController["Dab"] = currentClip.clip;
+                animController["nobones"] = currentClip.secondaryClip;
+                a2.runtimeAnimatorController = animController;
+                a2.Play("PoopToLoop", -1, (CustomAnimationClip.syncTimer[currentClip.syncPos] % currentClip.clip.length) / currentClip.clip.length);
+            }
         }
         else if (currentClip.looping)
         {
@@ -401,7 +440,7 @@ public class BoneMapper : MonoBehaviour
             a2.runtimeAnimatorController = animController;
             if (currentClip.clip.length != 0)
             {
-                a2.Play("Loop", -1, currentClip.syncTimer / currentClip.clip.length);
+                a2.Play("Loop", -1, (CustomAnimationClip.syncTimer[currentClip.syncPos] % currentClip.clip.length) / currentClip.clip.length);
             }
             else
             {
@@ -412,7 +451,7 @@ public class BoneMapper : MonoBehaviour
         {
             animController["Default Dance"] = currentClip.clip;
             a2.runtimeAnimatorController = animController;
-            a2.Play("Poop", -1, currentClip.syncTimer / currentClip.clip.length);
+            a2.Play("Poop", -1, (CustomAnimationClip.syncTimer[currentClip.syncPos] % currentClip.clip.length) / currentClip.clip.length);
         }
         twopart = false;
     }
@@ -495,6 +534,13 @@ public class BoneMapper : MonoBehaviour
     {
         if (local)
         {
+            for (int i = 0; i < CustomAnimationClip.syncPlayerCount.Count; i++)
+            {
+                if (CustomAnimationClip.syncPlayerCount[i] != 0)
+                {
+                    CustomAnimationClip.syncTimer[i] += Time.deltaTime;
+                }
+            }
             float closestDimmingSource = 20f;
             interval += Time.deltaTime;
             if (interval > 5f)
@@ -543,25 +589,18 @@ public class BoneMapper : MonoBehaviour
             try
             {
                 var body = NetworkUser.readOnlyLocalPlayersList[0].master?.GetBody();
-                if (body && Vector3.Distance(transform.parent.position, body.transform.position) < 4f)
+                //if (body && Vector3.Distance(transform.parent.position, body.transform.position) < 4f)
+                //{
+                //    local = true;
+                //}
+                if (body.gameObject.GetComponent<ModelLocator>().modelTransform == transform.parent)
                 {
+
                     local = true;
                 }
             }
             catch (Exception)
             {
-            }
-        }
-        foreach (var item in animClips)
-        {
-            if (item.Value != null)
-            {
-                if (item.Value.syncPlayerCount != 0)
-                {
-                    item.Value.syncTimer += Time.deltaTime;
-                    item.Value.syncTimer = item.Value.syncTimer % item.Value.clip.length;
-                    //DebugClass.Log($"----------adding to {item.Key}   [{item.Value.syncTimer}]");
-                }
             }
         }
         if (a2.GetCurrentAnimatorStateInfo(0).IsName("none"))
