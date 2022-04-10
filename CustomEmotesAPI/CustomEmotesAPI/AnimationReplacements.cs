@@ -184,22 +184,24 @@ public class CustomAnimationClip : MonoBehaviour
         visibility = visible;
         //int count = 0;
         //float timer = 0;
-        if (_wwiseEventName != "" && _wwiseStopEvent == "")
-        {
-            //DebugClass.Log($"Error #2: wwiseEventName is declared but wwiseStopEvent isn't skipping sound implementation for [{clip.name}]");
-        }
-        else if (_wwiseEventName == "" && _wwiseStopEvent != "")
-        {
-            //DebugClass.Log($"Error #3: wwiseStopEvent is declared but wwiseEventName isn't skipping sound implementation for [{clip.name}]");
-        }
-        else if (_wwiseEventName != "")
-        {
-            //if (!_shouldSyncronize)
-            //{
-            BoneMapper.stopEvents.Add(_wwiseStopEvent);
-            //}
-            wwiseEvent = _wwiseEventName;
-        }
+        //if (_wwiseEventName != "" && _wwiseStopEvent == "")
+        //{
+        //    //DebugClass.Log($"Error #2: wwiseEventName is declared but wwiseStopEvent isn't skipping sound implementation for [{clip.name}]");
+        //}
+        //else if (_wwiseEventName == "" && _wwiseStopEvent != "")
+        //{
+        //    //DebugClass.Log($"Error #3: wwiseStopEvent is declared but wwiseEventName isn't skipping sound implementation for [{clip.name}]");
+        //}
+        //else if (_wwiseEventName != "")
+        //{
+        //    //if (!_shouldSyncronize)
+        //    //{
+        //    BoneMapper.stopEvents.Add(_wwiseStopEvent);
+        //    //}
+        //    wwiseEvent = _wwiseEventName;
+        //}
+        BoneMapper.stopEvents.Add(_wwiseStopEvent);
+        BoneMapper.startEvents.Add(_wwiseEventName);
         if (soloBonesToIgnore.Length != 0)
         {
             soloIgnoredBones = new List<HumanBodyBones>(soloBonesToIgnore);
@@ -227,6 +229,8 @@ public class CustomAnimationClip : MonoBehaviour
 public class BoneMapper : MonoBehaviour
 {
     public static List<string> stopEvents = new List<string>();
+    public static List<string> startEvents = new List<string>();
+    internal List<GameObject> audioObjects = new List<GameObject>();
     public SkinnedMeshRenderer smr1, smr2;
     public Animator a1, a2;
     public HealthComponent h;
@@ -257,9 +261,26 @@ public class BoneMapper : MonoBehaviour
         try
         {
             currentClip.clip.ToString();
-            if (currentClip.syncronizeAnimation)
+            if (currentClip.syncronizeAnimation || currentClip.syncronizeAudio)
             {
                 CustomAnimationClip.syncPlayerCount[currentClip.syncPos]--;
+            }
+            if (stopEvents[currentClip.syncPos] != "")
+            {
+                if (!currentClip.syncronizeAudio)
+                {
+                    AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos], audioObjects[currentClip.syncPos]);
+                }
+                audioObjects[currentClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
+
+                if (CustomAnimationClip.syncPlayerCount[currentClip.syncPos] == 0 && currentClip.syncronizeAudio)
+                {
+                    foreach (var item in allMappers)
+                    {
+                        AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos], item.audioObjects[currentClip.syncPos]);
+                        item.audioObjects[currentClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
+                    }
+                }
             }
         }
         catch (Exception)
@@ -392,10 +413,10 @@ public class BoneMapper : MonoBehaviour
                     item.gameObject.GetComponent<ParentConstraint>().constraintActive = false;
             }
         }
-        foreach (var item in stopEvents)
-        {
-            AkSoundEngine.PostEvent(item, gameObject);
-        }
+        //foreach (var item in stopEvents)
+        //{
+        //    AkSoundEngine.PostEvent(item, gameObject);
+        //}
         if (s == "none")
         {
             a2.Play("none", -1, 0f);
@@ -403,20 +424,29 @@ public class BoneMapper : MonoBehaviour
             currentClip = null;
             return;
         }
-        if (currentClip.wwiseEvent != "")
-        {
-            AkSoundEngine.PostEvent(currentClip.wwiseEvent, gameObject);
-        }
         AnimatorOverrideController animController = new AnimatorOverrideController(a2.runtimeAnimatorController);
-
-
-        if (currentClip.syncronizeAnimation)
+        if (currentClip.syncronizeAnimation || currentClip.syncronizeAudio)
         {
             CustomAnimationClip.syncPlayerCount[currentClip.syncPos]++;
-            if (CustomAnimationClip.syncPlayerCount[currentClip.syncPos] == 1)
+        }
+        if (currentClip.syncronizeAnimation && CustomAnimationClip.syncPlayerCount[currentClip.syncPos] == 1)
+        {
+            CustomAnimationClip.syncTimer[currentClip.syncPos] = 0;
+        }
+        if (startEvents[currentClip.syncPos] != "")
+        {
+            if (CustomAnimationClip.syncPlayerCount[currentClip.syncPos] == 1 && currentClip.syncronizeAudio)
             {
-                CustomAnimationClip.syncTimer[currentClip.syncPos] = 0;
+                foreach (var item in allMappers)
+                {
+                    AkSoundEngine.PostEvent(startEvents[currentClip.syncPos], item.audioObjects[currentClip.syncPos]);
+                }
             }
+            else if (!currentClip.syncronizeAudio)
+            {
+                AkSoundEngine.PostEvent(startEvents[currentClip.syncPos], audioObjects[currentClip.syncPos]);
+            }
+            audioObjects[currentClip.syncPos].transform.localPosition = Vector3.zero;
         }
         if (currentClip.secondaryClip)
         {
@@ -472,6 +502,14 @@ public class BoneMapper : MonoBehaviour
         foreach (var item in allMappers)
         {
             //DebugClass.Log($"----------{item.a1.name}");
+        }
+        foreach (var item in startEvents)
+        {
+            GameObject obj = new GameObject();
+            obj = GameObject.Instantiate(obj);
+            obj.transform.SetParent(transform);
+            obj.transform.localPosition = new Vector3(0, -10000, 0);
+            audioObjects.Add(obj);
         }
         foreach (var item in model.GetComponents<DynamicBone>())
         {
@@ -613,8 +651,6 @@ public class BoneMapper : MonoBehaviour
             {
                 if (a2.enabled)
                 {
-                    AkSoundEngine.PostEvent("StopEmotes", gameObject);
-                    AkSoundEngine.PostEvent("StopCaramell", gameObject);
                     if (smr2.transform.parent.gameObject.name == "mdlVoidSurvivor" || smr2.transform.parent.gameObject.name == "mdlMage")
                     {
                         smr2.transform.parent.gameObject.SetActive(false);
@@ -637,6 +673,35 @@ public class BoneMapper : MonoBehaviour
                 }
                 a1.enabled = true;
                 a2.enabled = false;
+                try
+                {
+                    currentClip.clip.ToString();
+                    if (currentClip.syncronizeAnimation || currentClip.syncronizeAudio)
+                    {
+                        CustomAnimationClip.syncPlayerCount[currentClip.syncPos]--;
+                    }
+                    if (stopEvents[currentClip.syncPos] != "")
+                    {
+                        if (!currentClip.syncronizeAudio)
+                        {
+                            AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos], audioObjects[currentClip.syncPos]);
+                        }
+                        audioObjects[currentClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
+
+                        if (CustomAnimationClip.syncPlayerCount[currentClip.syncPos] == 0 && currentClip.syncronizeAudio)
+                        {
+                            foreach (var item in allMappers)
+                            {
+                                AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos], item.audioObjects[currentClip.syncPos]);
+                                item.audioObjects[currentClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
+                            }
+                        }
+                    }
+                    currentClip = null;
+                }
+                catch (Exception)
+                {
+                }
             }
         }
         else
@@ -646,8 +711,8 @@ public class BoneMapper : MonoBehaviour
         }
         if (h.health <= 0)
         {
-            AkSoundEngine.PostEvent("StopEmotes", gameObject);
-            AkSoundEngine.PostEvent("StopCaramell", gameObject);
+            //AkSoundEngine.PostEvent("StopEmotes", gameObject);
+            //AkSoundEngine.PostEvent("StopCaramell", gameObject);
             for (int i = 0; i < smr2.bones.Length; i++)
             {
                 try
@@ -663,6 +728,13 @@ public class BoneMapper : MonoBehaviour
                 }
             }
             GameObject.Destroy(gameObject);
+        }
+    }
+    void OnDestroy()
+    {
+        foreach (var item in allMappers)
+        {
+            AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos], item.audioObjects[currentClip.syncPos]);
         }
     }
 }
