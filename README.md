@@ -38,6 +38,10 @@ Underskeleton is a copy of the bodyPrefab which is setup as a humanoid skeleton
             bool stopWhenAttack = false                     //Stops the animation if attacking
 			
             bool visible = true                             //Dictates if emote will show up in the normal list.
+			
+            bool syncAnim = false                           //Dictates if emote will sync the animation.
+			
+            bool syncAudio = false                          //Dictates if emote will sync audio (requires wwise start and stop events)
 
 
 ### Examples
@@ -60,3 +64,11 @@ Underskeleton is a copy of the bodyPrefab which is setup as a humanoid skeleton
 `CustomEmotesAPI.AddCustomAnimation(dabAnimClip, false, "Dab", "DabStop", upperLegs, hips);`
 
 If you're still lost, consider srolling up and cloning from the example repo or @ me on Discord @Metrosexual Fruitcake#6969
+
+### Changelog
+
+- Version 1.1.0: Fixed issue with less than perfect connections causing the emotewheel to lock up. Added the ability to sync audio and animation position of emotes. This changes how you import anim files. If anyone is currently working on an animation pack, you need to download the latest version and use it as a reference for your project.
+
+- Version 1.0.1: Fixed error with armature importing. You shouldn't have to change anything on your end.
+
+- Version 1.0.0: Initial Release
