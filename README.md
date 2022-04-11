@@ -67,6 +67,14 @@ If you're still lost, consider srolling up and cloning from the example repo or 
 
 ### Changelog
 
+- Version 1.1.4: Added advanced, experimental, rocket science, galaxy brain technology that will usually not work. But in some cases like with Sett, it will auto generate an animation rig if one isn't present. Fixed an issue with emotes getting desynced upon a player dying.
+
+- Version 1.1.3: Fixed crippling performance from last patch. Hopefully everything is sorted for real this time. Admittidly the method is a bit jank. My apolocheese
+
+- Version 1.1.2: Fixed the fix because I suck at coding :)
+
+- Version 1.1.1: Fixed incompatibility issue with AutoSprintMod.
+
 - Version 1.1.0: Fixed issue with less than perfect connections causing the emotewheel to lock up. Added the ability to sync audio and animation position of emotes. This changes how you import anim files. If anyone is currently working on an animation pack, you need to download the latest version and use it as a reference for your project.
 
 - Version 1.0.1: Fixed error with armature importing. You shouldn't have to change anything on your end.
