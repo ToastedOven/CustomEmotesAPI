@@ -39,7 +39,7 @@ public class EmoteWheel : MonoBehaviour
     float XScale = 1, YScale = 1;
     void Start()
     {
-
+        transform.localPosition = new Vector3(0, 2000, 0);
     }
     internal void RefreshWheels()
     {

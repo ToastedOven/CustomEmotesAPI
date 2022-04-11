@@ -79,6 +79,57 @@ internal static class AnimationReplacements
                 ApplyAnimationStuff(SurvivorCatalog.FindSurvivorDefFromBody(Addressables.LoadAssetAsync<GameObject>("RoR2/DLC1/VoidSurvivor/VoidSurvivorBody.prefab").WaitForCompletion()), "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/voidsurvivor.prefab");
                 ApplyAnimationStuff(SurvivorCatalog.FindSurvivorDefFromBody(Addressables.LoadAssetAsync<GameObject>("RoR2/DLC1/Railgunner/RailgunnerBody.prefab").WaitForCompletion()), "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/railgunner.prefab");
                 ApplyAnimationStuff(Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Heretic/HereticBody.prefab").WaitForCompletion(), "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/heretic.prefab", 3);
+
+                foreach (var item in SurvivorCatalog.allSurvivorDefs)
+                {
+                    if (item.bodyPrefab.GetComponentsInChildren<BoneMapper>().Length == 0)
+                    {
+                        DebugClass.Log($"{item.bodyPrefab.name} needs a bonemapper");
+                        try
+                        {
+                            if (item.bodyPrefab.GetComponent<ModelLocator>().modelTransform.GetComponent<Animator>().avatar.isHuman)
+                            {
+                                DebugClass.Log($"and it is humanoid, gonna attempt to give a bonemapper...");
+                                try
+                                {
+                                    var modelTransform = item.bodyPrefab.GetComponent<ModelLocator>().modelTransform;
+                                    if (modelTransform)
+                                    {
+                                        var skele = GameObject.Instantiate(modelTransform.gameObject);
+                                        Animator a = skele.GetComponent<Animator>();
+                                        a.avatar = item.bodyPrefab.GetComponent<ModelLocator>().modelTransform.GetComponent<Animator>().avatar;
+
+                                        foreach (var comp in skele.GetComponentsInChildren<Component>())
+                                        {
+                                            if (comp.GetType() != typeof(Animator) && comp.GetType() != typeof(Transform) && comp.GetType() != typeof(SkinnedMeshRenderer))
+                                            {
+                                                Component.Destroy(comp);
+                                            }
+                                        }
+                                        CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
+                                        DebugClass.Log($"Hey it worked!");
+                                    }
+                                    else
+                                    {
+                                        DebugClass.Log($"Nah it broke lmao");
+                                    }
+                                }
+                                catch (Exception)
+                                {
+                                    DebugClass.Log($"Nah it broke lmao");
+                                }
+                            }
+                            else
+                            {
+                                DebugClass.Log($"but it isn't humanoid :Sadge:");
+                            }
+                        }
+                        catch (Exception)
+                        {
+                            DebugClass.Log($"Something broke, L");
+                        }
+                    }
+                }
             }
             //bodyPrefab = survivorDef.displayPrefab;
             //animcontroller = Resources.Load<GameObject>(resource);
@@ -150,7 +201,7 @@ internal static class AnimationReplacements
 }
 public class CustomAnimationClip : MonoBehaviour
 {
-    public AnimationClip clip, secondaryClip; //DONT SUPPORT MULTI CLIP ANIMATIONS TO SYNC     //but why not? how hard could it be, I'm sure I left that note for a reason....
+    public AnimationClip clip, secondaryClip; //DONT SUPPORT MULTI CLIP ANIMATIONS TO SYNC     //but why not? how hard could it be, I'm sure I left that note for a reason....  //it was for a reason, but it works now
     internal bool looping;
     internal string wwiseEvent;
     internal bool syncronizeAudio;
@@ -732,9 +783,41 @@ public class BoneMapper : MonoBehaviour
     }
     void OnDestroy()
     {
-        foreach (var item in allMappers)
+        //foreach (var item in allMappers)
+        //{
+        //    AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos], item.audioObjects[currentClip.syncPos]);
+        //}
+        try
         {
-            AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos], item.audioObjects[currentClip.syncPos]);
+            currentClip.clip.ToString();
+            if (currentClip.syncronizeAnimation || currentClip.syncronizeAudio)
+            {
+                if (CustomAnimationClip.syncPlayerCount[currentClip.syncPos] > 0)
+                    CustomAnimationClip.syncPlayerCount[currentClip.syncPos]--;
+            }
+            if (stopEvents[currentClip.syncPos] != "")
+            {
+                if (!currentClip.syncronizeAudio)
+                {
+                    AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos], audioObjects[currentClip.syncPos]);
+                }
+                audioObjects[currentClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
+
+                if (CustomAnimationClip.syncPlayerCount[currentClip.syncPos] == 0 && currentClip.syncronizeAudio)
+                {
+                    foreach (var item in allMappers)
+                    {
+                        AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos], item.audioObjects[currentClip.syncPos]);
+                        item.audioObjects[currentClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
+                    }
+                }
+            }
+            BoneMapper.allMappers.Remove(this);
+            currentClip = null;
+        }
+        catch (Exception e)
+        {
+            BoneMapper.allMappers.Remove(this);
         }
     }
 }

@@ -87,7 +87,7 @@ namespace EmotesAPI
             }
             return Input.GetKeyDown(entry.Value.MainKey);
         }
-        public const string VERSION = "1.1.0";
+        public const string VERSION = "1.1.4";
         internal static float Actual_MSX = 69;
         public static CustomEmotesAPI instance;
         public void Awake()
@@ -143,79 +143,165 @@ namespace EmotesAPI
             };
             On.RoR2.PlayerCharacterMasterController.FixedUpdate += (orig, self) =>
             {
-                if (self.hasEffectiveAuthority && self.GetFieldValue<InputBankTest>("bodyInputs"))
+                orig(self);
+                if (CustomEmotesAPI.GetKey(Settings.EmoteWheel))
                 {
-                    bool newState = false;
-                    bool newState2 = false;
-                    bool newState3 = false;
-                    bool newState4 = false;
-                    bool newState5 = false;
-                    bool newState6 = false;
-                    bool newState7 = false;
-                    bool newState8 = false;
-                    bool newState9 = false;
-                    LocalUser localUser;
-                    Rewired.Player player;
-                    CameraRigController cameraRigController;
-                    bool doIt = false;
-                    if (!self.networkUser)
+                    if (self.hasEffectiveAuthority && self.GetFieldValue<InputBankTest>("bodyInputs"))
                     {
-                        localUser = null;
-                        player = null;
-                        cameraRigController = null;
-                        doIt = false;
-                    }
-                    else
-                    {
-                        localUser = self.networkUser.localUser;
-                        player = self.networkUser.inputPlayer;
-                        cameraRigController = self.networkUser.cameraRigController;
-                        doIt = localUser != null && player != null && cameraRigController && !localUser.isUIFocused && cameraRigController.isControlAllowed;
-                    }
-                    if (doIt)
-                    {
-                        bool flag = self.GetFieldValue<CharacterBody>("body").isSprinting;
-                        if (self.GetFieldValue<bool>("sprintInputPressReceived"))
+                        bool newState = false;
+                        bool newState2 = false;
+                        bool newState3 = false;
+                        bool newState4 = false;
+                        LocalUser localUser;
+                        Rewired.Player player;
+                        CameraRigController cameraRigController;
+                        bool doIt = false;
+                        if (!self.networkUser)
                         {
-                            self.SetFieldValue("sprintInputPressReceived", false);
-                            flag = !flag;
+                            localUser = null;
+                            player = null;
+                            cameraRigController = null;
+                            doIt = false;
                         }
-                        if (flag)
+                        else
                         {
-                            Vector3 aimDirection = self.GetFieldValue<InputBankTest>("bodyInputs").aimDirection;
-                            aimDirection.y = 0f;
-                            aimDirection.Normalize();
-                            Vector3 moveVector = self.GetFieldValue<InputBankTest>("bodyInputs").moveVector;
-                            moveVector.y = 0f;
-                            moveVector.Normalize();
-                            if ((self.GetFieldValue<CharacterBody>("body").bodyFlags & CharacterBody.BodyFlags.SprintAnyDirection) == CharacterBody.BodyFlags.None && Vector3.Dot(aimDirection, moveVector) < self.GetFieldValue<float>("sprintMinAimMoveDot"))
-                            {
-                                flag = false;
-                            }
+                            localUser = self.networkUser.localUser;
+                            player = self.networkUser.inputPlayer;
+                            cameraRigController = self.networkUser.cameraRigController;
+                            doIt = localUser != null && player != null && cameraRigController && !localUser.isUIFocused && cameraRigController.isControlAllowed;
                         }
-                        newState = player.GetButton(7) && !CustomEmotesAPI.GetKey(Settings.EmoteWheel); //left click
-                        newState2 = player.GetButton(8) && !CustomEmotesAPI.GetKey(Settings.EmoteWheel); //right click
-                        newState3 = player.GetButton(9);
-                        newState4 = player.GetButton(10);
-                        newState5 = player.GetButton(5);
-                        newState6 = player.GetButton(4);
-                        newState7 = flag;
-                        newState8 = player.GetButton(6);
-                        newState9 = player.GetButton(28);
+                        if (doIt)
+                        {
+                            newState = player.GetButton(7) && !CustomEmotesAPI.GetKey(Settings.EmoteWheel); //left click
+                            newState2 = player.GetButton(8) && !CustomEmotesAPI.GetKey(Settings.EmoteWheel); //right click
+                            newState3 = player.GetButton(9);
+                            newState4 = player.GetButton(10);
+                            self.GetFieldValue<InputBankTest>("bodyInputs").skill1.PushState(newState);
+                            self.GetFieldValue<InputBankTest>("bodyInputs").skill2.PushState(newState2);
+                            BoneMapper.attacking = newState || newState2 || newState3 || newState4;
+                            BoneMapper.moving = self.GetFieldValue<InputBankTest>("bodyInputs").moveVector != Vector3.zero || player.GetButton(4);
+                        }
                     }
-                    BoneMapper.attacking = newState || newState2 || newState3 || newState4;
-                    BoneMapper.moving = self.GetFieldValue<InputBankTest>("bodyInputs").moveVector != Vector3.zero || player.GetButton(4);
-                    self.GetFieldValue<InputBankTest>("bodyInputs").skill1.PushState(newState);
-                    self.GetFieldValue<InputBankTest>("bodyInputs").skill2.PushState(newState2);
-                    self.GetFieldValue<InputBankTest>("bodyInputs").skill3.PushState(newState3);
-                    self.GetFieldValue<InputBankTest>("bodyInputs").skill4.PushState(newState4);
-                    self.GetFieldValue<InputBankTest>("bodyInputs").interact.PushState(newState5);
-                    self.GetFieldValue<InputBankTest>("bodyInputs").jump.PushState(newState6);
-                    self.GetFieldValue<InputBankTest>("bodyInputs").sprint.PushState(newState7);
-                    self.GetFieldValue<InputBankTest>("bodyInputs").activateEquipment.PushState(newState8);
-                    self.GetFieldValue<InputBankTest>("bodyInputs").ping.PushState(newState9);
-                    self.InvokeMethod("CheckPinging");
                 }
+                //bool didOrig = false;
+                //try
+                //{
+                //    if (self.hasEffectiveAuthority && self.GetFieldValue<InputBankTest>("bodyInputs"))
+                //    {
+                //        LocalUser localUser;
+                //        Rewired.Player player;
+                //        CameraRigController cameraRigController;
+                //        bool doIt = false;
+                //        bool newState = false;
+                //        bool newState2 = false;
+                //        localUser = self.networkUser.localUser;
+                //        player = self.networkUser.inputPlayer;
+                //        cameraRigController = self.networkUser.cameraRigController;
+                //        doIt = localUser != null && player != null && cameraRigController && !localUser.isUIFocused && cameraRigController.isControlAllowed;
+                //        if (doIt)
+                //        {
+                //            player = self.networkUser.inputPlayer;
+                //            newState = player.GetButton(7) && !CustomEmotesAPI.GetKey(Settings.EmoteWheel); //left click
+                //            newState2 = player.GetButton(8) && !CustomEmotesAPI.GetKey(Settings.EmoteWheel); //right click
+                //            bool newState3 = player.GetButton(9);
+                //            bool newState4 = player.GetButton(10);
+                //            BoneMapper.attacking = newState || newState2 || newState3 || newState4;
+                //            orig(self);
+                //            didOrig = true;
+                //            BoneMapper.moving = self.GetFieldValue<InputBankTest>("bodyInputs").moveVector != Vector3.zero || player.GetButton(4);
+                //            self.GetFieldValue<InputBankTest>("bodyInputs").skill1.PushState(newState);
+                //            self.GetFieldValue<InputBankTest>("bodyInputs").skill2.PushState(newState2);
+                //        }
+                //        else
+                //        {
+                //            orig(self);
+                //            didOrig = true;
+                //        }
+                //    }
+                //    else
+                //    {
+                //        orig(self);
+                //        didOrig = true;
+                //    }
+                //}
+                //catch (System.Exception)
+                //{
+                //    if (!didOrig)
+                //        orig(self);
+                //}
+                //if (self.hasEffectiveAuthority && self.GetFieldValue<InputBankTest>("bodyInputs"))
+                //{
+                //    bool newState = false;
+                //    bool newState2 = false;
+                //    bool newState3 = false;
+                //    bool newState4 = false;
+                //    bool newState5 = false;
+                //    bool newState6 = false;
+                //    bool newState7 = false;
+                //    bool newState8 = false;
+                //    bool newState9 = false;
+                //    LocalUser localUser;
+                //    Rewired.Player player;
+                //    CameraRigController cameraRigController;
+                //    bool doIt = false;
+                //    if (!self.networkUser)
+                //    {
+                //        localUser = null;
+                //        player = null;
+                //        cameraRigController = null;
+                //        doIt = false;
+                //    }
+                //    else
+                //    {
+                //        localUser = self.networkUser.localUser;
+                //        player = self.networkUser.inputPlayer;
+                //        cameraRigController = self.networkUser.cameraRigController;
+                //        doIt = localUser != null && player != null && cameraRigController && !localUser.isUIFocused && cameraRigController.isControlAllowed;
+                //    }
+                //    if (doIt)
+                //    {
+                //        bool flag = self.GetFieldValue<CharacterBody>("body").isSprinting;
+                //        if (self.GetFieldValue<bool>("sprintInputPressReceived"))
+                //        {
+                //            self.SetFieldValue("sprintInputPressReceived", false);
+                //            flag = !flag;
+                //        }
+                //        if (flag)
+                //        {
+                //            Vector3 aimDirection = self.GetFieldValue<InputBankTest>("bodyInputs").aimDirection;
+                //            aimDirection.y = 0f;
+                //            aimDirection.Normalize();
+                //            Vector3 moveVector = self.GetFieldValue<InputBankTest>("bodyInputs").moveVector;
+                //            moveVector.y = 0f;
+                //            moveVector.Normalize();
+                //            if ((self.GetFieldValue<CharacterBody>("body").bodyFlags & CharacterBody.BodyFlags.SprintAnyDirection) == CharacterBody.BodyFlags.None && Vector3.Dot(aimDirection, moveVector) < self.GetFieldValue<float>("sprintMinAimMoveDot"))
+                //            {
+                //                flag = false;
+                //            }
+                //        }
+                //        newState = player.GetButton(7) && !CustomEmotesAPI.GetKey(Settings.EmoteWheel); //left click
+                //        newState2 = player.GetButton(8) && !CustomEmotesAPI.GetKey(Settings.EmoteWheel); //right click
+                //        newState3 = player.GetButton(9);
+                //        newState4 = player.GetButton(10);
+                //        newState5 = player.GetButton(5);
+                //        newState6 = player.GetButton(4);
+                //        newState7 = flag;
+                //        newState8 = player.GetButton(6);
+                //        newState9 = player.GetButton(28);
+                //    }
+                //    BoneMapper.attacking = newState || newState2 || newState3 || newState4;
+                //    BoneMapper.moving = self.GetFieldValue<InputBankTest>("bodyInputs").moveVector != Vector3.zero || player.GetButton(4);
+                //    self.GetFieldValue<InputBankTest>("bodyInputs").skill1.PushState(newState);
+                //    self.GetFieldValue<InputBankTest>("bodyInputs").skill2.PushState(newState2);
+                //    self.GetFieldValue<InputBankTest>("bodyInputs").skill3.PushState(newState3);
+                //    self.GetFieldValue<InputBankTest>("bodyInputs").skill4.PushState(newState4);
+                //    self.GetFieldValue<InputBankTest>("bodyInputs").interact.PushState(newState5);
+                //    self.GetFieldValue<InputBankTest>("bodyInputs").jump.PushState(newState6);
+                //    self.GetFieldValue<InputBankTest>("bodyInputs").sprint.PushState(newState7);
+                //    self.GetFieldValue<InputBankTest>("bodyInputs").activateEquipment.PushState(newState8);
+                //    self.GetFieldValue<InputBankTest>("bodyInputs").ping.PushState(newState9);
+                //    self.InvokeMethod("CheckPinging");
+                //}
             };
         }
         public static void AddNonAnimatingEmote(string emoteName, bool visible = true)
