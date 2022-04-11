@@ -16,6 +16,8 @@ First off, if you are at all confused about any of this, I made a repo with exam
 `CustomEmotesAPI.ImportArmature(bodyPrefab, underskeleton)`
 Underskeleton is a copy of the bodyPrefab which is setup as a humanoid skeleton
 
+- https://youtu.be/c_G3G4RzCFA        a walkthrough of importing a bodyprefab into game. All vanilla survivors are already imported, this is for modded characters
+
 ## AddCustomAnimation Params
             AnimationClip animationClip                     //Default animation
 			
