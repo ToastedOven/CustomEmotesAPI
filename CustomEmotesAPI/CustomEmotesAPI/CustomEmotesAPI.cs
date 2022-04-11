@@ -111,6 +111,7 @@ namespace EmotesAPI
             On.RoR2.SceneCatalog.OnActiveSceneChanged += (orig, self, scene) =>
             {
                 orig(self, scene);
+                AkSoundEngine.SetRTPCValue("Volume_Emotes", Settings.EmotesVolume.Value);
                 if (allClipNames != null)
                 {
                     ScrollManager.SetupButtons(allClipNames);
