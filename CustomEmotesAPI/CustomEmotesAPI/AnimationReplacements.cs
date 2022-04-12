@@ -295,8 +295,6 @@ public class BoneMapper : MonoBehaviour
     public HealthComponent h;
     public List<BonePair> pairs = new List<BonePair>();
     public float timer = 0;
-    public static float caramellCount = 0;
-    public static float caramellTimer = 0;
     public GameObject model;
     List<string> ignore = new List<string>();
     bool twopart = false;
@@ -609,20 +607,52 @@ public class BoneMapper : MonoBehaviour
                 ignore.Add(item.name);
             }
         }
-        for (int i = 0; i < smr2.bones.Length; i++)
+        int offset = 0;
+        bool nuclear = true;
+        //for (int i = 0; i + offset < smr2.bones.Length; i++)
+        //{
+        //    try
+        //    {
+        //        if (!ignore.Contains(smr2.bones[i].name))
+        //        {
+        //            while (smr2.bones[i + offset].name != smr1.bones[i].name)
+        //            {
+        //                offset++;
+        //                if (i + offset > smr1.bones.Length - 1)
+        //                {
+        //                    nuclear = true;
+        //                    DebugClass.Log($"----------ah fuck");
+        //                    break;
+        //                }
+        //                else
+        //                {
+        //                    DebugClass.Log($"offset test {i + offset} [{smr2.bones[i + offset]}]   {i} [{smr1.bones[i]}]");
+        //                }
+        //            }
+        //            var s = new ConstraintSource();
+        //            s.sourceTransform = smr1.bones[i];
+        //            s.weight = 1;
+        //            smr2.bones[i + offset].gameObject.AddComponent<ParentConstraint>().AddSource(s);
+        //        }
+        //    }
+        //    catch (Exception)
+        //    {
+        //    }
+        //}
+        if (nuclear)
         {
-            try
+            foreach (var smr1bone in smr1.bones)
             {
-                if (!ignore.Contains(smr2.bones[i].name))
+                foreach (var smr2bone in smr2.bones)
                 {
-                    var s = new ConstraintSource();
-                    s.sourceTransform = smr1.bones[i];
-                    s.weight = 1;
-                    smr2.bones[i].gameObject.AddComponent<ParentConstraint>().AddSource(s);
+                    if (smr1bone.name == smr2bone.name && !smr2bone.GetComponent<ParentConstraint>())
+                    {
+                        var s = new ConstraintSource();
+                        s.sourceTransform = smr1bone;
+                        s.weight = 1;
+                        smr2bone.gameObject.AddComponent<ParentConstraint>().AddSource(s);
+                    }
                 }
-            }
-            catch (Exception)
-            {
             }
         }
     }
@@ -770,8 +800,6 @@ public class BoneMapper : MonoBehaviour
         }
         if (h.health <= 0)
         {
-            //AkSoundEngine.PostEvent("StopEmotes", gameObject);
-            //AkSoundEngine.PostEvent("StopCaramell", gameObject);
             for (int i = 0; i < smr2.bones.Length; i++)
             {
                 try
