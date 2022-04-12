@@ -73,63 +73,63 @@ internal static class AnimationReplacements
                 ApplyAnimationStuff(RoR2Content.Survivors.Merc, "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/merc.prefab");
                 ApplyAnimationStuff(RoR2Content.Survivors.Toolbot, "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/mult.prefab");
                 ApplyAnimationStuff(RoR2Content.Survivors.Treebot, "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/rex.prefab");
-                ApplyAnimationStuff(RoR2Content.Survivors.Commando, "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commando.prefab");
+                ApplyAnimationStuff(RoR2Content.Survivors.Commando, "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commandoFixed.prefab");
                 ApplyAnimationStuff(RoR2Content.Survivors.Huntress, "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/huntress2022.prefab");
                 ApplyAnimationStuff(RoR2Content.Survivors.Bandit2, "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/bandit.prefab");
                 ApplyAnimationStuff(SurvivorCatalog.FindSurvivorDefFromBody(Addressables.LoadAssetAsync<GameObject>("RoR2/DLC1/VoidSurvivor/VoidSurvivorBody.prefab").WaitForCompletion()), "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/voidsurvivor.prefab");
                 ApplyAnimationStuff(SurvivorCatalog.FindSurvivorDefFromBody(Addressables.LoadAssetAsync<GameObject>("RoR2/DLC1/Railgunner/RailgunnerBody.prefab").WaitForCompletion()), "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/railgunner.prefab");
                 ApplyAnimationStuff(Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Heretic/HereticBody.prefab").WaitForCompletion(), "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/heretic.prefab", 3);
 
-                foreach (var item in SurvivorCatalog.allSurvivorDefs)
-                {
-                    if (item.bodyPrefab.GetComponentsInChildren<BoneMapper>().Length == 0)
-                    {
-                        DebugClass.Log($"{item.bodyPrefab.name} needs a bonemapper");
-                        try
-                        {
-                            if (item.bodyPrefab.GetComponent<ModelLocator>().modelTransform.GetComponent<Animator>().avatar.isHuman)
-                            {
-                                DebugClass.Log($"and it is humanoid, gonna attempt to give a bonemapper...");
-                                try
-                                {
-                                    var modelTransform = item.bodyPrefab.GetComponent<ModelLocator>().modelTransform;
-                                    if (modelTransform)
-                                    {
-                                        var skele = GameObject.Instantiate(modelTransform.gameObject);
-                                        Animator a = skele.GetComponent<Animator>();
-                                        a.avatar = item.bodyPrefab.GetComponent<ModelLocator>().modelTransform.GetComponent<Animator>().avatar;
+                //foreach (var item in SurvivorCatalog.allSurvivorDefs)
+                //{
+                //    if (item.bodyPrefab.GetComponentsInChildren<BoneMapper>().Length == 0)
+                //    {
+                //        DebugClass.Log($"{item.bodyPrefab.name} needs a bonemapper");
+                //        try
+                //        {
+                //            if (item.bodyPrefab.GetComponent<ModelLocator>().modelTransform.GetComponent<Animator>().avatar.isHuman)
+                //            {
+                //                DebugClass.Log($"and it is humanoid, gonna attempt to give a bonemapper...");
+                //                try
+                //                {
+                //                    var modelTransform = item.bodyPrefab.GetComponent<ModelLocator>().modelTransform;
+                //                    if (modelTransform)
+                //                    {
+                //                        var skele = GameObject.Instantiate(modelTransform.gameObject);
+                //                        Animator a = skele.GetComponent<Animator>();
+                //                        a.avatar = item.bodyPrefab.GetComponent<ModelLocator>().modelTransform.GetComponent<Animator>().avatar;
 
-                                        foreach (var comp in skele.GetComponentsInChildren<Component>())
-                                        {
-                                            if (comp.GetType() != typeof(Animator) && comp.GetType() != typeof(Transform) && comp.GetType() != typeof(SkinnedMeshRenderer))
-                                            {
-                                                Component.Destroy(comp);
-                                            }
-                                        }
-                                        CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
-                                        DebugClass.Log($"Hey it worked!");
-                                    }
-                                    else
-                                    {
-                                        DebugClass.Log($"Nah it broke lmao");
-                                    }
-                                }
-                                catch (Exception)
-                                {
-                                    DebugClass.Log($"Nah it broke lmao");
-                                }
-                            }
-                            else
-                            {
-                                DebugClass.Log($"but it isn't humanoid :Sadge:");
-                            }
-                        }
-                        catch (Exception)
-                        {
-                            DebugClass.Log($"Something broke, L");
-                        }
-                    }
-                }
+                //                        foreach (var comp in skele.GetComponentsInChildren<Component>())
+                //                        {
+                //                            if (comp.GetType() != typeof(Animator) && comp.GetType() != typeof(Transform) && comp.GetType() != typeof(SkinnedMeshRenderer))
+                //                            {
+                //                                Component.Destroy(comp);
+                //                            }
+                //                        }
+                //                        CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
+                //                        DebugClass.Log($"Hey it worked!");
+                //                    }
+                //                    else
+                //                    {
+                //                        DebugClass.Log($"Nah it broke lmao");
+                //                    }
+                //                }
+                //                catch (Exception)
+                //                {
+                //                    DebugClass.Log($"Nah it broke lmao");
+                //                }
+                //            }
+                //            else
+                //            {
+                //                DebugClass.Log($"but it isn't humanoid :Sadge:");
+                //            }
+                //        }
+                //        catch (Exception)
+                //        {
+                //            DebugClass.Log($"Something broke, L");
+                //        }
+                //    }
+                //}
             }
             //bodyPrefab = survivorDef.displayPrefab;
             //animcontroller = Resources.Load<GameObject>(resource);
@@ -161,6 +161,14 @@ internal static class AnimationReplacements
         {
             DebugClass.Log($"{animcontroller}'s avatar isn't humanoid, please fix it in unity!");
             return;
+        }
+        foreach (var item in animcontroller.GetComponentsInChildren<SkinnedMeshRenderer>())
+        {
+            item.sharedMesh = null;
+        }
+        foreach (var item in animcontroller.GetComponentsInChildren<MeshFilter>())
+        {
+            item.sharedMesh = null;
         }
         animcontroller.transform.parent = bodyPrefab.GetComponent<ModelLocator>().modelTransform;
         animcontroller.transform.localPosition = Vector3.zero;
@@ -811,6 +819,7 @@ public class BoneMapper : MonoBehaviour
                         item.audioObjects[currentClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
                     }
                 }
+                AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos], audioObjects[currentClip.syncPos]);
             }
             BoneMapper.allMappers.Remove(this);
             currentClip = null;
