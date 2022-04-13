@@ -10,16 +10,18 @@ public class SyncAnimationToServer : INetMessage
 {
     NetworkInstanceId netId;
     string animation;
+    int position;
 
     public SyncAnimationToServer()
     {
 
     }
 
-    public SyncAnimationToServer(NetworkInstanceId netId, string animation)
+    public SyncAnimationToServer(NetworkInstanceId netId, string animation, int pos)
     {
         this.netId = netId;
         this.animation = animation;
+        this.position = pos;
     }
 
     public void Deserialize(NetworkReader reader)
@@ -28,6 +30,7 @@ public class SyncAnimationToServer : INetMessage
 
         netId = reader.ReadNetworkId();
         animation = reader.ReadString();
+        position = reader.ReadInt32();
     }
 
     public void OnReceived()
@@ -43,14 +46,15 @@ public class SyncAnimationToServer : INetMessage
 
         DebugClass.Log($"Recieved message to play {animation} on client. Playing on {bodyObject.GetComponent<ModelLocator>().modelTransform}");
 
-        bodyObject.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>().PlayAnim(animation);
+        bodyObject.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>().PlayAnim(animation, position);
 
-        new SyncAnimationToClients(netId, animation).Send(R2API.Networking.NetworkDestination.Clients);
+        new SyncAnimationToClients(netId, animation, position).Send(R2API.Networking.NetworkDestination.Clients);
     }
 
     public void Serialize(NetworkWriter writer)
     {
         writer.Write(netId);
         writer.Write(animation);
+        writer.Write(position);
     }
 }

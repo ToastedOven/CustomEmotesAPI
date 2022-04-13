@@ -11,16 +11,18 @@ class SyncAnimationToClients : INetMessage
 {
     NetworkInstanceId netId;
     string animation;
+    int position;
 
     public SyncAnimationToClients()
     {
 
     }
 
-    public SyncAnimationToClients(NetworkInstanceId netId, string animation)
+    public SyncAnimationToClients(NetworkInstanceId netId, string animation, int pos)
     {
         this.netId = netId;
         this.animation = animation;
+        this.position = pos;
     }
 
     public void Deserialize(NetworkReader reader)
@@ -29,6 +31,7 @@ class SyncAnimationToClients : INetMessage
 
         netId = reader.ReadNetworkId();
         animation = reader.ReadString();
+        position = reader.ReadInt32();
     }
 
     public void OnReceived()
@@ -45,12 +48,13 @@ class SyncAnimationToClients : INetMessage
 
         DebugClass.Log($"Recieved message to play {animation} on client. Playing on {bodyObject.GetComponent<ModelLocator>().modelTransform}");
 
-        bodyObject.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>().PlayAnim(animation);
+        bodyObject.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>().PlayAnim(animation, position);
     }
 
     public void Serialize(NetworkWriter writer)
     {
         writer.Write(netId);
         writer.Write(animation);
+        writer.Write(position);
     }
 }

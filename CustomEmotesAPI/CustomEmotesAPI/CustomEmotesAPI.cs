@@ -311,6 +311,27 @@ namespace EmotesAPI
                 allClipNames.Add(emoteName);
             BoneMapper.animClips.Add(emoteName, null);
         }
+        public static void AddCustomAnimation(AnimationClip[] animationClip, bool looping, string _wwiseEventName = "", string _wwiseStopEvent = "", HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip[] secondaryAnimation = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true, bool syncAnim = false, bool syncAudio = false, int startPref = -1, int joinPref = -1)
+        {
+            if (BoneMapper.animClips.ContainsKey(animationClip[0].name))
+            {
+                Debug.Log($"EmotesError: [{animationClip[0].name}] is already defined as a custom emote but is trying to be added. Skipping");
+                return;
+            }
+            if (!animationClip[0].isHumanMotion)
+            {
+                Debug.Log($"EmotesError: [{animationClip[0].name}] is not a humanoid animation!");
+                return;
+            }
+            if (rootBonesToIgnore == null)
+                rootBonesToIgnore = new HumanBodyBones[0];
+            if (soloBonesToIgnore == null)
+                soloBonesToIgnore = new HumanBodyBones[0];
+            CustomAnimationClip clip = new CustomAnimationClip(animationClip, looping, _wwiseEventName, _wwiseStopEvent, rootBonesToIgnore, soloBonesToIgnore, secondaryAnimation, dimWhenClose, stopWhenMove, stopWhenAttack, visible, syncAnim, syncAudio, startPref, joinPref);
+            if (visible)
+                allClipNames.Add(animationClip[0].name);
+            BoneMapper.animClips.Add(animationClip[0].name, clip);
+        }
         public static void AddCustomAnimation(AnimationClip animationClip, bool looping, string _wwiseEventName = "", string _wwiseStopEvent = "", HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip secondaryAnimation = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true, bool syncAnim = false, bool syncAudio = false)
         {
             if (BoneMapper.animClips.ContainsKey(animationClip.name))
@@ -327,18 +348,12 @@ namespace EmotesAPI
                 rootBonesToIgnore = new HumanBodyBones[0];
             if (soloBonesToIgnore == null)
                 soloBonesToIgnore = new HumanBodyBones[0];
-            CustomAnimationClip clip = new CustomAnimationClip(animationClip, looping, _wwiseEventName, _wwiseStopEvent, rootBonesToIgnore, soloBonesToIgnore, secondaryAnimation, dimWhenClose, stopWhenMove, stopWhenAttack, visible, syncAnim, syncAudio);
+            AnimationClip[] animationClips = new AnimationClip[] { animationClip };
+            AnimationClip[] secondaryClips = new AnimationClip[] { secondaryAnimation };
+            CustomAnimationClip clip = new CustomAnimationClip(animationClips, looping, _wwiseEventName, _wwiseStopEvent, rootBonesToIgnore, soloBonesToIgnore, secondaryClips, dimWhenClose, stopWhenMove, stopWhenAttack, visible, syncAnim, syncAudio);
             if (visible)
                 allClipNames.Add(animationClip.name);
             BoneMapper.animClips.Add(animationClip.name, clip);
-        }
-
-        internal static void AddCustomAnimation(Animator animator, bool[] looping, string[] _wwiseEventName = null, string[] _wwiseStopEvent = null, bool[] visible = null, bool[] syncAnim = null, bool[] syncAudio = null)
-        {
-            for (int i = 0; i < animator.runtimeAnimatorController.animationClips.Length; i++)
-            {
-                AddCustomAnimation(animator.runtimeAnimatorController.animationClips[i], looping[i], _wwiseEventName[i], _wwiseStopEvent[i], visible: visible[i], syncAnim: syncAnim[i], syncAudio: syncAudio[i]);
-            }
         }
 
         public static void ImportArmature(GameObject bodyPrefab, GameObject rigToAnimate, int meshPos = 0, bool hideMeshes = true)
@@ -358,29 +373,29 @@ namespace EmotesAPI
             AnimationReplacements.ApplyAnimationStuff(bodyPrefab, rigToAnimate, meshPos);
         }
 
-        public static void PlayAnimation(string animationName)
+        public static void PlayAnimation(string animationName, int pos = -2)
         {
             var identity = NetworkUser.readOnlyLocalPlayersList[0].master?.GetBody().gameObject.GetComponent<NetworkIdentity>();
 
             if (!NetworkServer.active)
             {
-                new SyncAnimationToServer(identity.netId, animationName).Send(R2API.Networking.NetworkDestination.Server);
+                new SyncAnimationToServer(identity.netId, animationName, pos).Send(R2API.Networking.NetworkDestination.Server);
             }
             else
             {
-                new SyncAnimationToClients(identity.netId, animationName).Send(R2API.Networking.NetworkDestination.Clients);
+                new SyncAnimationToClients(identity.netId, animationName, pos).Send(R2API.Networking.NetworkDestination.Clients);
 
                 GameObject bodyObject = Util.FindNetworkObject(identity.netId);
-                bodyObject.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>().PlayAnim(animationName);
+                bodyObject.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>().PlayAnim(animationName, pos);
             }
         }
         internal static BoneMapper localMapper = null;
         static BoneMapper nearestMapper = null;
-        public static AnimationClip GetLocalBodyAnimationClip()
+        public static CustomAnimationClip GetLocalBodyCustomAnimationClip()
         {
             if (localMapper)
             {
-                return localMapper.currentClip.clip;
+                return localMapper.currentClip;
             }
             else
             {
@@ -431,7 +446,7 @@ namespace EmotesAPI
                     }
                     if (nearestMapper)
                     {
-                        PlayAnimation(nearestMapper.currentClip.clip.name);
+                        PlayAnimation(nearestMapper.currentClip.clip[0].name);
                     }
                     nearestMapper = null;
                 }
