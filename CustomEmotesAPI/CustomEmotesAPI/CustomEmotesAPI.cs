@@ -87,7 +87,7 @@ namespace EmotesAPI
             }
             return Input.GetKeyDown(entry.Value.MainKey);
         }
-        public const string VERSION = "1.2.0";
+        public const string VERSION = "1.2.1";
         internal static float Actual_MSX = 69;
         public static CustomEmotesAPI instance;
         public void Awake()

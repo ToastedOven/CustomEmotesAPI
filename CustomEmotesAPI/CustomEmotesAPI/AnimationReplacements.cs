@@ -224,9 +224,9 @@ public class CustomAnimationClip : MonoBehaviour
 
 
     internal bool syncronizeAnimation;
-    internal int syncPos;
+    public int syncPos;
     internal static List<float> syncTimer = new List<float>();
-    internal static List<int> syncPlayerCount = new List<int>();
+    public static List<int> syncPlayerCount = new List<int>();
 
     internal CustomAnimationClip(AnimationClip[] _clip, bool _loop/*, bool _shouldSyncronize = false*/, string _wwiseEventName = "", string _wwiseStopEvent = "", HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip[] _secondaryClip = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true, bool syncAnim = false, bool syncAudio = false, int startPreference = -1, int joinPreference = -1)
     {
@@ -330,7 +330,7 @@ public class BoneMapper : MonoBehaviour
         List<string> dontAnimateUs = new List<string>();
         try
         {
-            currentClip.clip.ToString();
+            currentClip.clip[0].ToString();
             if (currentClip.syncronizeAnimation || currentClip.syncronizeAudio)
             {
                 CustomAnimationClip.syncPlayerCount[currentClip.syncPos]--;
@@ -358,11 +358,10 @@ public class BoneMapper : MonoBehaviour
         }
         if (s != "none")
         {
-            CustomEmotesAPI.Changed(s, this);
             currentClip = animClips[s];
             try
             {
-                currentClip.clip.ToString();
+                currentClip.clip[0].ToString();
             }
             catch (Exception)
             {
@@ -436,10 +435,6 @@ public class BoneMapper : MonoBehaviour
                 }
             }
         }
-        else
-        {
-            CustomEmotesAPI.Changed(s, this);
-        }
         bool left = upperLegL && lowerLegL && footL;
         bool right = upperLegR && lowerLegR && footR;
         Transform LeftLegIK = null;
@@ -502,6 +497,7 @@ public class BoneMapper : MonoBehaviour
             a2.Play("none", -1, 0f);
             twopart = false;
             currentClip = null;
+            CustomEmotesAPI.Changed(s, this);
             return;
         }
         AnimatorOverrideController animController = new AnimatorOverrideController(a2.runtimeAnimatorController);
@@ -566,6 +562,7 @@ public class BoneMapper : MonoBehaviour
             a2.runtimeAnimatorController = animController;
             a2.Play("Poop", -1, (CustomAnimationClip.syncTimer[currentClip.syncPos] % currentClip.clip[pos].length) / currentClip.clip[pos].length);
         }
+        CustomEmotesAPI.Changed(s, this);
         twopart = false;
     }
     void AddIgnore(DynamicBone dynbone, Transform t)
