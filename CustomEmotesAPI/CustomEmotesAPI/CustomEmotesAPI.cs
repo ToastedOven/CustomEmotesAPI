@@ -374,14 +374,18 @@ namespace EmotesAPI
                 bodyObject.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>().PlayAnim(animationName);
             }
         }
-        static BoneMapper localMapper = null;
+        internal static BoneMapper localMapper = null;
+        static BoneMapper nearestMapper = null;
         public static AnimationClip GetLocalBodyAnimationClip()
         {
-            if (!localMapper)
+            if (localMapper)
             {
-                localMapper = NetworkUser.readOnlyLocalPlayersList[0].master?.GetBody().gameObject.GetComponentInChildren<BoneMapper>();
+                return localMapper.currentClip.clip;
             }
-            return localMapper.currentClip.clip;
+            else
+            {
+                return null;
+            }
         }
         public static BoneMapper[] GetAllBoneMappers()
         {
@@ -394,6 +398,43 @@ namespace EmotesAPI
             if (animChanged != null)
             {
                 animChanged(newAnimation, mapper);
+            }
+        }
+
+        void Update()
+        {
+            if (GetKeyPressed(Settings.RandomEmote))
+            {
+                int rand = UnityEngine.Random.Range(0, allClipNames.Count);
+                PlayAnimation(allClipNames[rand]);
+            }
+            if (GetKeyPressed(Settings.JoinEmote))
+            {
+                if (localMapper)
+                {
+                    foreach (var mapper in BoneMapper.allMappers)
+                    {
+                        if (mapper != localMapper)
+                        {
+                            if (!nearestMapper && (mapper.currentClip.syncronizeAnimation || mapper.currentClip.syncronizeAudio))
+                            {
+                                nearestMapper = mapper;
+                            }
+                            else if (nearestMapper)
+                            {
+                                if ((mapper.currentClip.syncronizeAnimation || mapper.currentClip.syncronizeAudio) && Vector3.Distance(localMapper.transform.position, mapper.transform.position) < Vector3.Distance(localMapper.transform.position, nearestMapper.transform.position))
+                                {
+                                    nearestMapper = mapper;
+                                }
+                            }
+                        }
+                    }
+                    if (nearestMapper)
+                    {
+                        PlayAnimation(nearestMapper.currentClip.clip.name);
+                    }
+                    nearestMapper = null;
+                }
             }
         }
     }

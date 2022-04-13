@@ -210,6 +210,7 @@ internal static class AnimationReplacements
 public class CustomAnimationClip : MonoBehaviour
 {
     public AnimationClip clip, secondaryClip; //DONT SUPPORT MULTI CLIP ANIMATIONS TO SYNC     //but why not? how hard could it be, I'm sure I left that note for a reason....  //it was for a reason, but it works now
+    public CustomAnimationClip joinClip, adultClip;
     internal bool looping;
     internal string wwiseEvent;
     internal bool syncronizeAudio;
@@ -226,7 +227,7 @@ public class CustomAnimationClip : MonoBehaviour
     internal int syncPos;
     internal static List<float> syncTimer = new List<float>();
     internal static List<int> syncPlayerCount = new List<int>();
-    internal CustomAnimationClip(AnimationClip _clip, bool _loop/*, bool _shouldSyncronize = false*/, string _wwiseEventName = "", string _wwiseStopEvent = "", HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip _secondaryClip = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true, bool syncAnim = false, bool syncAudio = false)
+    internal CustomAnimationClip(AnimationClip _clip, bool _loop/*, bool _shouldSyncronize = false*/, string _wwiseEventName = "", string _wwiseStopEvent = "", HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip _secondaryClip = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true, bool syncAnim = false, bool syncAudio = false, CustomAnimationClip joiningClip = null)
     {
         if (rootBonesToIgnore == null)
             rootBonesToIgnore = new HumanBodyBones[0];
@@ -235,6 +236,11 @@ public class CustomAnimationClip : MonoBehaviour
         clip = _clip;
         if (_secondaryClip)
             secondaryClip = _secondaryClip;
+        if (joiningClip)
+        {
+            joinClip = joiningClip;
+            joinClip.adultClip = this;
+        }
         looping = _loop;
         //syncronizeAnimation = _shouldSyncronize;
         dimAudioWhenClose = dimWhenClose;
@@ -321,6 +327,10 @@ public class BoneMapper : MonoBehaviour
             if (currentClip.syncronizeAnimation || currentClip.syncronizeAudio)
             {
                 CustomAnimationClip.syncPlayerCount[currentClip.syncPos]--;
+                if (currentClip.joinClip)
+                {
+                    CustomAnimationClip.syncPlayerCount[currentClip.joinClip.syncPos]--;
+                }
             }
             if (stopEvents[currentClip.syncPos] != "")
             {
@@ -329,6 +339,10 @@ public class BoneMapper : MonoBehaviour
                     AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos], audioObjects[currentClip.syncPos]);
                 }
                 audioObjects[currentClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
+                if (currentClip.joinClip)
+                {
+                    audioObjects[currentClip.joinClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
+                }
 
                 if (CustomAnimationClip.syncPlayerCount[currentClip.syncPos] == 0 && currentClip.syncronizeAudio)
                 {
@@ -336,6 +350,11 @@ public class BoneMapper : MonoBehaviour
                     {
                         AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos], item.audioObjects[currentClip.syncPos]);
                         item.audioObjects[currentClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
+                        if (currentClip.joinClip)
+                        {
+                            AkSoundEngine.PostEvent(stopEvents[currentClip.joinClip.syncPos], item.audioObjects[currentClip.joinClip.syncPos]);
+                            item.audioObjects[currentClip.joinClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
+                        }
                     }
                 }
             }
@@ -724,6 +743,7 @@ public class BoneMapper : MonoBehaviour
                 {
 
                     local = true;
+                    CustomEmotesAPI.localMapper = this;
                 }
             }
             catch (Exception)
@@ -760,6 +780,7 @@ public class BoneMapper : MonoBehaviour
                         }
                     }
                 }
+                //DebugClass.Log($"----------{a1}");
                 a1.enabled = true;
                 a2.enabled = false;
                 try

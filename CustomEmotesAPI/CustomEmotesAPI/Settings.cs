@@ -17,6 +17,8 @@ namespace EmotesAPI
         public static ConfigEntry<KeyboardShortcut> EmoteWheel;
         public static ConfigEntry<KeyboardShortcut> Left;
         public static ConfigEntry<KeyboardShortcut> Right;
+        public static ConfigEntry<KeyboardShortcut> RandomEmote;
+        public static ConfigEntry<KeyboardShortcut> JoinEmote;
         public static ConfigEntry<float> EmotesVolume;
         public static ConfigEntry<float> DontTouchThis;
 
@@ -96,6 +98,8 @@ namespace EmotesAPI
             Left = CustomEmotesAPI.instance.Config.Bind<KeyboardShortcut>("Controls", "Cycle Wheel Left", new KeyboardShortcut(KeyCode.Mouse0), "Cycles the emote wheel left");
             Right = CustomEmotesAPI.instance.Config.Bind<KeyboardShortcut>("Controls", "Cycle Wheel Right", new KeyboardShortcut(KeyCode.Mouse1), "Cycles the emote wheel right");
             EmotesVolume = CustomEmotesAPI.instance.Config.Bind<float>("Controls", "Emotes Volume", 50, "Emotes \"Should\" be controlled by Volume SFX as well, but this is a seperate slider if you want a different audio balance.");
+            RandomEmote = CustomEmotesAPI.instance.Config.Bind<KeyboardShortcut>("Controls", "Play Random Emote", new KeyboardShortcut(KeyCode.Mouse0), "Cycles the emote wheel left");
+            JoinEmote = CustomEmotesAPI.instance.Config.Bind<KeyboardShortcut>("Controls", "Join Nearest Syncing Emote", new KeyboardShortcut(KeyCode.Mouse1), "Cycles the emote wheel right");
 
 
             emote0 = CustomEmotesAPI.instance.Config.Bind<string>("Data", "Bind for emotes0", "none", "Messing with this here is not reccomended, like at all");
@@ -130,6 +134,8 @@ namespace EmotesAPI
             ModSettingsManager.AddOption(new KeyBindOption(Left));
             ModSettingsManager.AddOption(new KeyBindOption(Right));
             ModSettingsManager.AddOption(new SliderOption(EmotesVolume));
+            ModSettingsManager.AddOption(new KeyBindOption(RandomEmote));
+            ModSettingsManager.AddOption(new KeyBindOption(JoinEmote));
             EmotesVolume.SettingChanged += EmotesVolume_SettingChanged;
         }
 
@@ -145,7 +151,7 @@ namespace EmotesAPI
             picker.transform.Find("emotepicker").gameObject.SetActive(true);
             picker.transform.SetAsLastSibling();
             picker.GetComponent<Canvas>().sortingOrder = 5;
-            
         }
+        
     }
 }
