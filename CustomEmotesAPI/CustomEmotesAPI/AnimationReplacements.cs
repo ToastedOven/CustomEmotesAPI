@@ -235,8 +235,9 @@ public class CustomAnimationClip : MonoBehaviour
         if (soloBonesToIgnore == null)
             soloBonesToIgnore = new HumanBodyBones[0];
         clip = _clip;
-        if (_secondaryClip.Length != 0)
-            secondaryClip = _secondaryClip;
+        if (secondaryClip != null)
+            if (_secondaryClip.Length != 0)
+                secondaryClip = _secondaryClip;
         looping = _loop;
         //syncronizeAnimation = _shouldSyncronize;
         dimAudioWhenClose = dimWhenClose;
@@ -527,20 +528,23 @@ public class BoneMapper : MonoBehaviour
             }
             audioObjects[currentClip.syncPos].transform.localPosition = Vector3.zero;
         }
-        if (currentClip.secondaryClip.Length != 0)
+        if (currentClip.secondaryClip != null && currentClip.secondaryClip.Length != 0)
         {
-            if (CustomAnimationClip.syncTimer[currentClip.syncPos] > currentClip.clip[pos].length)
+            if (true)
             {
-                animController["Floss"] = currentClip.secondaryClip[pos];
-                a2.runtimeAnimatorController = animController;
-                a2.Play("Loop", -1, ((CustomAnimationClip.syncTimer[currentClip.syncPos] - currentClip.clip[pos].length) % currentClip.secondaryClip[pos].length) / currentClip.secondaryClip[pos].length);
-            }
-            else
-            {
-                animController["Dab"] = currentClip.clip[pos];
-                animController["nobones"] = currentClip.secondaryClip[pos];
-                a2.runtimeAnimatorController = animController;
-                a2.Play("PoopToLoop", -1, (CustomAnimationClip.syncTimer[currentClip.syncPos] % currentClip.clip[pos].length) / currentClip.clip[pos].length);
+                if (CustomAnimationClip.syncTimer[currentClip.syncPos] > currentClip.clip[pos].length)
+                {
+                    animController["Floss"] = currentClip.secondaryClip[pos];
+                    a2.runtimeAnimatorController = animController;
+                    a2.Play("Loop", -1, ((CustomAnimationClip.syncTimer[currentClip.syncPos] - currentClip.clip[pos].length) % currentClip.secondaryClip[pos].length) / currentClip.secondaryClip[pos].length);
+                }
+                else
+                {
+                    animController["Dab"] = currentClip.clip[pos];
+                    animController["nobones"] = currentClip.secondaryClip[pos];
+                    a2.runtimeAnimatorController = animController;
+                    a2.Play("PoopToLoop", -1, (CustomAnimationClip.syncTimer[currentClip.syncPos] % currentClip.clip[pos].length) / currentClip.clip[pos].length);
+                }
             }
         }
         else if (currentClip.looping)

@@ -87,7 +87,7 @@ namespace EmotesAPI
             }
             return Input.GetKeyDown(entry.Value.MainKey);
         }
-        public const string VERSION = "1.1.10";
+        public const string VERSION = "1.2.0";
         internal static float Actual_MSX = 69;
         public static CustomEmotesAPI instance;
         public void Awake()
@@ -349,7 +349,11 @@ namespace EmotesAPI
             if (soloBonesToIgnore == null)
                 soloBonesToIgnore = new HumanBodyBones[0];
             AnimationClip[] animationClips = new AnimationClip[] { animationClip };
-            AnimationClip[] secondaryClips = new AnimationClip[] { secondaryAnimation };
+            AnimationClip[] secondaryClips = null;
+            if (secondaryAnimation)
+            {
+                secondaryClips = new AnimationClip[] { secondaryAnimation };
+            }
             CustomAnimationClip clip = new CustomAnimationClip(animationClips, looping, _wwiseEventName, _wwiseStopEvent, rootBonesToIgnore, soloBonesToIgnore, secondaryClips, dimWhenClose, stopWhenMove, stopWhenAttack, visible, syncAnim, syncAudio);
             if (visible)
                 allClipNames.Add(animationClip.name);
