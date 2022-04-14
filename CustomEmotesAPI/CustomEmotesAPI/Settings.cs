@@ -152,6 +152,32 @@ namespace EmotesAPI
             picker.transform.SetAsLastSibling();
             picker.GetComponent<Canvas>().sortingOrder = 5;
         }
-        
+        internal static void DebugBones(GameObject fab)
+        {
+            var meshes = fab.GetComponentsInChildren<SkinnedMeshRenderer>();
+            StringBuilder sb = new StringBuilder();
+            sb.Append($"rendererererer: {meshes[0]}\n");
+            sb.Append($"bone count: {meshes[0].bones.Length}\n");
+            sb.Append($"mesh count: {meshes.Length}\n");
+            sb.Append($"root bone: {meshes[0].rootBone.name}\n");
+            sb.Append($"{fab.ToString()}:\n");
+            if (meshes[0].bones.Length == 0)
+            {
+                sb.Append("No bones");
+            }
+            else
+            {
+                sb.Append("[");
+                foreach (var bone in meshes[0].bones)
+                {
+                    sb.Append($"'{bone.name}', ");
+                }
+                sb.Remove(sb.Length - 2, 2);
+                sb.Append("]");
+            }
+            sb.Append("\n\n");
+            DebugClass.Log(sb.ToString());
+        }
+
     }
 }

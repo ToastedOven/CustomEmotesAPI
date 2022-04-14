@@ -87,7 +87,7 @@ namespace EmotesAPI
             }
             return Input.GetKeyDown(entry.Value.MainKey);
         }
-        public const string VERSION = "1.2.1";
+        public const string VERSION = "1.3.0";
         internal static float Actual_MSX = 69;
         public static CustomEmotesAPI instance;
         public void Awake()
@@ -95,6 +95,7 @@ namespace EmotesAPI
             instance = this;
             DebugClass.SetLogger(base.Logger);
             CustomEmotesAPI.LoadResource("customemotespackage");
+            CustomEmotesAPI.LoadResource("fineilldoitmyself");
             if (!BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("com.gemumoddo.MoistureUpset"))
             {
                 CustomEmotesAPI.LoadResource("moisture_animationreplacements"); // I don't remember what's in here that makes importing emotes work, don't @ me
@@ -304,6 +305,7 @@ namespace EmotesAPI
                 //    self.InvokeMethod("CheckPinging");
                 //}
             };
+            AddNonAnimatingEmote("none");
         }
         public static void AddNonAnimatingEmote(string emoteName, bool visible = true)
         {
@@ -360,21 +362,15 @@ namespace EmotesAPI
             BoneMapper.animClips.Add(animationClip.name, clip);
         }
 
+        public static void ImportArmature(GameObject bodyPrefab, GameObject rigToAnimate, bool jank, int meshPos = 0, bool hideMeshes = true)
+        {
+            rigToAnimate.GetComponent<Animator>().runtimeAnimatorController = GameObject.Instantiate<GameObject>(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commando.prefab")).GetComponent<Animator>().runtimeAnimatorController;
+            AnimationReplacements.ApplyAnimationStuff(bodyPrefab, rigToAnimate, meshPos, hideMeshes, jank);
+        }
         public static void ImportArmature(GameObject bodyPrefab, GameObject rigToAnimate, int meshPos = 0, bool hideMeshes = true)
         {
-            if (hideMeshes)
-            {
-                foreach (var item in rigToAnimate.GetComponentsInChildren<MeshFilter>())
-                {
-                    item.mesh = null;
-                }
-                foreach (var item in rigToAnimate.GetComponentsInChildren<SkinnedMeshRenderer>())
-                {
-                    item.sharedMesh = null;
-                }
-            }
             rigToAnimate.GetComponent<Animator>().runtimeAnimatorController = GameObject.Instantiate<GameObject>(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commando.prefab")).GetComponent<Animator>().runtimeAnimatorController;
-            AnimationReplacements.ApplyAnimationStuff(bodyPrefab, rigToAnimate, meshPos);
+            AnimationReplacements.ApplyAnimationStuff(bodyPrefab, rigToAnimate, meshPos, hideMeshes);
         }
 
         public static void PlayAnimation(string animationName, int pos = -2)
