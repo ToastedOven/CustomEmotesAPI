@@ -389,6 +389,29 @@ namespace EmotesAPI
                 bodyObject.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>().PlayAnim(animationName, pos);
             }
         }
+        public static void PlayAnimation(string animationName, BoneMapper mapper, int pos = -2)
+        {
+            foreach (var item in BoneMapper.allMappers)
+            {
+                if (item == mapper)
+                {
+                    var identity = mapper.transform.parent.GetComponent<CharacterModel>().body.GetComponent<NetworkIdentity>();
+
+                    if (!NetworkServer.active)
+                    {
+                        new SyncAnimationToServer(identity.netId, animationName, pos).Send(R2API.Networking.NetworkDestination.Server);
+                    }
+                    else
+                    {
+                        new SyncAnimationToClients(identity.netId, animationName, pos).Send(R2API.Networking.NetworkDestination.Clients);
+
+                        GameObject bodyObject = Util.FindNetworkObject(identity.netId);
+                        bodyObject.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>().PlayAnim(animationName, pos);
+                    }
+                }
+            }
+            DebugClass.Log($"BoneMapper of name {mapper.transform.name} was not found, L");
+        }
         internal static BoneMapper localMapper = null;
         static BoneMapper nearestMapper = null;
         public static CustomAnimationClip GetLocalBodyCustomAnimationClip()

@@ -244,4 +244,16 @@ public class EmoteWheel : MonoBehaviour
 
         yield break;
     }
+
+    void OnDestroy()
+    {
+        if (CustomEmotesAPI.GetKey(Settings.EmoteWheel))
+        {
+            if (events.cursorOpenerForGamepadCount > 0)
+            {
+                events.cursorOpenerForGamepadCount -= 1;
+                events.cursorOpenerCount -= 1;
+            }
+        }
+    }
 }
