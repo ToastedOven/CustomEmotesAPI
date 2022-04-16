@@ -20,6 +20,19 @@ namespace EmotesAPI
         public static ConfigEntry<KeyboardShortcut> RandomEmote;
         public static ConfigEntry<KeyboardShortcut> JoinEmote;
         public static ConfigEntry<float> EmotesVolume;
+        public static ConfigEntry<bool> SolSupport;
+        public static ConfigEntry<bool> Paladin;
+        public static ConfigEntry<bool> Enforcer;
+        public static ConfigEntry<bool> Chef;
+        public static ConfigEntry<bool> Holomancer;
+        public static ConfigEntry<bool> Sett;
+        public static ConfigEntry<bool> Tracer;
+        public static ConfigEntry<bool> House;
+        public static ConfigEntry<bool> Henry;
+        public static ConfigEntry<bool> Katarina;
+        public static ConfigEntry<bool> Miner;
+        public static ConfigEntry<bool> Phoenix;
+        public static ConfigEntry<bool> Scout;
         public static ConfigEntry<float> DontTouchThis;
 
         public static ConfigEntry<string> emote0;
@@ -100,7 +113,19 @@ namespace EmotesAPI
             EmotesVolume = CustomEmotesAPI.instance.Config.Bind<float>("Controls", "Emotes Volume", 50, "Emotes \"Should\" be controlled by Volume SFX as well, but this is a seperate slider if you want a different audio balance.");
             RandomEmote = CustomEmotesAPI.instance.Config.Bind<KeyboardShortcut>("Controls", "Play Random Emote", new KeyboardShortcut(KeyCode.G), "Plays a random emote from all available emotes");
             JoinEmote = CustomEmotesAPI.instance.Config.Bind<KeyboardShortcut>("Controls", "Join Nearest Syncing Emote", new KeyboardShortcut(KeyCode.V), "Picks the nearest player with a syncing emote and joins them");
-
+            SolSupport = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Aurelion Sol Support", true, "Support for Aurelion Sol to animate, this will break his model a little bit but if you don't mind that feel free to leave this on");
+            Paladin = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Paladin Support", true, "Support for Paladin to animate");
+            Enforcer = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Enforcer Support", true, "Support for Enforcer to animate");
+            Chef = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Chef Support", true, "Support for Chef to animate");
+            Holomancer = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Holomancer Support", false, "Support for Holomancer to animate");
+            Sett = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Sett Support", true, "Support for Sett to animate");
+            Tracer = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Tracer Support", true, "Support for Tracer to animate");
+            House = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "House Support", true, "Support for House to animate");
+            Henry = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Henry Support", true, "Support for Henry to animate");
+            Katarina = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Katarina Support", true, "Support for Katarina to animate");
+            Miner = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Miner Support", true, "Support for Miner to animate");
+            Phoenix = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Phoenix Support", true, "Support for Phoenix to animate");
+            Scout = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Scout Support", true, "Support for Scout to animate");
 
             emote0 = CustomEmotesAPI.instance.Config.Bind<string>("Data", "Bind for emotes0", "none", "Messing with this here is not reccomended, like at all");
             emote1 = CustomEmotesAPI.instance.Config.Bind<string>("Data", "Bind for emotes1", "none", "Messing with this here is not reccomended, like at all");
@@ -136,6 +161,20 @@ namespace EmotesAPI
             ModSettingsManager.AddOption(new SliderOption(EmotesVolume));
             ModSettingsManager.AddOption(new KeyBindOption(RandomEmote));
             ModSettingsManager.AddOption(new KeyBindOption(JoinEmote));
+            ModSettingsManager.AddOption(new CheckBoxOption(SolSupport, true));
+            ModSettingsManager.AddOption(new CheckBoxOption(Paladin, true));
+            ModSettingsManager.AddOption(new CheckBoxOption(Enforcer, true));
+            ModSettingsManager.AddOption(new CheckBoxOption(Chef, true));
+            ModSettingsManager.AddOption(new CheckBoxOption(Holomancer, true));
+            ModSettingsManager.AddOption(new CheckBoxOption(Sett, true));
+            ModSettingsManager.AddOption(new CheckBoxOption(Tracer, true));
+            ModSettingsManager.AddOption(new CheckBoxOption(House, true));
+            ModSettingsManager.AddOption(new CheckBoxOption(Henry, true));
+            ModSettingsManager.AddOption(new CheckBoxOption(Katarina, true));
+            ModSettingsManager.AddOption(new CheckBoxOption(Miner, true));
+            ModSettingsManager.AddOption(new CheckBoxOption(Phoenix, true));
+            ModSettingsManager.AddOption(new CheckBoxOption(Scout, true));
+            //ModSettingsManager.AddOption(new CheckBoxOption(SolSupport, true));
             EmotesVolume.SettingChanged += EmotesVolume_SettingChanged;
         }
 
