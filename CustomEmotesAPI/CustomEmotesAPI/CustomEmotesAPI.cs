@@ -446,7 +446,10 @@ namespace EmotesAPI
             if (GetKeyPressed(Settings.RandomEmote))
             {
                 int rand = UnityEngine.Random.Range(0, allClipNames.Count);
-                PlayAnimation(allClipNames[rand]);
+                foreach (var item in BoneMapper.allMappers)
+                {
+                    PlayAnimation(allClipNames[rand], item);
+                }
             }
             if (GetKeyPressed(Settings.JoinEmote))
             {

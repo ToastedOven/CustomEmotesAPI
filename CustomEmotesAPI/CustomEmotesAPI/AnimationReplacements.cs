@@ -58,29 +58,14 @@ internal static class AnimationReplacements
         };
     }
     internal static bool setup = false;
+    internal static void EnemyArmatures()
+    {
+        CustomEmotesAPI.ImportArmature(Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Brother/BrotherBody.prefab").WaitForCompletion(), Assets.Load<GameObject>("@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/brother.prefab"));
+        CustomEmotesAPI.ImportArmature(Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Beetle/BeetleBody.prefab").WaitForCompletion(), Assets.Load<GameObject>("@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/beetle.prefab"));
+        CustomEmotesAPI.ImportArmature(Addressables.LoadAssetAsync<GameObject>("RoR2/Base/ClayBruiser/ClayBruiserBody.prefab").WaitForCompletion(), Assets.Load<GameObject>("@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/templar.prefab"));
+    }
     internal static void ChangeAnims()
     {
-        //On.EntityStates.BaseState.OnEnter += (orig, self) =>
-        //{
-        //    orig(self);
-        //    if (self.outer.commonComponents.characterBody)
-        //    {
-        //        if (self.outer.commonComponents.characterBody.GetComponent<ModelLocator>())
-        //        {
-        //            if (self.outer.commonComponents.characterBody.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>())
-        //            {
-        //                try
-        //                {
-        //                    self.outer.commonComponents.characterBody.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>().currentClip.clip[0].ToString();
-        //                }
-        //                catch (Exception)
-        //                {
-        //                    CustomEmotesAPI.PlayAnimation("HondaStep", self.outer.commonComponents.characterBody.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>());
-        //                }
-        //            }
-        //        }
-        //    }
-        //};
         On.RoR2.SurvivorCatalog.Init += (orig) =>
         {
             orig();
@@ -102,7 +87,7 @@ internal static class AnimationReplacements
                 ApplyAnimationStuff(SurvivorCatalog.FindSurvivorDefFromBody(Addressables.LoadAssetAsync<GameObject>("RoR2/DLC1/Railgunner/RailgunnerBody.prefab").WaitForCompletion()), "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/railgunner.prefab");
                 ApplyAnimationStuff(Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Heretic/HereticBody.prefab").WaitForCompletion(), "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/heretic.prefab", 3);
 
-
+                EnemyArmatures();
 
                 //CustomEmotesAPI.ImportArmature(Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Brother/BrotherBody.prefab").WaitForCompletion(), Assets.Load<GameObject>("@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/brother.prefab"));
                 //CustomEmotesAPI.ImportArmature(Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Brother/BrotherHurtBody.prefab").WaitForCompletion(), Assets.Load<GameObject>("@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/brother.prefab"));
@@ -220,6 +205,35 @@ internal static class AnimationReplacements
         animcontroller.transform.localPosition = Vector3.zero;
         animcontroller.transform.localEulerAngles = Vector3.zero;
         animcontroller.transform.localScale = Vector3.one;
+
+
+        var fab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Beetle/BeetleBody.prefab").WaitForCompletion();
+        if (fab == bodyPrefab)
+        {
+            List<Transform> t = new List<Transform>();
+            foreach (var item in bodyPrefab.GetComponentsInChildren<Transform>())
+            {
+                if (!item.name.Contains("Hurtbox") && !item.name.Contains("BeetleBody") && !item.name.Contains("Mesh") && !item.name.Contains("mdl"))
+                {
+                    t.Add(item);
+                }
+            }
+            Transform temp = t[14];
+            t[14] = t[11];
+            t[11] = temp;
+            temp = t[15];
+            t[15] = t[12];
+            t[12] = temp;
+            temp = t[16];
+            t[16] = t[13];
+            t[13] = temp;
+            foreach (var item in bodyPrefab.GetComponentsInChildren<SkinnedMeshRenderer>())
+            {
+                item.bones = t.ToArray();
+            }
+        }
+
+
         SkinnedMeshRenderer smr1 = animcontroller.GetComponentsInChildren<SkinnedMeshRenderer>()[pos];
         SkinnedMeshRenderer smr2 = bodyPrefab.GetComponent<ModelLocator>().modelTransform.GetComponentsInChildren<SkinnedMeshRenderer>()[pos];
         int matchingBones = 0;
@@ -383,6 +397,7 @@ public class BoneMapper : MonoBehaviour
     public List<GameObject> props = new List<GameObject>();
     public void PlayAnim(string s, int pos)
     {
+        props.Clear();
         CustomEmotesAPI.Changed(s, this);
         if (s != "none")
         {
@@ -404,7 +419,6 @@ public class BoneMapper : MonoBehaviour
         {
             GameObject.Destroy(item);
         }
-        props.Clear();
         bool footL = false;
         bool footR = false;
         bool upperLegR = false;
