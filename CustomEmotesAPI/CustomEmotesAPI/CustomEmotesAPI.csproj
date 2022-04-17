@@ -8,12 +8,14 @@
   <ItemGroup>
     <None Remove="customemotespackage" />
     <None Remove="customemotespackage2" />
+    <None Remove="enemyskeletons" />
     <None Remove="fineilldoitmyself" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="customemotespackage" />
     <EmbeddedResource Include="customemotespackage2" />
+    <EmbeddedResource Include="enemyskeletons" />
     <EmbeddedResource Include="fineilldoitmyself" />
     <EmbeddedResource Include="moisture_animationreplacements" />
   </ItemGroup>

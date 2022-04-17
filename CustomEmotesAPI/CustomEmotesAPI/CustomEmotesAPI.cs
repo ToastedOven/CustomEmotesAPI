@@ -87,7 +87,7 @@ namespace EmotesAPI
             }
             return Input.GetKeyDown(entry.Value.MainKey);
         }
-        public const string VERSION = "1.3.3";
+        public const string VERSION = "1.3.4";
         internal static float Actual_MSX = 69;
         public static CustomEmotesAPI instance;
         public void Awake()
@@ -96,6 +96,7 @@ namespace EmotesAPI
             DebugClass.SetLogger(base.Logger);
             CustomEmotesAPI.LoadResource("customemotespackage");
             CustomEmotesAPI.LoadResource("fineilldoitmyself");
+            CustomEmotesAPI.LoadResource("enemyskeletons");
             if (!BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("com.gemumoddo.MoistureUpset"))
             {
                 CustomEmotesAPI.LoadResource("moisture_animationreplacements"); // I don't remember what's in here that makes importing emotes work, don't @ me
@@ -408,6 +409,7 @@ namespace EmotesAPI
                         GameObject bodyObject = Util.FindNetworkObject(identity.netId);
                         bodyObject.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>().PlayAnim(animationName, pos);
                     }
+                    return;
                 }
             }
             DebugClass.Log($"BoneMapper of name {mapper.transform.name} was not found, L");

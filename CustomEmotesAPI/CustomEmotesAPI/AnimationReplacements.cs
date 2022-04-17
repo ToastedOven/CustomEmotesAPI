@@ -19,6 +19,7 @@ using UnityEngine.Animations;
 using UnityEngine.UI;
 using EmotesAPI;
 using UnityEngine.AddressableAssets;
+using Generics.Dynamics;
 
 internal static class AnimationReplacements
 {
@@ -59,6 +60,27 @@ internal static class AnimationReplacements
     internal static bool setup = false;
     internal static void ChangeAnims()
     {
+        //On.EntityStates.BaseState.OnEnter += (orig, self) =>
+        //{
+        //    orig(self);
+        //    if (self.outer.commonComponents.characterBody)
+        //    {
+        //        if (self.outer.commonComponents.characterBody.GetComponent<ModelLocator>())
+        //        {
+        //            if (self.outer.commonComponents.characterBody.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>())
+        //            {
+        //                try
+        //                {
+        //                    self.outer.commonComponents.characterBody.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>().currentClip.clip[0].ToString();
+        //                }
+        //                catch (Exception)
+        //                {
+        //                    CustomEmotesAPI.PlayAnimation("HondaStep", self.outer.commonComponents.characterBody.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>());
+        //                }
+        //            }
+        //        }
+        //    }
+        //};
         On.RoR2.SurvivorCatalog.Init += (orig) =>
         {
             orig();
@@ -80,6 +102,10 @@ internal static class AnimationReplacements
                 ApplyAnimationStuff(SurvivorCatalog.FindSurvivorDefFromBody(Addressables.LoadAssetAsync<GameObject>("RoR2/DLC1/Railgunner/RailgunnerBody.prefab").WaitForCompletion()), "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/railgunner.prefab");
                 ApplyAnimationStuff(Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Heretic/HereticBody.prefab").WaitForCompletion(), "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/heretic.prefab", 3);
 
+
+
+                //CustomEmotesAPI.ImportArmature(Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Brother/BrotherBody.prefab").WaitForCompletion(), Assets.Load<GameObject>("@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/brother.prefab"));
+                //CustomEmotesAPI.ImportArmature(Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Brother/BrotherHurtBody.prefab").WaitForCompletion(), Assets.Load<GameObject>("@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/brother.prefab"));
 
                 foreach (var item in SurvivorCatalog.allSurvivorDefs)
                 {
@@ -270,7 +296,7 @@ public class CustomAnimationClip : MonoBehaviour
 
     internal bool syncronizeAnimation;
     public int syncPos;
-    internal static List<float> syncTimer = new List<float>();
+    public static List<float> syncTimer = new List<float>();
     public static List<int> syncPlayerCount = new List<int>();
 
     internal CustomAnimationClip(AnimationClip[] _clip, bool _loop/*, bool _shouldSyncronize = false*/, string _wwiseEventName = "", string _wwiseStopEvent = "", HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip[] _secondaryClip = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true, bool syncAnim = false, bool syncAudio = false, int startPreference = -1, int joinPreference = -1)
@@ -357,11 +383,20 @@ public class BoneMapper : MonoBehaviour
     public List<GameObject> props = new List<GameObject>();
     public void PlayAnim(string s, int pos)
     {
+        CustomEmotesAPI.Changed(s, this);
         if (s != "none")
         {
             if (!animClips.ContainsKey(s))
             {
                 DebugClass.Log($"No emote bound to the name [{s}]");
+                return;
+            }
+            try
+            {
+                animClips[s].ToString();
+            }
+            catch (Exception)
+            {
                 return;
             }
         }
@@ -377,6 +412,10 @@ public class BoneMapper : MonoBehaviour
         bool lowerLegR = false;
         bool lowerLegL = false;
         a2.enabled = true;
+        if (a2.transform.parent.GetComponent<InverseKinematics>() && a2.name != "loader")
+        {
+            a2.transform.parent.GetComponent<InverseKinematics>().enabled = false;
+        }
         List<string> dontAnimateUs = new List<string>();
         try
         {
@@ -554,7 +593,6 @@ public class BoneMapper : MonoBehaviour
             a2.Play("none", -1, 0f);
             twopart = false;
             currentClip = null;
-            CustomEmotesAPI.Changed(s, this);
             return;
         }
         AnimatorOverrideController animController = new AnimatorOverrideController(a2.runtimeAnimatorController);
@@ -619,7 +657,6 @@ public class BoneMapper : MonoBehaviour
             a2.runtimeAnimatorController = animController;
             a2.Play("Poop", -1, (CustomAnimationClip.syncTimer[currentClip.syncPos] % currentClip.clip[pos].length) / currentClip.clip[pos].length);
         }
-        CustomEmotesAPI.Changed(s, this);
         twopart = false;
     }
     void AddIgnore(DynamicBone dynbone, Transform t)
@@ -866,6 +903,10 @@ public class BoneMapper : MonoBehaviour
                 //DebugClass.Log($"----------{a1}");
                 a1.enabled = true;
                 a2.enabled = false;
+                if (a2.transform.parent.GetComponent<InverseKinematics>() && a2.name != "loader")
+                {
+                    a2.transform.parent.GetComponent<InverseKinematics>().enabled = true;
+                }
                 try
                 {
                     currentClip.clip.ToString();
