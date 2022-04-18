@@ -60,9 +60,25 @@ internal static class AnimationReplacements
     internal static bool setup = false;
     internal static void EnemyArmatures()
     {
-        CustomEmotesAPI.ImportArmature(Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Brother/BrotherBody.prefab").WaitForCompletion(), Assets.Load<GameObject>("@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/brother.prefab"));
-        CustomEmotesAPI.ImportArmature(Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Beetle/BeetleBody.prefab").WaitForCompletion(), Assets.Load<GameObject>("@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/beetle.prefab"));
-        CustomEmotesAPI.ImportArmature(Addressables.LoadAssetAsync<GameObject>("RoR2/Base/ClayBruiser/ClayBruiserBody.prefab").WaitForCompletion(), Assets.Load<GameObject>("@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/templar.prefab"));
+        Import("RoR2/Base/Brother/BrotherBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/brother.prefab");
+        Import("RoR2/Base/ClayBruiser/ClayBruiserBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/templar.prefab");
+
+        Import("RoR2/DLC1/AcidLarva/AcidLarvaBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/AcidLarva1.prefab");
+        Import("RoR2/Base/Titan/TitanGoldBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/Aurelionite.prefab");
+        Import("RoR2/Base/Beetle/BeetleGuardBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/Beetle guard.prefab");
+        Import("RoR2/Base/Beetle/BeetleQueen2Body.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/beetle queen1.prefab");
+
+        Import("RoR2/DLC1/ClayGrenadier/ClayGrenadierBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/claygrenadier.prefab");
+        Import("RoR2/Base/Bison/BisonBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/bison.prefab");
+        Import("RoR2/Base/Bell/BellBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/brass contraption2.prefab");
+        Import("RoR2/DLC1/FlyingVermin/FlyingVerminBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/flyingvermin1.prefab");
+
+
+        //CustomEmotesAPI.ImportArmature(Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Beetle/BeetleBody.prefab").WaitForCompletion(), Assets.Load<GameObject>("@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/beetle.prefab"));
+    }
+    internal static void Import(string prefab, string skeleton)
+    {
+        CustomEmotesAPI.ImportArmature(Addressables.LoadAssetAsync<GameObject>(prefab).WaitForCompletion(), Assets.Load<GameObject>(skeleton));
     }
     internal static void ChangeAnims()
     {
@@ -397,6 +413,10 @@ public class BoneMapper : MonoBehaviour
     public List<GameObject> props = new List<GameObject>();
     public void PlayAnim(string s, int pos)
     {
+        foreach (var item in props)
+        {
+            GameObject.Destroy(item);
+        }
         props.Clear();
         CustomEmotesAPI.Changed(s, this);
         if (s != "none")
@@ -414,10 +434,6 @@ public class BoneMapper : MonoBehaviour
             {
                 return;
             }
-        }
-        foreach (var item in props)
-        {
-            GameObject.Destroy(item);
         }
         bool footL = false;
         bool footR = false;

@@ -87,7 +87,7 @@ namespace EmotesAPI
             }
             return Input.GetKeyDown(entry.Value.MainKey);
         }
-        public const string VERSION = "1.3.4";
+        public const string VERSION = "1.3.5";
         internal static float Actual_MSX = 69;
         public static CustomEmotesAPI instance;
         public void Awake()
@@ -439,6 +439,20 @@ namespace EmotesAPI
             {
                 animChanged(newAnimation, mapper);
             }
+            if (newAnimation != "none")
+            {
+                if (mapper.transform.name == "templar")
+                {
+                    mapper.transform.parent.Find("ClayBruiserCannonMesh").gameObject.SetActive(false);
+                }
+            }
+            else
+            {
+                if (mapper.transform.name == "templar")
+                {
+                    mapper.transform.parent.Find("ClayBruiserCannonMesh").gameObject.SetActive(true);
+                }
+            }
         }
 
         void Update()
@@ -450,6 +464,7 @@ namespace EmotesAPI
                 {
                     PlayAnimation(allClipNames[rand], item);
                 }
+               // PlayAnimation(allClipNames[rand]);
             }
             if (GetKeyPressed(Settings.JoinEmote))
             {
