@@ -710,7 +710,6 @@ public class BoneMapper : MonoBehaviour
         foreach (var item in startEvents)
         {
             GameObject obj = new GameObject();
-            obj = GameObject.Instantiate(obj);
             obj.transform.SetParent(transform);
             obj.transform.localPosition = new Vector3(0, -10000, 0);
             audioObjects.Add(obj);
