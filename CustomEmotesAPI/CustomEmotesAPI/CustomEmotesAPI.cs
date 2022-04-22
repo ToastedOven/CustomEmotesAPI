@@ -87,7 +87,7 @@ namespace EmotesAPI
             }
             return Input.GetKeyDown(entry.Value.MainKey);
         }
-        public const string VERSION = "1.3.5";
+        public const string VERSION = "1.3.6";
         internal static float Actual_MSX = 69;
         public static CustomEmotesAPI instance;
         public void Awake()
@@ -97,10 +97,10 @@ namespace EmotesAPI
             CustomEmotesAPI.LoadResource("customemotespackage");
             CustomEmotesAPI.LoadResource("fineilldoitmyself");
             CustomEmotesAPI.LoadResource("enemyskeletons");
-            if (!BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("com.gemumoddo.MoistureUpset"))
-            {
-                CustomEmotesAPI.LoadResource("moisture_animationreplacements"); // I don't remember what's in here that makes importing emotes work, don't @ me
-            }
+            //if (!BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("com.gemumoddo.MoistureUpset"))
+            //{
+            //}
+            CustomEmotesAPI.LoadResource("moisture_animationreplacements"); // I don't remember what's in here that makes importing emotes work, don't @ me
             Settings.RunAll();
             Register.Init();
             AnimationReplacements.RunAll();
@@ -460,11 +460,11 @@ namespace EmotesAPI
             if (GetKeyPressed(Settings.RandomEmote))
             {
                 int rand = UnityEngine.Random.Range(0, allClipNames.Count);
-                foreach (var item in BoneMapper.allMappers)
-                {
-                    PlayAnimation(allClipNames[rand], item);
-                }
-               // PlayAnimation(allClipNames[rand]);
+                //foreach (var item in BoneMapper.allMappers)
+                //{
+                //    PlayAnimation(allClipNames[rand], item);
+                //}
+                PlayAnimation(allClipNames[rand]);
             }
             if (GetKeyPressed(Settings.JoinEmote))
             {
