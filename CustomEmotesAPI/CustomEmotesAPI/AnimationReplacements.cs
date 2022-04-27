@@ -1019,7 +1019,7 @@ public class BoneMapper : MonoBehaviour
         {
             if (overrideMoveSpeed)
             {
-                //transform.parent.GetComponent<CharacterModel>().body.SetPropertyValue<float>("moveSpeed", autoWalkSpeed);
+                transform.parent.GetComponent<CharacterModel>().body.moveSpeed = autoWalkSpeed;
             }
             transform.parent.GetComponent<CharacterModel>().body.GetComponent<CharacterMotor>().moveDirection = transform.parent.GetComponent<CharacterModel>().body.GetComponent<CharacterDirection>().forward * autoWalkSpeed;
         }
