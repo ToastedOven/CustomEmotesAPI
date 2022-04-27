@@ -1,20 +1,8 @@
-﻿using BepInEx;
-using R2API.Utils;
-using RoR2;
-using R2API;
-using R2API.MiscHelpers;
-using System.Reflection;
-using static R2API.SoundAPI;
+﻿using RoR2;
 using System;
 using UnityEngine;
-using UnityEngine.Networking;
-using System.IO;
-using UnityEngine.SceneManagement;
 using System.Collections.Generic;
-using System.Text;
-using RiskOfOptions;
 using TMPro;
-using R2API.Networking.Interfaces;
 using UnityEngine.Animations;
 using UnityEngine.UI;
 using EmotesAPI;
@@ -33,9 +21,10 @@ internal static class AnimationReplacements
             g = GameObject.Instantiate(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/emotewheel.prefab"));
             foreach (var item in g.GetComponentsInChildren<TextMeshProUGUI>())
             {
-                item.font = self.mainContainer.transform.Find("MainUIArea").Find("SpringCanvas").Find("UpperLeftCluster").Find("MoneyRoot").Find("ValueText").GetComponent<TextMeshProUGUI>().font;
-                item.fontMaterial = self.mainContainer.transform.Find("MainUIArea").Find("SpringCanvas").Find("UpperLeftCluster").Find("MoneyRoot").Find("ValueText").GetComponent<TextMeshProUGUI>().fontMaterial;
-                item.fontSharedMaterial = self.mainContainer.transform.Find("MainUIArea").Find("SpringCanvas").Find("UpperLeftCluster").Find("MoneyRoot").Find("ValueText").GetComponent<TextMeshProUGUI>().fontSharedMaterial;
+                var money = self.moneyText.targetText;
+                item.font = money.font;
+                item.fontMaterial = money.fontMaterial;
+                item.fontSharedMaterial = money.fontSharedMaterial;
             }
             g.transform.SetParent(self.mainContainer.transform);
             g.transform.localPosition = new Vector3(0, 0, 0);
