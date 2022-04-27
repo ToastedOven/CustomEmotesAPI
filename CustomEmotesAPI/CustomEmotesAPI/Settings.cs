@@ -33,6 +33,7 @@ namespace EmotesAPI
         public static ConfigEntry<bool> Miner;
         public static ConfigEntry<bool> Phoenix;
         public static ConfigEntry<bool> Scout;
+        public static ConfigEntry<bool> DimmingSpheres;
         public static ConfigEntry<float> DontTouchThis;
 
         public static ConfigEntry<string> emote0;
@@ -126,6 +127,7 @@ namespace EmotesAPI
             Miner = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Miner Support", true, "Support for Miner to animate");
             Phoenix = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Phoenix Support", true, "Support for Phoenix to animate");
             Scout = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Scout Support", true, "Support for Scout to animate");
+            DimmingSpheres = CustomEmotesAPI.instance.Config.Bind<bool>("Misc", "Dimming Spheres", true, "Turn off music dimming when near emotes that support dimming.");
 
             emote0 = CustomEmotesAPI.instance.Config.Bind<string>("Data", "Bind for emotes0", "none", "Messing with this here is not reccomended, like at all");
             emote1 = CustomEmotesAPI.instance.Config.Bind<string>("Data", "Bind for emotes1", "none", "Messing with this here is not reccomended, like at all");
@@ -174,6 +176,7 @@ namespace EmotesAPI
             ModSettingsManager.AddOption(new CheckBoxOption(Miner, true));
             ModSettingsManager.AddOption(new CheckBoxOption(Phoenix, true));
             ModSettingsManager.AddOption(new CheckBoxOption(Scout, true));
+            ModSettingsManager.AddOption(new CheckBoxOption(DimmingSpheres, true));
             //ModSettingsManager.AddOption(new CheckBoxOption(SolSupport, true));
             EmotesVolume.SettingChanged += EmotesVolume_SettingChanged;
         }

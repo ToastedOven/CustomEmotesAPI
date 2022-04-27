@@ -70,7 +70,7 @@ internal static class AnimationReplacements
 
         Import("RoR2/DLC1/ClayGrenadier/ClayGrenadierBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/claygrenadier.prefab");
         Import("RoR2/Base/Bison/BisonBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/bison.prefab");
-        Import("RoR2/Base/Bell/BellBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/brass contraption2.prefab");
+        //Import("RoR2/Base/Bell/BellBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/brass contraption2.prefab");
         Import("RoR2/DLC1/FlyingVermin/FlyingVerminBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/flyingvermin1.prefab");
 
 
@@ -304,6 +304,13 @@ internal static class AnimationReplacements
         test.a1 = bodyPrefab.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<Animator>();
         test.a2 = animcontroller.GetComponentInChildren<Animator>();
 
+        var nuts = Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/bandit.prefab");
+        float banditScale = Vector3.Distance(nuts.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.Head).position, nuts.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.LeftFoot).position);
+
+        float currScale = Vector3.Distance(animcontroller.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.Head).position, animcontroller.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.LeftFoot).position);
+
+        test.scale = currScale / banditScale;
+
         test.h = bodyPrefab.GetComponentInChildren<HealthComponent>();
         test.model = bodyPrefab.GetComponent<ModelLocator>().modelTransform.gameObject;
     }
@@ -329,7 +336,7 @@ public class CustomAnimationClip : MonoBehaviour
     public static List<float> syncTimer = new List<float>();
     public static List<int> syncPlayerCount = new List<int>();
 
-    internal CustomAnimationClip(AnimationClip[] _clip, bool _loop/*, bool _shouldSyncronize = false*/, string _wwiseEventName = "", string _wwiseStopEvent = "", HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip[] _secondaryClip = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true, bool syncAnim = false, bool syncAudio = false, int startPreference = -1, int joinPreference = -1)
+    internal CustomAnimationClip(AnimationClip[] _clip, bool _loop/*, bool _shouldSyncronize = false*/, string[] _wwiseEventName = null, string[] _wwiseStopEvent = null, HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip[] _secondaryClip = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true, bool syncAnim = false, bool syncAudio = false, int startPreference = -1, int joinPreference = -1)
     {
         if (rootBonesToIgnore == null)
             rootBonesToIgnore = new HumanBodyBones[0];
@@ -363,8 +370,20 @@ public class CustomAnimationClip : MonoBehaviour
         //    //}
         //    wwiseEvent = _wwiseEventName;
         //}
-        BoneMapper.stopEvents.Add(_wwiseStopEvent);
-        BoneMapper.startEvents.Add(_wwiseEventName);
+        string[] wwiseEvents;
+        string[] wwiseStopEvents;
+        if (_wwiseEventName == null)
+        {
+            wwiseEvents = new string[] { "" };
+            wwiseStopEvents = new string[] { "" };
+        }
+        else
+        {
+            wwiseEvents = _wwiseEventName;
+            wwiseStopEvents = _wwiseStopEvent;
+        }
+        BoneMapper.stopEvents.Add(wwiseStopEvents);
+        BoneMapper.startEvents.Add(wwiseEvents);
         if (soloBonesToIgnore.Length != 0)
         {
             soloIgnoredBones = new List<HumanBodyBones>(soloBonesToIgnore);
@@ -391,8 +410,8 @@ public class CustomAnimationClip : MonoBehaviour
 }
 public class BoneMapper : MonoBehaviour
 {
-    public static List<string> stopEvents = new List<string>();
-    public static List<string> startEvents = new List<string>();
+    public static List<string[]> stopEvents = new List<string[]>();
+    public static List<string[]> startEvents = new List<string[]>();
     internal List<GameObject> audioObjects = new List<GameObject>();
     public SkinnedMeshRenderer smr1, smr2;
     public Animator a1, a2;
@@ -411,14 +430,12 @@ public class BoneMapper : MonoBehaviour
     internal static bool attacking = false;
     public bool jank = false;
     public List<GameObject> props = new List<GameObject>();
+    public float scale = 1.0f;
+    int currEvent = 0;
+    public float autoWalkSpeed = 0;
+    public bool overrideMoveSpeed = false;
     public void PlayAnim(string s, int pos)
     {
-        foreach (var item in props)
-        {
-            GameObject.Destroy(item);
-        }
-        props.Clear();
-        CustomEmotesAPI.Changed(s, this);
         if (s != "none")
         {
             if (!animClips.ContainsKey(s))
@@ -432,6 +449,7 @@ public class BoneMapper : MonoBehaviour
             }
             catch (Exception)
             {
+                CustomEmotesAPI.Changed(s, this);
                 return;
             }
         }
@@ -454,11 +472,11 @@ public class BoneMapper : MonoBehaviour
             {
                 CustomAnimationClip.syncPlayerCount[currentClip.syncPos]--;
             }
-            if (stopEvents[currentClip.syncPos] != "")
+            if (stopEvents[currentClip.syncPos][currEvent] != "")
             {
                 if (!currentClip.syncronizeAudio)
                 {
-                    AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos], audioObjects[currentClip.syncPos]);
+                    AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos][currEvent], audioObjects[currentClip.syncPos]);
                 }
                 audioObjects[currentClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
 
@@ -466,7 +484,7 @@ public class BoneMapper : MonoBehaviour
                 {
                     foreach (var item in allMappers)
                     {
-                        AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos], item.audioObjects[currentClip.syncPos]);
+                        AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos][currEvent], item.audioObjects[currentClip.syncPos]);
                         item.audioObjects[currentClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
                     }
                 }
@@ -475,6 +493,7 @@ public class BoneMapper : MonoBehaviour
         catch (Exception)
         {
         }
+        currEvent = 0;
         if (s != "none")
         {
             currentClip = animClips[s];
@@ -623,6 +642,16 @@ public class BoneMapper : MonoBehaviour
             a2.Play("none", -1, 0f);
             twopart = false;
             currentClip = null;
+
+            foreach (var item in props)
+            {
+                GameObject.Destroy(item);
+            }
+            props.Clear();
+            autoWalkSpeed = 0;
+            overrideMoveSpeed = false;
+            CustomEmotesAPI.Changed(s, this);
+
             return;
         }
         AnimatorOverrideController animController = new AnimatorOverrideController(a2.runtimeAnimatorController);
@@ -634,18 +663,21 @@ public class BoneMapper : MonoBehaviour
         {
             CustomAnimationClip.syncTimer[currentClip.syncPos] = 0;
         }
-        if (startEvents[currentClip.syncPos] != "")
+        if (startEvents[currentClip.syncPos][currEvent] != "")
         {
             if (CustomAnimationClip.syncPlayerCount[currentClip.syncPos] == 1 && currentClip.syncronizeAudio)
             {
+                currEvent = UnityEngine.Random.Range(0, startEvents[currentClip.syncPos].Length);
                 foreach (var item in allMappers)
                 {
-                    AkSoundEngine.PostEvent(startEvents[currentClip.syncPos], item.audioObjects[currentClip.syncPos]);
+                    item.currEvent = currEvent;
+                    AkSoundEngine.PostEvent(startEvents[currentClip.syncPos][currEvent], item.audioObjects[currentClip.syncPos]);
                 }
             }
             else if (!currentClip.syncronizeAudio)
             {
-                AkSoundEngine.PostEvent(startEvents[currentClip.syncPos], audioObjects[currentClip.syncPos]);
+                currEvent = UnityEngine.Random.Range(0, startEvents[currentClip.syncPos].Length);
+                AkSoundEngine.PostEvent(startEvents[currentClip.syncPos][currEvent], audioObjects[currentClip.syncPos]);
             }
             audioObjects[currentClip.syncPos].transform.localPosition = Vector3.zero;
         }
@@ -688,6 +720,22 @@ public class BoneMapper : MonoBehaviour
             a2.Play("Poop", -1, (CustomAnimationClip.syncTimer[currentClip.syncPos] % currentClip.clip[pos].length) / currentClip.clip[pos].length);
         }
         twopart = false;
+        foreach (var item in props)
+        {
+            GameObject.Destroy(item);
+        }
+        props.Clear();
+        autoWalkSpeed = 0;
+        overrideMoveSpeed = false;
+        CustomEmotesAPI.Changed(s, this);
+    }
+    public void ScaleProps()
+    {
+        Vector3 parentScale = this.transform.parent.transform.localScale;
+        foreach (var item in props)
+        {
+            item.transform.localScale = new Vector3(scale / parentScale.x, scale / parentScale.y, scale / parentScale.z);
+        }
     }
     void AddIgnore(DynamicBone dynbone, Transform t)
     {
@@ -855,7 +903,7 @@ public class BoneMapper : MonoBehaviour
                 {
                 }
             }
-            if (closestDimmingSource < 20f)
+            if (closestDimmingSource < 20f && Settings.DimmingSpheres.Value)
             {
                 Current_MSX = Mathf.Lerp(Current_MSX, (closestDimmingSource / 20f) * CustomEmotesAPI.Actual_MSX, Time.deltaTime * 3);
                 AkSoundEngine.SetRTPCValue("Volume_MSX", Current_MSX);
@@ -949,11 +997,11 @@ public class BoneMapper : MonoBehaviour
                     {
                         CustomAnimationClip.syncPlayerCount[currentClip.syncPos]--;
                     }
-                    if (stopEvents[currentClip.syncPos] != "")
+                    if (stopEvents[currentClip.syncPos][currEvent] != "")
                     {
                         if (!currentClip.syncronizeAudio)
                         {
-                            AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos], audioObjects[currentClip.syncPos]);
+                            AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos][currEvent], audioObjects[currentClip.syncPos]);
                         }
                         audioObjects[currentClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
 
@@ -961,7 +1009,7 @@ public class BoneMapper : MonoBehaviour
                         {
                             foreach (var item in allMappers)
                             {
-                                AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos], item.audioObjects[currentClip.syncPos]);
+                                AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos][currEvent], item.audioObjects[currentClip.syncPos]);
                                 item.audioObjects[currentClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
                             }
                         }
@@ -977,6 +1025,14 @@ public class BoneMapper : MonoBehaviour
         {
             //a1.enabled = false;
             twopart = false;
+        }
+        if (autoWalkSpeed != 0)
+        {
+            if (overrideMoveSpeed)
+            {
+                transform.parent.GetComponent<CharacterModel>().body.SetPropertyValue<float>("moveSpeed", autoWalkSpeed);
+            }
+            transform.parent.GetComponent<CharacterModel>().body.GetComponent<CharacterMotor>().moveDirection = transform.parent.GetComponent<CharacterModel>().body.GetComponent<CharacterDirection>().forward * autoWalkSpeed;
         }
         if (h.health <= 0)
         {
@@ -997,6 +1053,25 @@ public class BoneMapper : MonoBehaviour
             GameObject.Destroy(gameObject);
         }
     }
+    public void SetAutoWalk(float speed, bool overrideBaseMovement)
+    {
+        autoWalkSpeed = speed;
+        overrideMoveSpeed = overrideBaseMovement;
+    }
+    void FixedUpdate()
+    {
+        //if (autoWalkSpeed != 0)
+        //{
+        //    if (overrideMoveSpeed)
+        //    {
+        //        transform.parent.GetComponent<CharacterModel>().body.GetComponent<InputBankTest>().moveVector = transform.parent.GetComponent<CharacterModel>().body.GetComponent<CharacterDirection>().forward * autoWalkSpeed;
+        //    }
+        //    else
+        //    {
+        //        transform.parent.GetComponent<CharacterModel>().body.GetComponent<CharacterMotor>().moveDirection = transform.parent.GetComponent<CharacterModel>().body.GetComponent<CharacterDirection>().forward * autoWalkSpeed;
+        //    }
+        //}
+    }
     void OnDestroy()
     {
         //foreach (var item in allMappers)
@@ -1011,11 +1086,11 @@ public class BoneMapper : MonoBehaviour
                 if (CustomAnimationClip.syncPlayerCount[currentClip.syncPos] > 0)
                     CustomAnimationClip.syncPlayerCount[currentClip.syncPos]--;
             }
-            if (stopEvents[currentClip.syncPos] != "")
+            if (stopEvents[currentClip.syncPos][currEvent] != "")
             {
                 if (!currentClip.syncronizeAudio)
                 {
-                    AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos], audioObjects[currentClip.syncPos]);
+                    AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos][currEvent], audioObjects[currentClip.syncPos]);
                 }
                 audioObjects[currentClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
 
@@ -1023,11 +1098,11 @@ public class BoneMapper : MonoBehaviour
                 {
                     foreach (var item in allMappers)
                     {
-                        AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos], item.audioObjects[currentClip.syncPos]);
+                        AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos][currEvent], item.audioObjects[currentClip.syncPos]);
                         item.audioObjects[currentClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
                     }
                 }
-                AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos], audioObjects[currentClip.syncPos]);
+                AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos][currEvent], audioObjects[currentClip.syncPos]);
             }
             BoneMapper.allMappers.Remove(this);
             currentClip = null;

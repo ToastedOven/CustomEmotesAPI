@@ -306,6 +306,17 @@ namespace EmotesAPI
                 //    self.InvokeMethod("CheckPinging");
                 //}
             };
+            //On.RoR2.PlayerCharacterMasterController.Update += (orig, self) =>
+            //{
+            //    DebugClass.Log($"----------{self.transform.name}");
+            //    if (self.transform.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>() && self.transform.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>().overrideMoveSpeed)
+            //    {
+            //        DebugClass.Log($"----------nut");
+            //        DebugClass.Log($"----------{self.transform.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>().overrideMoveSpeed}");
+            //        return;
+            //    }
+            //    orig(self);
+            //};
             AddNonAnimatingEmote("none");
         }
         public static void AddNonAnimatingEmote(string emoteName, bool visible = true)
@@ -313,6 +324,31 @@ namespace EmotesAPI
             if (visible)
                 allClipNames.Add(emoteName);
             BoneMapper.animClips.Add(emoteName, null);
+        }
+        public static void AddCustomAnimation(AnimationClip[] animationClip, bool looping, string[] _wwiseEventName = null, string[] _wwiseStopEvent = null, HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip[] secondaryAnimation = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true, bool syncAnim = false, bool syncAudio = false, int startPref = -1, int joinPref = -1)
+        {
+            if (BoneMapper.animClips.ContainsKey(animationClip[0].name))
+            {
+                Debug.Log($"EmotesError: [{animationClip[0].name}] is already defined as a custom emote but is trying to be added. Skipping");
+                return;
+            }
+            if (!animationClip[0].isHumanMotion)
+            {
+                Debug.Log($"EmotesError: [{animationClip[0].name}] is not a humanoid animation!");
+                return;
+            }
+            if (rootBonesToIgnore == null)
+                rootBonesToIgnore = new HumanBodyBones[0];
+            if (soloBonesToIgnore == null)
+                soloBonesToIgnore = new HumanBodyBones[0];
+            if (_wwiseEventName == null)
+                _wwiseEventName = new string[] { "" };
+            if (_wwiseStopEvent == null)
+                _wwiseStopEvent = new string[] { "" };
+            CustomAnimationClip clip = new CustomAnimationClip(animationClip, looping, _wwiseEventName, _wwiseStopEvent, rootBonesToIgnore, soloBonesToIgnore, secondaryAnimation, dimWhenClose, stopWhenMove, stopWhenAttack, visible, syncAnim, syncAudio, startPref, joinPref);
+            if (visible)
+                allClipNames.Add(animationClip[0].name);
+            BoneMapper.animClips.Add(animationClip[0].name, clip);
         }
         public static void AddCustomAnimation(AnimationClip[] animationClip, bool looping, string _wwiseEventName = "", string _wwiseStopEvent = "", HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip[] secondaryAnimation = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true, bool syncAnim = false, bool syncAudio = false, int startPref = -1, int joinPref = -1)
         {
@@ -330,7 +366,9 @@ namespace EmotesAPI
                 rootBonesToIgnore = new HumanBodyBones[0];
             if (soloBonesToIgnore == null)
                 soloBonesToIgnore = new HumanBodyBones[0];
-            CustomAnimationClip clip = new CustomAnimationClip(animationClip, looping, _wwiseEventName, _wwiseStopEvent, rootBonesToIgnore, soloBonesToIgnore, secondaryAnimation, dimWhenClose, stopWhenMove, stopWhenAttack, visible, syncAnim, syncAudio, startPref, joinPref);
+            string[] wwiseEvents = new string[] { _wwiseEventName };
+            string[] wwiseStopEvents = new string[] { _wwiseStopEvent };
+            CustomAnimationClip clip = new CustomAnimationClip(animationClip, looping, wwiseEvents, wwiseStopEvents, rootBonesToIgnore, soloBonesToIgnore, secondaryAnimation, dimWhenClose, stopWhenMove, stopWhenAttack, visible, syncAnim, syncAudio, startPref, joinPref);
             if (visible)
                 allClipNames.Add(animationClip[0].name);
             BoneMapper.animClips.Add(animationClip[0].name, clip);
@@ -357,7 +395,9 @@ namespace EmotesAPI
             {
                 secondaryClips = new AnimationClip[] { secondaryAnimation };
             }
-            CustomAnimationClip clip = new CustomAnimationClip(animationClips, looping, _wwiseEventName, _wwiseStopEvent, rootBonesToIgnore, soloBonesToIgnore, secondaryClips, dimWhenClose, stopWhenMove, stopWhenAttack, visible, syncAnim, syncAudio);
+            string[] wwiseEvents = new string[] { _wwiseEventName };
+            string[] wwiseStopEvents = new string[] { _wwiseStopEvent };
+            CustomAnimationClip clip = new CustomAnimationClip(animationClips, looping, wwiseEvents, wwiseStopEvents, rootBonesToIgnore, soloBonesToIgnore, secondaryClips, dimWhenClose, stopWhenMove, stopWhenAttack, visible, syncAnim, syncAudio);
             if (visible)
                 allClipNames.Add(animationClip.name);
             BoneMapper.animClips.Add(animationClip.name, clip);
@@ -435,6 +475,7 @@ namespace EmotesAPI
         public static event AnimationChanged animChanged;
         internal static void Changed(string newAnimation, BoneMapper mapper) //is a neat game made by a developer who endorses nsfw content while calling it a fine game for kids
         {
+            mapper.transform.parent.GetComponent<CharacterModel>().body.RecalculateStats();
             if (animChanged != null)
             {
                 animChanged(newAnimation, mapper);
@@ -460,11 +501,11 @@ namespace EmotesAPI
             if (GetKeyPressed(Settings.RandomEmote))
             {
                 int rand = UnityEngine.Random.Range(0, allClipNames.Count);
-                //foreach (var item in BoneMapper.allMappers)
-                //{
-                //    PlayAnimation(allClipNames[rand], item);
-                //}
-                PlayAnimation(allClipNames[rand]);
+                foreach (var item in BoneMapper.allMappers)
+                {
+                    PlayAnimation(allClipNames[rand], item);
+                }
+                //PlayAnimation(allClipNames[rand]);
             }
             if (GetKeyPressed(Settings.JoinEmote))
             {
