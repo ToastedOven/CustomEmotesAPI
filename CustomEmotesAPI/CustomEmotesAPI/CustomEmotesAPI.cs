@@ -497,11 +497,11 @@ namespace EmotesAPI
                 }
             }
         }
-        public delegate void JoinedEmoteSpot(GameObject emoteSpot, BoneMapper joiner, BoneMapper host);
+        public delegate void JoinedEmoteSpot(string emoteSpotName, string currentClipName, BoneMapper joiner, BoneMapper host);
         public static event JoinedEmoteSpot emoteSpotJoined;
         internal static void Joined(GameObject emoteSpot, BoneMapper joiner, BoneMapper host)
         {
-            emoteSpotJoined(emoteSpot, joiner, host);
+            emoteSpotJoined(emoteSpot.name, host.currentClip.name, joiner, host);
         }
 
         void Update()
@@ -509,11 +509,11 @@ namespace EmotesAPI
             if (GetKeyPressed(Settings.RandomEmote))
             {
                 int rand = UnityEngine.Random.Range(0, allClipNames.Count);
-                foreach (var item in BoneMapper.allMappers)
-                {
-                    PlayAnimation(allClipNames[rand], item);
-                }
-                //PlayAnimation(allClipNames[rand]);
+                //foreach (var item in BoneMapper.allMappers)
+                //{
+                //    PlayAnimation(allClipNames[rand], item);
+                //}
+                PlayAnimation(allClipNames[rand]);
             }
             if (GetKeyPressed(Settings.JoinEmote))
             {

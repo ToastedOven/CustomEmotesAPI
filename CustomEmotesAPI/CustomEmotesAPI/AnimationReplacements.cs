@@ -752,6 +752,7 @@ public class BoneMapper : MonoBehaviour
                 props[props.Count - 1].transform.localPosition = locations[i].position;
                 props[props.Count - 1].transform.localEulerAngles = locations[i].rotation;
                 props[props.Count - 1].transform.localScale = locations[i].scale;
+                props[props.Count - 1].name = locations[i].name;
                 props[props.Count - 1].AddComponent<EmoteLocation>().owner = this;
                 props[props.Count - 1].transform.parent = null;
             }
