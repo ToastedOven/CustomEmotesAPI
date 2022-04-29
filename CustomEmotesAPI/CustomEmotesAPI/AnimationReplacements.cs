@@ -8,7 +8,10 @@ using UnityEngine.UI;
 using EmotesAPI;
 using UnityEngine.AddressableAssets;
 using Generics.Dynamics;
+using System.Security;
+using System.Security.Permissions;
 
+[assembly: SecurityPermission(SecurityAction.RequestMinimum, SkipVerification = true)]
 internal static class AnimationReplacements
 {
     internal static GameObject g;
@@ -304,6 +307,27 @@ internal static class AnimationReplacements
         test.model = bodyPrefab.GetComponent<ModelLocator>().modelTransform.gameObject;
     }
 }
+public struct JoinSpot
+{
+    public string name;
+    public Vector3 position;
+    public Vector3 rotation;
+    public Vector3 scale;
+    public JoinSpot(string _name, Vector3 _position, Vector3 _rotation, Vector3 _scale)
+    {
+        name = _name;
+        position = _position;
+        rotation = _rotation;
+        scale = _scale;
+    }
+    public JoinSpot(string _name, Vector3 _position)
+    {
+        name = _name;
+        position = _position;
+        rotation = Vector3.zero;
+        scale = Vector3.one;
+    }
+}
 public class CustomAnimationClip : MonoBehaviour
 {
     public AnimationClip[] clip, secondaryClip; //DONT SUPPORT MULTI CLIP ANIMATIONS TO SYNC     //but why not? how hard could it be, I'm sure I left that note for a reason....  //it was for a reason, but it works now
@@ -317,7 +341,7 @@ public class CustomAnimationClip : MonoBehaviour
     internal bool stopOnMove;
     internal bool visibility;
     public int startPref, joinPref;
-
+    public JoinSpot[] joinSpots;
 
 
     internal bool syncronizeAnimation;
@@ -325,7 +349,7 @@ public class CustomAnimationClip : MonoBehaviour
     public static List<float> syncTimer = new List<float>();
     public static List<int> syncPlayerCount = new List<int>();
 
-    internal CustomAnimationClip(AnimationClip[] _clip, bool _loop/*, bool _shouldSyncronize = false*/, string[] _wwiseEventName = null, string[] _wwiseStopEvent = null, HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip[] _secondaryClip = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true, bool syncAnim = false, bool syncAudio = false, int startPreference = -1, int joinPreference = -1)
+    internal CustomAnimationClip(AnimationClip[] _clip, bool _loop/*, bool _shouldSyncronize = false*/, string[] _wwiseEventName = null, string[] _wwiseStopEvent = null, HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip[] _secondaryClip = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true, bool syncAnim = false, bool syncAudio = false, int startPreference = -1, int joinPreference = -1, JoinSpot[] _joinSpots = null)
     {
         if (rootBonesToIgnore == null)
             rootBonesToIgnore = new HumanBodyBones[0];
@@ -395,6 +419,10 @@ public class CustomAnimationClip : MonoBehaviour
         syncPos = syncTimer.Count;
         syncTimer.Add(0);
         syncPlayerCount.Add(0);
+
+        if (_joinSpots == null)
+            _joinSpots = new JoinSpot[0];
+        joinSpots = _joinSpots;
     }
 }
 public class BoneMapper : MonoBehaviour
@@ -423,6 +451,8 @@ public class BoneMapper : MonoBehaviour
     int currEvent = 0;
     public float autoWalkSpeed = 0;
     public bool overrideMoveSpeed = false;
+    public GameObject currentEmoteSpot = null;
+
     public void PlayAnim(string s, int pos)
     {
         if (s != "none")
@@ -632,13 +662,7 @@ public class BoneMapper : MonoBehaviour
             twopart = false;
             currentClip = null;
 
-            foreach (var item in props)
-            {
-                GameObject.Destroy(item);
-            }
-            props.Clear();
-            autoWalkSpeed = 0;
-            overrideMoveSpeed = false;
+            NewAnimation(null);
             CustomEmotesAPI.Changed(s, this);
 
             return;
@@ -709,14 +733,35 @@ public class BoneMapper : MonoBehaviour
             a2.Play("Poop", -1, (CustomAnimationClip.syncTimer[currentClip.syncPos] % currentClip.clip[pos].length) / currentClip.clip[pos].length);
         }
         twopart = false;
+        NewAnimation(currentClip.joinSpots);
+        CustomEmotesAPI.Changed(s, this);
+    }
+    internal void NewAnimation(JoinSpot[] locations)
+    {
         foreach (var item in props)
         {
             GameObject.Destroy(item);
         }
         props.Clear();
+        if (locations != null)
+        {
+            for (int i = 0; i < locations.Length; i++)
+            {
+                props.Add(GameObject.Instantiate(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/emotejoiner/emotespot1.prefab")));
+                props[props.Count - 1].transform.SetParent(this.transform.parent);
+                props[props.Count - 1].transform.localPosition = locations[i].position;
+                props[props.Count - 1].transform.localEulerAngles = locations[i].rotation;
+                props[props.Count - 1].transform.localScale = locations[i].scale;
+                props[props.Count - 1].AddComponent<EmoteLocation>().owner = this;
+                props[props.Count - 1].transform.parent = null;
+            }
+        }
         autoWalkSpeed = 0;
         overrideMoveSpeed = false;
-        CustomEmotesAPI.Changed(s, this);
+        parentGameObject = null;
+        transform.parent.GetComponent<CharacterModel>().body.GetComponent<ModelLocator>().modelBaseTransform.localEulerAngles = Vector3.zero;
+        transform.parent.GetComponent<CharacterModel>().body.GetComponent<CharacterDirection>().enabled = true;
+        transform.parent.localScale = ogScale;
     }
     public void ScaleProps()
     {
@@ -855,12 +900,41 @@ public class BoneMapper : MonoBehaviour
                     DebugClass.Log($"{e}");
                 }
             }
-
         }
     }
+    GameObject parentGameObject;
+    bool positionLock, rotationLock, scaleLock;
+    public void AssignParentGameObject(GameObject youAreTheFather, bool lockPosition, bool lockRotation, bool lockScale)
+    {
+        ogScale = transform.parent.localScale;
+        scaleDiff = ogScale - Vector3.one;
+        parentGameObject = youAreTheFather;
+        positionLock = lockPosition;
+        rotationLock = lockRotation;
+        scaleLock = lockScale;
+    }
     float interval = 0;
+    Vector3 ogScale = Vector3.one;
+    Vector3 scaleDiff = Vector3.one;
     void Update()
     {
+        if (parentGameObject)
+        {
+            if (positionLock)
+            {
+                transform.parent.GetComponent<CharacterModel>().body.GetComponentInChildren<KinematicCharacterController.KinematicCharacterMotor>().SetPosition(parentGameObject.transform.position);
+                transform.parent.GetComponent<CharacterModel>().body.GetComponent<CharacterMotor>().velocity = Vector3.zero;
+            }
+            if (rotationLock)
+            {
+                transform.parent.GetComponent<CharacterModel>().body.GetComponent<CharacterDirection>().enabled = false;
+                transform.parent.GetComponent<CharacterModel>().body.GetComponent<ModelLocator>().modelBaseTransform.rotation = parentGameObject.transform.rotation;
+            }
+            if (scaleLock)
+            {
+                transform.parent.localScale = parentGameObject.transform.localScale + scaleDiff;
+            }
+        }
         if (local)
         {
             for (int i = 0; i < CustomAnimationClip.syncPlayerCount.Count; i++)
@@ -918,13 +992,8 @@ public class BoneMapper : MonoBehaviour
             try
             {
                 var body = NetworkUser.readOnlyLocalPlayersList[0].master?.GetBody();
-                //if (body && Vector3.Distance(transform.parent.position, body.transform.position) < 4f)
-                //{
-                //    local = true;
-                //}
                 if (body.gameObject.GetComponent<ModelLocator>().modelTransform == transform.parent)
                 {
-
                     local = true;
                     CustomEmotesAPI.localMapper = this;
                 }

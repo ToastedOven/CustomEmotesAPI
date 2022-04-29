@@ -172,9 +172,13 @@ public class ScrollManager : MonoBehaviour
         gameObject.transform.parent.Find("Wheels").gameObject.SetActive(true);
         gameObject.SetActive(false);
     }
-
+    bool first = true;
     public void UpdateButtonVisibility(string filter)
     {
+        if (first)
+        {
+            DebugClass.Log($"Wanna see a cool NRE?");
+        }
         List<GameObject> validButtons = new List<GameObject>();
         foreach (var item in buttons)
         {

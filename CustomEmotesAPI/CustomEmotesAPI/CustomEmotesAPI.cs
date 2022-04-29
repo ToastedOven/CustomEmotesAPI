@@ -87,7 +87,7 @@ namespace EmotesAPI
             }
             return Input.GetKeyDown(entry.Value.MainKey);
         }
-        public const string VERSION = "1.3.6";
+        public const string VERSION = "1.4.0";
         internal static float Actual_MSX = 69;
         public static CustomEmotesAPI instance;
         public void Awake()
@@ -325,7 +325,7 @@ namespace EmotesAPI
                 allClipNames.Add(emoteName);
             BoneMapper.animClips.Add(emoteName, null);
         }
-        public static void AddCustomAnimation(AnimationClip[] animationClip, bool looping, string[] _wwiseEventName = null, string[] _wwiseStopEvent = null, HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip[] secondaryAnimation = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true, bool syncAnim = false, bool syncAudio = false, int startPref = -1, int joinPref = -1)
+        public static void AddCustomAnimation(AnimationClip[] animationClip, bool looping, string[] _wwiseEventName = null, string[] _wwiseStopEvent = null, HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip[] secondaryAnimation = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true, bool syncAnim = false, bool syncAudio = false, int startPref = -1, int joinPref = -1, JoinSpot[] joinSpots = null)
         {
             if (BoneMapper.animClips.ContainsKey(animationClip[0].name))
             {
@@ -345,7 +345,9 @@ namespace EmotesAPI
                 _wwiseEventName = new string[] { "" };
             if (_wwiseStopEvent == null)
                 _wwiseStopEvent = new string[] { "" };
-            CustomAnimationClip clip = new CustomAnimationClip(animationClip, looping, _wwiseEventName, _wwiseStopEvent, rootBonesToIgnore, soloBonesToIgnore, secondaryAnimation, dimWhenClose, stopWhenMove, stopWhenAttack, visible, syncAnim, syncAudio, startPref, joinPref);
+            if (joinSpots == null)
+                joinSpots = new JoinSpot[0];
+            CustomAnimationClip clip = new CustomAnimationClip(animationClip, looping, _wwiseEventName, _wwiseStopEvent, rootBonesToIgnore, soloBonesToIgnore, secondaryAnimation, dimWhenClose, stopWhenMove, stopWhenAttack, visible, syncAnim, syncAudio, startPref, joinPref, joinSpots);
             if (visible)
                 allClipNames.Add(animationClip[0].name);
             BoneMapper.animClips.Add(animationClip[0].name, clip);
@@ -495,6 +497,12 @@ namespace EmotesAPI
                 }
             }
         }
+        public delegate void JoinedEmoteSpot(GameObject emoteSpot, BoneMapper joiner, BoneMapper host);
+        public static event JoinedEmoteSpot emoteSpotJoined;
+        internal static void Joined(GameObject emoteSpot, BoneMapper joiner, BoneMapper host)
+        {
+            emoteSpotJoined(emoteSpot, joiner, host);
+        }
 
         void Update()
         {
@@ -511,28 +519,41 @@ namespace EmotesAPI
             {
                 if (localMapper)
                 {
-                    foreach (var mapper in BoneMapper.allMappers)
+                    if (localMapper.currentEmoteSpot)
                     {
-                        if (mapper != localMapper)
+                        Joined(localMapper.currentEmoteSpot, localMapper, localMapper.currentEmoteSpot.GetComponent<EmoteLocation>().owner);
+                    }
+                    else
+                    {
+                        foreach (var mapper in BoneMapper.allMappers)
                         {
-                            if (!nearestMapper && (mapper.currentClip.syncronizeAnimation || mapper.currentClip.syncronizeAudio))
+                            try
                             {
-                                nearestMapper = mapper;
-                            }
-                            else if (nearestMapper)
-                            {
-                                if ((mapper.currentClip.syncronizeAnimation || mapper.currentClip.syncronizeAudio) && Vector3.Distance(localMapper.transform.position, mapper.transform.position) < Vector3.Distance(localMapper.transform.position, nearestMapper.transform.position))
+                                if (mapper != localMapper)
                                 {
-                                    nearestMapper = mapper;
+                                    if (!nearestMapper && (mapper.currentClip.syncronizeAnimation || mapper.currentClip.syncronizeAudio))
+                                    {
+                                        nearestMapper = mapper;
+                                    }
+                                    else if (nearestMapper)
+                                    {
+                                        if ((mapper.currentClip.syncronizeAnimation || mapper.currentClip.syncronizeAudio) && Vector3.Distance(localMapper.transform.position, mapper.transform.position) < Vector3.Distance(localMapper.transform.position, nearestMapper.transform.position))
+                                        {
+                                            nearestMapper = mapper;
+                                        }
+                                    }
                                 }
                             }
+                            catch (System.Exception)
+                            {
+                            }
                         }
+                        if (nearestMapper)
+                        {
+                            PlayAnimation(nearestMapper.currentClip.clip[0].name);
+                        }
+                        nearestMapper = null;
                     }
-                    if (nearestMapper)
-                    {
-                        PlayAnimation(nearestMapper.currentClip.clip[0].name);
-                    }
-                    nearestMapper = null;
                 }
             }
         }
