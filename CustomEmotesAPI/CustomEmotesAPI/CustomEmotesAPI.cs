@@ -14,6 +14,7 @@ using UnityEngine.Networking;
 using R2API.Networking.Interfaces;
 using System.Globalization;
 using BepInEx.Configuration;
+using UnityEngine.AddressableAssets;
 
 namespace EmotesAPI
 {
@@ -319,6 +320,34 @@ namespace EmotesAPI
             //};
             AddNonAnimatingEmote("none");
         }
+        public static int RegisterWorldProp(GameObject worldProp, JoinSpot[] joinSpots)
+        {
+            worldProp.AddComponent<BoneMapper>().worldProp = true;
+            BoneMapper.allWorldProps.Add(new WorldProp(worldProp, joinSpots));
+            return BoneMapper.allWorldProps.Count - 1;
+        }
+        static Shader standardShader = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Commando/CommandoBody.prefab").WaitForCompletion().GetComponentInChildren<SkinnedMeshRenderer>().material.shader;
+        public static GameObject SpawnWorldProp(int propPos)
+        {
+            GameObject prop = GameObject.Instantiate(BoneMapper.allWorldProps[propPos].prop);
+            BoneMapper mapper = prop.GetComponent<BoneMapper>();
+            foreach (var item in BoneMapper.allWorldProps[propPos].joinSpots)
+            {
+                mapper.props.Add(GameObject.Instantiate(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/emotejoiner/emotespot1.prefab")));
+                mapper.props[mapper.props.Count - 1].transform.SetParent(mapper.transform);
+                mapper.props[mapper.props.Count - 1].transform.localPosition = item.position;
+                mapper.props[mapper.props.Count - 1].transform.localEulerAngles = item.rotation;
+                mapper.props[mapper.props.Count - 1].transform.localScale = item.scale;
+                mapper.props[mapper.props.Count - 1].name = item.name;
+                foreach (var rend in mapper.props[mapper.props.Count - 1].GetComponentsInChildren<SkinnedMeshRenderer>())
+                {
+                    rend.material.shader = standardShader;
+                }
+                mapper.props[mapper.props.Count - 1].AddComponent<EmoteLocation>().owner = mapper;
+            }
+            return prop;
+        }
+
         public static void AddNonAnimatingEmote(string emoteName, bool visible = true)
         {
             if (visible)
@@ -497,11 +526,17 @@ namespace EmotesAPI
                 }
             }
         }
-        public delegate void JoinedEmoteSpot(string emoteSpotName, string currentClipName, BoneMapper joiner, BoneMapper host);
-        public static event JoinedEmoteSpot emoteSpotJoined;
-        internal static void Joined(GameObject emoteSpot, BoneMapper joiner, BoneMapper host)
+        public delegate void JoinedEmoteSpotBody(string emoteSpotName, string currentClipName, BoneMapper joiner, BoneMapper host);
+        public static event JoinedEmoteSpotBody emoteSpotJoined_Body;
+        internal static void JoinedBody(GameObject emoteSpot, BoneMapper joiner, BoneMapper host)
         {
-            emoteSpotJoined(emoteSpot.name, host.currentClip.name, joiner, host);
+            emoteSpotJoined_Body(emoteSpot.name, host.currentClip.name, joiner, host);
+        }
+        public delegate void JoinedEmoteSpotProp(string emoteSpotName, BoneMapper joiner, BoneMapper host);
+        public static event JoinedEmoteSpotProp emoteSpotJoined_Prop;
+        internal static void JoinedProp(GameObject emoteSpot, BoneMapper joiner, BoneMapper host)
+        {
+            emoteSpotJoined_Prop(emoteSpot.name, joiner, host);
         }
 
         void Update()
@@ -521,7 +556,14 @@ namespace EmotesAPI
                 {
                     if (localMapper.currentEmoteSpot)
                     {
-                        Joined(localMapper.currentEmoteSpot, localMapper, localMapper.currentEmoteSpot.GetComponent<EmoteLocation>().owner);
+                        if (localMapper.currentEmoteSpot.GetComponent<EmoteLocation>().owner.worldProp)
+                        {
+                            JoinedProp(localMapper.currentEmoteSpot, localMapper, localMapper.currentEmoteSpot.GetComponent<EmoteLocation>().owner);
+                        }
+                        else
+                        {
+                            JoinedBody(localMapper.currentEmoteSpot, localMapper, localMapper.currentEmoteSpot.GetComponent<EmoteLocation>().owner);
+                        }
                     }
                     else
                     {

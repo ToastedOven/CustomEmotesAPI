@@ -425,6 +425,16 @@ public class CustomAnimationClip : MonoBehaviour
         joinSpots = _joinSpots;
     }
 }
+public struct WorldProp
+{
+    internal GameObject prop;
+    internal JoinSpot[] joinSpots;
+    public WorldProp(GameObject _prop, JoinSpot[] _joinSpots)
+    {
+        prop = _prop;
+        joinSpots = _joinSpots;
+    }
+}
 public class BoneMapper : MonoBehaviour
 {
     public static List<string[]> stopEvents = new List<string[]>();
@@ -442,6 +452,7 @@ public class BoneMapper : MonoBehaviour
     public CustomAnimationClip currentClip = null;
     internal static float Current_MSX = 69;
     internal static List<BoneMapper> allMappers = new List<BoneMapper>();
+    internal static List<WorldProp> allWorldProps = new List<WorldProp>();
     public bool local = false;
     internal static bool moving = false;
     internal static bool attacking = false;
@@ -452,6 +463,8 @@ public class BoneMapper : MonoBehaviour
     public float autoWalkSpeed = 0;
     public bool overrideMoveSpeed = false;
     public GameObject currentEmoteSpot = null;
+    public bool worldProp = false;
+    public bool ragdolling = false;
 
     public void PlayAnim(string s, int pos)
     {
@@ -754,7 +767,6 @@ public class BoneMapper : MonoBehaviour
                 props[props.Count - 1].transform.localScale = locations[i].scale;
                 props[props.Count - 1].name = locations[i].name;
                 props[props.Count - 1].AddComponent<EmoteLocation>().owner = this;
-                props[props.Count - 1].transform.parent = null;
             }
         }
         autoWalkSpeed = 0;
@@ -785,11 +797,11 @@ public class BoneMapper : MonoBehaviour
     }
     void Start()
     {
-        allMappers.Add(this);
-        foreach (var item in allMappers)
+        if (worldProp)
         {
-            //DebugClass.Log($"----------{item.a1.name}");
+            return;
         }
+        allMappers.Add(this);
         foreach (var item in startEvents)
         {
             GameObject obj = new GameObject();
@@ -919,6 +931,10 @@ public class BoneMapper : MonoBehaviour
     Vector3 scaleDiff = Vector3.one;
     void Update()
     {
+        if (worldProp)
+        {
+            return;
+        }
         if (parentGameObject)
         {
             if (positionLock)
@@ -1037,7 +1053,10 @@ public class BoneMapper : MonoBehaviour
                     }
                 }
                 //DebugClass.Log($"----------{a1}");
-                a1.enabled = true;
+                if (!ragdolling)
+                {
+                    a1.enabled = true;
+                }
                 a2.enabled = false;
                 if (a2.transform.parent.GetComponent<InverseKinematics>() && a2.name != "loader")
                 {
