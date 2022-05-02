@@ -104,6 +104,9 @@ namespace EmotesAPI
             CustomEmotesAPI.LoadResource("moisture_animationreplacements"); // I don't remember what's in here that makes importing emotes work, don't @ me
             Settings.RunAll();
             Register.Init();
+            GameObject joinSpot = Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/emotejoiner/emotespot1.prefab");
+            joinSpot.AddComponent<NetworkIdentity>();
+            joinSpot.RegisterNetworkPrefab();
             AnimationReplacements.RunAll();
             float WhosSteveJobs = 69420;
             CreateBaseNameTokenPairs();
@@ -323,29 +326,16 @@ namespace EmotesAPI
         public static int RegisterWorldProp(GameObject worldProp, JoinSpot[] joinSpots)
         {
             worldProp.AddComponent<BoneMapper>().worldProp = true;
+            var handler = worldProp.AddComponent<WorldPropSpawnHandler>();
+            handler.propPos = BoneMapper.allWorldProps.Count;
             BoneMapper.allWorldProps.Add(new WorldProp(worldProp, joinSpots));
             return BoneMapper.allWorldProps.Count - 1;
         }
-        static Shader standardShader = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Commando/CommandoBody.prefab").WaitForCompletion().GetComponentInChildren<SkinnedMeshRenderer>().material.shader;
+        internal static Shader standardShader = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Commando/CommandoBody.prefab").WaitForCompletion().GetComponentInChildren<SkinnedMeshRenderer>().material.shader;
         public static GameObject SpawnWorldProp(int propPos)
         {
-            GameObject prop = GameObject.Instantiate(BoneMapper.allWorldProps[propPos].prop);
-            BoneMapper mapper = prop.GetComponent<BoneMapper>();
-            foreach (var item in BoneMapper.allWorldProps[propPos].joinSpots)
-            {
-                mapper.props.Add(GameObject.Instantiate(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/emotejoiner/emotespot1.prefab")));
-                mapper.props[mapper.props.Count - 1].transform.SetParent(mapper.transform);
-                mapper.props[mapper.props.Count - 1].transform.localPosition = item.position;
-                mapper.props[mapper.props.Count - 1].transform.localEulerAngles = item.rotation;
-                mapper.props[mapper.props.Count - 1].transform.localScale = item.scale;
-                mapper.props[mapper.props.Count - 1].name = item.name;
-                foreach (var rend in mapper.props[mapper.props.Count - 1].GetComponentsInChildren<SkinnedMeshRenderer>())
-                {
-                    rend.material.shader = standardShader;
-                }
-                mapper.props[mapper.props.Count - 1].AddComponent<EmoteLocation>().owner = mapper;
-            }
-            return prop;
+            BoneMapper.allWorldProps[propPos].prop.GetComponent<WorldPropSpawnHandler>().propPos = propPos;
+            return GameObject.Instantiate(BoneMapper.allWorldProps[propPos].prop);
         }
 
         public static void AddNonAnimatingEmote(string emoteName, bool visible = true)
@@ -485,7 +475,7 @@ namespace EmotesAPI
             }
             DebugClass.Log($"BoneMapper of name {mapper.transform.name} was not found, L");
         }
-        internal static BoneMapper localMapper = null;
+        public static BoneMapper localMapper = null;
         static BoneMapper nearestMapper = null;
         public static CustomAnimationClip GetLocalBodyCustomAnimationClip()
         {
@@ -556,14 +546,8 @@ namespace EmotesAPI
                 {
                     if (localMapper.currentEmoteSpot)
                     {
-                        if (localMapper.currentEmoteSpot.GetComponent<EmoteLocation>().owner.worldProp)
-                        {
-                            JoinedProp(localMapper.currentEmoteSpot, localMapper, localMapper.currentEmoteSpot.GetComponent<EmoteLocation>().owner);
-                        }
-                        else
-                        {
-                            JoinedBody(localMapper.currentEmoteSpot, localMapper, localMapper.currentEmoteSpot.GetComponent<EmoteLocation>().owner);
-                        }
+                        DebugClass.Log($"----------{localMapper.currentEmoteSpot.GetComponent<NetworkIdentity>().netId}");
+                        new SyncSpotJoined(localMapper.transform.parent.GetComponent<CharacterModel>().body.GetComponent<NetworkIdentity>().netId, localMapper.currentEmoteSpot.GetComponent<NetworkIdentity>().netId).Send(R2API.Networking.NetworkDestination.Clients);
                     }
                     else
                     {

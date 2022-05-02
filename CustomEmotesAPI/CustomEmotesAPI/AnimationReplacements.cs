@@ -10,6 +10,7 @@ using UnityEngine.AddressableAssets;
 using Generics.Dynamics;
 using System.Security;
 using System.Security.Permissions;
+using UnityEngine.Networking;
 
 [assembly: SecurityPermission(SecurityAction.RequestMinimum, SkipVerification = true)]
 internal static class AnimationReplacements
@@ -106,6 +107,7 @@ internal static class AnimationReplacements
                     {
                         var skele = Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/animPaladin.prefab");
                         CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele, true);
+                        skele.GetComponentInChildren<BoneMapper>().scale = 1.65f;
                     }
                     else if (item.bodyPrefab.name == "EnforcerBody" && Settings.Enforcer.Value)
                     {
@@ -753,20 +755,15 @@ public class BoneMapper : MonoBehaviour
     {
         foreach (var item in props)
         {
-            GameObject.Destroy(item);
+            if (item)
+                GameObject.Destroy(item);
         }
         props.Clear();
         if (locations != null)
         {
             for (int i = 0; i < locations.Length; i++)
             {
-                props.Add(GameObject.Instantiate(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/emotejoiner/emotespot1.prefab")));
-                props[props.Count - 1].transform.SetParent(this.transform.parent);
-                props[props.Count - 1].transform.localPosition = locations[i].position;
-                props[props.Count - 1].transform.localEulerAngles = locations[i].rotation;
-                props[props.Count - 1].transform.localScale = locations[i].scale;
-                props[props.Count - 1].name = locations[i].name;
-                props[props.Count - 1].AddComponent<EmoteLocation>().owner = this;
+                SpawnJoinSpot(locations[i]);
             }
         }
         autoWalkSpeed = 0;
@@ -774,14 +771,31 @@ public class BoneMapper : MonoBehaviour
         parentGameObject = null;
         transform.parent.GetComponent<CharacterModel>().body.GetComponent<ModelLocator>().modelBaseTransform.localEulerAngles = Vector3.zero;
         transform.parent.GetComponent<CharacterModel>().body.GetComponent<CharacterDirection>().enabled = true;
-        transform.parent.localScale = ogScale;
+        if (ogScale != new Vector3(-69, -69, -69))
+        {
+            transform.parent.localScale = ogScale;
+            ogScale = new Vector3(-69, -69, -69);
+        }
+        if (ogLocation != new Vector3(-69, -69, -69))
+        {
+            transform.parent.GetComponent<CharacterModel>().body.GetComponent<ModelLocator>().modelBaseTransform.localPosition = ogLocation;
+            ogLocation = new Vector3(-69, -69, -69);
+        }
+        transform.parent.GetComponent<CharacterModel>().body.GetComponent<CapsuleCollider>().enabled = true;
+        if (!transform.parent.GetComponent<CharacterModel>().body.GetComponent<KinematicCharacterController.KinematicCharacterMotor>().enabled)
+        {
+            Vector3 desired = transform.parent.GetComponent<CharacterModel>().body.gameObject.transform.position;
+            transform.parent.GetComponent<CharacterModel>().body.GetComponent<KinematicCharacterController.KinematicCharacterMotor>().enabled = true;
+            transform.parent.GetComponent<CharacterModel>().body.GetComponent<KinematicCharacterController.KinematicCharacterMotor>().SetPosition(desired);
+        }
     }
     public void ScaleProps()
     {
         Vector3 parentScale = this.transform.parent.transform.localScale;
         foreach (var item in props)
         {
-            item.transform.localScale = new Vector3(scale / parentScale.x, scale / parentScale.y, scale / parentScale.z);
+            if (item)
+                item.transform.localScale = new Vector3(scale / parentScale.x, scale / parentScale.y, scale / parentScale.z);
         }
     }
     void AddIgnore(DynamicBone dynbone, Transform t)
@@ -915,19 +929,32 @@ public class BoneMapper : MonoBehaviour
             }
         }
     }
-    GameObject parentGameObject;
+    public GameObject parentGameObject;
     bool positionLock, rotationLock, scaleLock;
-    public void AssignParentGameObject(GameObject youAreTheFather, bool lockPosition, bool lockRotation, bool lockScale)
+    public void AssignParentGameObject(GameObject youAreTheFather, bool lockPosition, bool lockRotation, bool lockScale, bool scaleAsBandit = true, bool disableCollider = true)
     {
+        ogLocation = transform.parent.GetComponent<CharacterModel>().body.GetComponent<ModelLocator>().modelBaseTransform.localPosition;
         ogScale = transform.parent.localScale;
-        scaleDiff = ogScale - Vector3.one;
+        if (scaleAsBandit)
+            scaleDiff = (ogScale / scale) - Vector3.one;
+        else
+            scaleDiff = ogScale - Vector3.one;
         parentGameObject = youAreTheFather;
         positionLock = lockPosition;
         rotationLock = lockRotation;
         scaleLock = lockScale;
+        transform.parent.GetComponent<CharacterModel>().body.GetComponent<CapsuleCollider>().enabled = !disableCollider;
+        transform.parent.GetComponent<CharacterModel>().body.GetComponent<KinematicCharacterController.KinematicCharacterMotor>().enabled = !lockPosition;
+        if (disableCollider)
+        {
+            currentEmoteSpot.GetComponent<EmoteLocation>().validPlayers--;
+            currentEmoteSpot.GetComponent<EmoteLocation>().SetColor();
+            currentEmoteSpot = null;
+        }
     }
     float interval = 0;
-    Vector3 ogScale = Vector3.one;
+    Vector3 ogScale = new Vector3(-69, -69, -69);
+    Vector3 ogLocation = new Vector3(-69, -69, -69);
     Vector3 scaleDiff = Vector3.one;
     void Update()
     {
@@ -939,13 +966,14 @@ public class BoneMapper : MonoBehaviour
         {
             if (positionLock)
             {
-                transform.parent.GetComponent<CharacterModel>().body.GetComponentInChildren<KinematicCharacterController.KinematicCharacterMotor>().SetPosition(parentGameObject.transform.position);
+                transform.parent.GetComponent<CharacterModel>().body.gameObject.transform.position = parentGameObject.transform.position;
+                transform.parent.GetComponent<CharacterModel>().body.GetComponent<ModelLocator>().modelBaseTransform.position = parentGameObject.transform.position;
                 transform.parent.GetComponent<CharacterModel>().body.GetComponent<CharacterMotor>().velocity = Vector3.zero;
             }
             if (rotationLock)
             {
                 transform.parent.GetComponent<CharacterModel>().body.GetComponent<CharacterDirection>().enabled = false;
-                transform.parent.GetComponent<CharacterModel>().body.GetComponent<ModelLocator>().modelBaseTransform.rotation = parentGameObject.transform.rotation;
+                transform.parent.GetComponent<CharacterModel>().body.GetComponent<ModelLocator>().modelBaseTransform.eulerAngles = parentGameObject.transform.eulerAngles;
             }
             if (scaleLock)
             {
@@ -1068,7 +1096,8 @@ public class BoneMapper : MonoBehaviour
                     CustomEmotesAPI.Changed("none", this);
                     foreach (var item in props)
                     {
-                        GameObject.Destroy(item);
+                        if (item)
+                            GameObject.Destroy(item);
                     }
                     props.Clear();
                     if (currentClip.syncronizeAnimation || currentClip.syncronizeAudio)
@@ -1130,6 +1159,34 @@ public class BoneMapper : MonoBehaviour
             }
             GameObject.Destroy(gameObject);
         }
+    }
+    public int SpawnJoinSpot(JoinSpot joinSpot, bool parent = true)
+    {
+        if (NetworkServer.active)
+        {
+            GameObject g = GameObject.Instantiate(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/emotejoiner/emotespot1.prefab"));
+            NetworkServer.Spawn(g);
+            //new networkjoinspotspawn objectnetid, propnetid, position, rotation, scale, parent, name
+            props.Add();
+            if (parent)
+                props[props.Count - 1].transform.SetParent(transform.parent);
+            else
+                props[props.Count - 1].transform.SetParent(transform);
+            props[props.Count - 1].transform.localPosition = joinSpot.position;
+            props[props.Count - 1].transform.localEulerAngles = joinSpot.rotation;
+            props[props.Count - 1].transform.localScale = joinSpot.scale;
+            props[props.Count - 1].name = joinSpot.name;
+            foreach (var rend in props[props.Count - 1].GetComponentsInChildren<SkinnedMeshRenderer>())
+            {
+                rend.material.shader = CustomEmotesAPI.standardShader;
+            }
+            props[props.Count - 1].AddComponent<EmoteLocation>().owner = this;
+        }
+        return props.Count - 1;
+    }
+    public void RemoveProp(int propPos)
+    {
+        GameObject.Destroy(props[propPos]);
     }
     public void SetAutoWalk(float speed, bool overrideBaseMovement)
     {
