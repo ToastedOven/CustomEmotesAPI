@@ -13,7 +13,7 @@ namespace EmotesAPI
             BoneMapper mapper = GetComponent<BoneMapper>();
             foreach (var item in BoneMapper.allWorldProps[propPos].joinSpots)
             {
-                mapper.SpawnJoinSpot(item, false);
+                mapper.SpawnJoinSpot(item);
             }
         }
     }

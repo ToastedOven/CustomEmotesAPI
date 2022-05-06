@@ -44,11 +44,24 @@ public class SyncAnimationToServer : INetMessage
             DebugClass.Log($"Body is null!!!");
         }
 
-        DebugClass.Log($"Recieved message to play {animation} on client. Playing on {bodyObject.GetComponent<ModelLocator>().modelTransform}");
+        //DebugClass.Log($"Recieved message to play {animation} on client. Playing on {bodyObject.GetComponent<ModelLocator>().modelTransform}");
 
-        bodyObject.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>().PlayAnim(animation, position);
+        //bodyObject.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>().PlayAnim(animation, position);
 
-        new SyncAnimationToClients(netId, animation, position).Send(R2API.Networking.NetworkDestination.Clients);
+        BoneMapper map = Util.FindNetworkObject(netId).GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>();
+        int eventNum = -1;
+        CustomAnimationClip clip = BoneMapper.animClips[animation];
+        try
+        {
+            clip.clip[0].ToString();
+            eventNum = UnityEngine.Random.Range(0, BoneMapper.startEvents[clip.syncPos].Length);
+        }
+        catch (Exception)
+        {
+        }
+
+
+        new SyncAnimationToClients(netId, animation, position, eventNum).Send(R2API.Networking.NetworkDestination.Clients);
     }
 
     public void Serialize(NetworkWriter writer)

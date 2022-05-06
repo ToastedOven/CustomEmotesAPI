@@ -1,6 +1,8 @@
-﻿using R2API.Networking.Interfaces;
+﻿using EmotesAPI;
+using R2API.Networking.Interfaces;
 using RoR2;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
@@ -8,20 +10,47 @@ using UnityEngine.Networking;
 
 public class EmoteLocation : MonoBehaviour
 {
-    public static List<GameObject> emoteLocations = new List<GameObject>();
+    public static List<EmoteLocation> emoteLocations = new List<EmoteLocation>();
     public int spot;
     public int validPlayers = 0;
     internal BoneMapper owner;
+    internal BoneMapper emoter;
+    internal JoinSpot joinSpot;
+
     void Start()
     {
         SetColor();
-        spot = emoteLocations.Count;
-        emoteLocations.Add(this.gameObject);
+        //spot = emoteLocations.Count;
+        emoteLocations.Add(this);
+        StartCoroutine(setScale());
+    }
+    public void SetEmoterAndHideLocation(BoneMapper boneMapper)
+    {
+        emoter = boneMapper;
+        SetVisible(false);
+    }
+    public IEnumerator setScale()
+    {
+        yield return new WaitForSeconds(.1f);
+        if (owner.smr1)
+        {
+            Vector3 scal = owner.transform.parent.lossyScale;
+            transform.localPosition = new Vector3(joinSpot.position.x / scal.x, joinSpot.position.y / scal.y, joinSpot.position.z / scal.z);
+            transform.localEulerAngles = joinSpot.rotation;
+            transform.localScale = new Vector3(joinSpot.scale.x / scal.x, joinSpot.scale.y / scal.y, joinSpot.scale.z / scal.z);
+        }
+    }
+    internal void SetVisible(bool visibility)
+    {
+        if (visibility)
+            gameObject.transform.localPosition += new Vector3(5000, 5000, 5000);
+        else
+            gameObject.transform.localPosition -= new Vector3(5000, 5000, 5000);
     }
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.GetComponent<ModelLocator>() && other.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>())
+        if (other.GetComponent<ModelLocator>() && other.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>() && other.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>() != owner)
         {
             BoneMapper mapper = other.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>();
             if (mapper)
@@ -35,7 +64,7 @@ public class EmoteLocation : MonoBehaviour
     }
     void OnTriggerExit(Collider other)
     {
-        if (other.GetComponent<ModelLocator>() && other.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>())
+        if (other.GetComponent<ModelLocator>() && other.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>() && other.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>() != owner)
         {
             BoneMapper mapper = other.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>();
             if (mapper)

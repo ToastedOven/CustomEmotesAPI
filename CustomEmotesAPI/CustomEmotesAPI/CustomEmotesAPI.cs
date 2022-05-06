@@ -88,7 +88,7 @@ namespace EmotesAPI
             }
             return Input.GetKeyDown(entry.Value.MainKey);
         }
-        public const string VERSION = "1.4.0";
+        public const string VERSION = "1.5.0";
         internal static float Actual_MSX = 69;
         public static CustomEmotesAPI instance;
         public void Awake()
@@ -104,9 +104,11 @@ namespace EmotesAPI
             CustomEmotesAPI.LoadResource("moisture_animationreplacements"); // I don't remember what's in here that makes importing emotes work, don't @ me
             Settings.RunAll();
             Register.Init();
-            GameObject joinSpot = Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/emotejoiner/emotespot1.prefab");
-            joinSpot.AddComponent<NetworkIdentity>();
-            joinSpot.RegisterNetworkPrefab();
+
+            //GameObject joinSpot = Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/emotejoiner/emotespot1.prefab");
+            //joinSpot.AddComponent<NetworkIdentity>();
+            //joinSpot.RegisterNetworkPrefab();
+
             AnimationReplacements.RunAll();
             float WhosSteveJobs = 69420;
             CreateBaseNameTokenPairs();
@@ -114,6 +116,14 @@ namespace EmotesAPI
             {
                 WhosSteveJobs = Settings.DontTouchThis.Value;
             }
+            //On.RoR2.Networking.NetworkManagerSystem.OnServerAddPlayerInternal += (orig, self, con, id, reader) =>
+            //{
+            //    orig(self, con, id, reader);
+            //    if (NetworkServer.active)
+            //    {
+            //        new SyncEmoteLocations()
+            //    }
+            //};
             On.RoR2.SceneCatalog.OnActiveSceneChanged += (orig, self, scene) =>
             {
                 orig(self, scene);
@@ -325,6 +335,8 @@ namespace EmotesAPI
         }
         public static int RegisterWorldProp(GameObject worldProp, JoinSpot[] joinSpots)
         {
+            worldProp.AddComponent<NetworkIdentity>();
+            worldProp.RegisterNetworkPrefab();
             worldProp.AddComponent<BoneMapper>().worldProp = true;
             var handler = worldProp.AddComponent<WorldPropSpawnHandler>();
             handler.propPos = BoneMapper.allWorldProps.Count;
@@ -438,18 +450,19 @@ namespace EmotesAPI
         public static void PlayAnimation(string animationName, int pos = -2)
         {
             var identity = NetworkUser.readOnlyLocalPlayersList[0].master?.GetBody().gameObject.GetComponent<NetworkIdentity>();
-
-            if (!NetworkServer.active)
-            {
                 new SyncAnimationToServer(identity.netId, animationName, pos).Send(R2API.Networking.NetworkDestination.Server);
-            }
-            else
-            {
-                new SyncAnimationToClients(identity.netId, animationName, pos).Send(R2API.Networking.NetworkDestination.Clients);
 
-                GameObject bodyObject = Util.FindNetworkObject(identity.netId);
-                bodyObject.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>().PlayAnim(animationName, pos);
-            }
+
+            //if (!NetworkServer.active)
+            //{
+            //}
+            //else
+            //{
+            //    new SyncAnimationToClients(identity.netId, animationName, pos).Send(R2API.Networking.NetworkDestination.Clients);
+
+            //    //GameObject bodyObject = Util.FindNetworkObject(identity.netId);
+            //    //bodyObject.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>().PlayAnim(animationName, pos);
+            //}
         }
         public static void PlayAnimation(string animationName, BoneMapper mapper, int pos = -2)
         {
@@ -458,18 +471,18 @@ namespace EmotesAPI
                 if (item == mapper)
                 {
                     var identity = mapper.transform.parent.GetComponent<CharacterModel>().body.GetComponent<NetworkIdentity>();
-
-                    if (!NetworkServer.active)
-                    {
                         new SyncAnimationToServer(identity.netId, animationName, pos).Send(R2API.Networking.NetworkDestination.Server);
-                    }
-                    else
-                    {
-                        new SyncAnimationToClients(identity.netId, animationName, pos).Send(R2API.Networking.NetworkDestination.Clients);
 
-                        GameObject bodyObject = Util.FindNetworkObject(identity.netId);
-                        bodyObject.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>().PlayAnim(animationName, pos);
-                    }
+                    //if (!NetworkServer.active)
+                    //{
+                    //}
+                    //else
+                    //{
+                    //    new SyncAnimationToClients(identity.netId, animationName, pos).Send(R2API.Networking.NetworkDestination.Clients);
+
+                    //    //GameObject bodyObject = Util.FindNetworkObject(identity.netId);
+                    //    //bodyObject.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>().PlayAnim(animationName, pos);
+                    //}
                     return;
                 }
             }
@@ -496,6 +509,14 @@ namespace EmotesAPI
         public static event AnimationChanged animChanged;
         internal static void Changed(string newAnimation, BoneMapper mapper) //is a neat game made by a developer who endorses nsfw content while calling it a fine game for kids
         {
+            foreach (var item in EmoteLocation.emoteLocations)
+            {
+                if (item.emoter == mapper)
+                {
+                    item.emoter = null;
+                    item.SetVisible(true);
+                }
+            }
             mapper.transform.parent.GetComponent<CharacterModel>().body.RecalculateStats();
             if (animChanged != null)
             {
@@ -516,17 +537,17 @@ namespace EmotesAPI
                 }
             }
         }
-        public delegate void JoinedEmoteSpotBody(string emoteSpotName, string currentClipName, BoneMapper joiner, BoneMapper host);
+        public delegate void JoinedEmoteSpotBody(GameObject emoteSpot, BoneMapper joiner, BoneMapper host);
         public static event JoinedEmoteSpotBody emoteSpotJoined_Body;
         internal static void JoinedBody(GameObject emoteSpot, BoneMapper joiner, BoneMapper host)
         {
-            emoteSpotJoined_Body(emoteSpot.name, host.currentClip.name, joiner, host);
+            emoteSpotJoined_Body(emoteSpot, joiner, host);
         }
-        public delegate void JoinedEmoteSpotProp(string emoteSpotName, BoneMapper joiner, BoneMapper host);
+        public delegate void JoinedEmoteSpotProp(GameObject emoteSpot, BoneMapper joiner, BoneMapper host);
         public static event JoinedEmoteSpotProp emoteSpotJoined_Prop;
         internal static void JoinedProp(GameObject emoteSpot, BoneMapper joiner, BoneMapper host)
         {
-            emoteSpotJoined_Prop(emoteSpot.name, joiner, host);
+            emoteSpotJoined_Prop(emoteSpot, joiner, host);
         }
 
         void Update()
@@ -546,8 +567,7 @@ namespace EmotesAPI
                 {
                     if (localMapper.currentEmoteSpot)
                     {
-                        DebugClass.Log($"----------{localMapper.currentEmoteSpot.GetComponent<NetworkIdentity>().netId}");
-                        new SyncSpotJoined(localMapper.transform.parent.GetComponent<CharacterModel>().body.GetComponent<NetworkIdentity>().netId, localMapper.currentEmoteSpot.GetComponent<NetworkIdentity>().netId).Send(R2API.Networking.NetworkDestination.Clients);
+                        localMapper.JoinEmoteSpot();
                     }
                     else
                     {

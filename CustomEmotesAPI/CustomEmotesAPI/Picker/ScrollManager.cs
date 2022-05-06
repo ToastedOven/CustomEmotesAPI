@@ -16,6 +16,7 @@ public class ScrollManager : MonoBehaviour
     internal static List<string> emoteNames = new List<string>();
     internal GameObject emoteInQuestion;
     internal static List<GameObject> circularButtons = new List<GameObject>();
+    GameObject wheels;
     void Start()
     {
         gameObject.transform.parent.Find("Wheels").gameObject.SetActive(true);
@@ -50,7 +51,7 @@ public class ScrollManager : MonoBehaviour
         gameObject.transform.Find("Finish").GetComponentInChildren<HGButton>().onClick.AddListener(Cancel);
         TMP_InputField field = gameObject.transform.Find("InputField (TMP)").gameObject.GetComponent<TMP_InputField>();
         field.onValueChanged.AddListener(delegate { UpdateButtonVisibility(field.text); });
-        GameObject wheels = transform.parent.Find("Wheels").gameObject;
+        wheels = transform.parent.Find("Wheels").gameObject;
         var basedonwhatbasedonthehardwareinside = wheels.transform.Find("Middle");
         for (int i = 0; i < 8; i++)
         {
@@ -172,12 +173,13 @@ public class ScrollManager : MonoBehaviour
         gameObject.transform.parent.Find("Wheels").gameObject.SetActive(true);
         gameObject.SetActive(false);
     }
-    bool first = true;
+    static bool first = true;
     public void UpdateButtonVisibility(string filter)
     {
         if (first)
         {
             DebugClass.Log($"Wanna see a cool NRE?");
+            first = false;
         }
         List<GameObject> validButtons = new List<GameObject>();
         foreach (var item in buttons)
@@ -210,5 +212,9 @@ public class ScrollManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Cancel();
+        }
     }
 }

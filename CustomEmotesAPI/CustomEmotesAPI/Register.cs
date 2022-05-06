@@ -10,6 +10,7 @@ public static class Register
     {
         NetworkingAPI.RegisterMessageType<SyncAnimationToServer>();
         NetworkingAPI.RegisterMessageType<SyncAnimationToClients>();
-        NetworkingAPI.RegisterMessageType<SyncSpotJoined>();
+        NetworkingAPI.RegisterMessageType<SyncSpotJoinedToHost>();
+        NetworkingAPI.RegisterMessageType<SyncSpotJoinedToClient>();
     }
 }
