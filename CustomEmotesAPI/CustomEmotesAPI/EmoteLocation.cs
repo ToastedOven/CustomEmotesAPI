@@ -32,13 +32,18 @@ public class EmoteLocation : MonoBehaviour
     public IEnumerator setScale()
     {
         yield return new WaitForSeconds(.1f);
+        Vector3 scal = Vector3.one;
         if (owner.smr1)
         {
-            Vector3 scal = owner.transform.parent.lossyScale;
-            transform.localPosition = new Vector3(joinSpot.position.x / scal.x, joinSpot.position.y / scal.y, joinSpot.position.z / scal.z);
-            transform.localEulerAngles = joinSpot.rotation;
-            transform.localScale = new Vector3(joinSpot.scale.x / scal.x, joinSpot.scale.y / scal.y, joinSpot.scale.z / scal.z);
+            scal = owner.transform.parent.lossyScale;
         }
+        else
+        {
+            scal = owner.transform.lossyScale;
+        }
+        transform.localPosition = new Vector3(joinSpot.position.x / scal.x, joinSpot.position.y / scal.y, joinSpot.position.z / scal.z);
+        transform.localEulerAngles = joinSpot.rotation;
+        transform.localScale = new Vector3(joinSpot.scale.x / scal.x, joinSpot.scale.y / scal.y, joinSpot.scale.z / scal.z);
     }
     internal void SetVisible(bool visibility)
     {
@@ -82,16 +87,36 @@ public class EmoteLocation : MonoBehaviour
     {
         if (validPlayers > 0)
         {
-            foreach (var item in GetComponentsInChildren<SkinnedMeshRenderer>())
+            GetComponentsInChildren<Renderer>()[GetComponentsInChildren<Renderer>().Length - 1].material.color = Color.green;
+            foreach (var item in GetComponentsInChildren<Renderer>())
             {
-                item.material.color = Color.green;
+                item.material.SetColor("_EmissionColor", Color.green);
+            }
+            foreach (var item in GetComponentsInChildren<ParticleSystemRenderer>())
+            {
+                item.material.SetColor("_EmissionColor", Color.green);
+            }
+            foreach (var item in GetComponentsInChildren<ParticleSystem>())
+            {
+                var trails = item.trails;
+                trails.colorOverTrail = Color.green;
             }
         }
         else
         {
-            foreach (var item in GetComponentsInChildren<SkinnedMeshRenderer>())
+            GetComponentsInChildren<Renderer>()[GetComponentsInChildren<Renderer>().Length - 1].material.color = new Color(1f / 255f, 156f / 255f, 190f / 255f);
+            foreach (var item in GetComponentsInChildren<Renderer>())
             {
-                item.material.color = Color.grey;
+                item.material.SetColor("_EmissionColor", new Color(1f / 255f, 156f / 255f, 190f / 255f));
+            }
+            foreach (var item in GetComponentsInChildren<ParticleSystemRenderer>())
+            {
+                item.material.SetColor("_EmissionColor", new Color(1f / 255f, 156f / 255f, 190f / 255f));
+            }
+            foreach (var item in GetComponentsInChildren<ParticleSystem>())
+            {
+                var trails = item.trails;
+                trails.colorOverTrail = new Color(1f / 255f, 156f / 255f, 190f / 255f);
             }
         }
     }

@@ -503,6 +503,7 @@ public class BoneMapper : MonoBehaviour
     bool twopart = false;
     public static Dictionary<string, CustomAnimationClip> animClips = new Dictionary<string, CustomAnimationClip>();
     public CustomAnimationClip currentClip = null;
+    public CustomAnimationClip prevClip = null;
     internal static float Current_MSX = 69;
     internal static List<BoneMapper> allMappers = new List<BoneMapper>();
     internal static List<WorldProp> allWorldProps = new List<WorldProp>();
@@ -521,6 +522,8 @@ public class BoneMapper : MonoBehaviour
     public bool ragdolling = false;
     public GameObject bodyPrefab;
     public int uniqueSpot = -1;
+    public bool preserveProps = false;
+    public bool preserveParent = false;
 
     public void PlayAnim(string s, int pos, int eventNum)
     {
@@ -594,6 +597,7 @@ public class BoneMapper : MonoBehaviour
         currEvent = 0;
         if (s != "none")
         {
+            prevClip = currentClip;
             currentClip = animClips[s];
             try
             {
@@ -756,8 +760,8 @@ public class BoneMapper : MonoBehaviour
         {
             a2.Play("none", -1, 0f);
             twopart = false;
+            prevClip = currentClip;
             currentClip = null;
-
             NewAnimation(null);
             CustomEmotesAPI.Changed(s, this);
 
@@ -837,63 +841,84 @@ public class BoneMapper : MonoBehaviour
     }
     internal void NewAnimation(JoinSpot[] locations)
     {
-        autoWalkSpeed = 0;
-        overrideMoveSpeed = false;
-        if (parentGameObject)
+        try
         {
-            Vector3 OHYEAHHHHHH = transform.parent.GetComponent<CharacterModel>().body.gameObject.transform.position;
-            OHYEAHHHHHH = (TeleportHelper.FindSafeTeleportDestination(transform.parent.GetComponent<CharacterModel>().body.gameObject.transform.position, transform.parent.GetComponent<CharacterModel>().body, RoR2Application.rng)) ?? OHYEAHHHHHH;
-            Vector3 result = OHYEAHHHHHH;
-            RaycastHit raycastHit = default(RaycastHit);
-            Ray ray = new Ray(OHYEAHHHHHH + Vector3.up * 2f, Vector3.down);
-            float maxDistance = 4f;
-            if (Physics.SphereCast(ray, transform.parent.GetComponent<CharacterModel>().body.radius, out raycastHit, maxDistance, LayerIndex.world.mask))
+            autoWalkSpeed = 0;
+            overrideMoveSpeed = false;
+            if (parentGameObject && !preserveParent)
             {
-                result.y = ray.origin.y - raycastHit.distance;
+                Vector3 OHYEAHHHHHH = transform.parent.GetComponent<CharacterModel>().body.gameObject.transform.position;
+                OHYEAHHHHHH = (TeleportHelper.FindSafeTeleportDestination(transform.parent.GetComponent<CharacterModel>().body.gameObject.transform.position, transform.parent.GetComponent<CharacterModel>().body, RoR2Application.rng)) ?? OHYEAHHHHHH;
+                Vector3 result = OHYEAHHHHHH;
+                RaycastHit raycastHit = default(RaycastHit);
+                Ray ray = new Ray(OHYEAHHHHHH + Vector3.up * 2f, Vector3.down);
+                float maxDistance = 4f;
+                if (Physics.SphereCast(ray, transform.parent.GetComponent<CharacterModel>().body.radius, out raycastHit, maxDistance, LayerIndex.world.mask))
+                {
+                    result.y = ray.origin.y - raycastHit.distance;
+                }
+                float bodyPrefabFootOffset = Util.GetBodyPrefabFootOffset(bodyPrefab);
+                result.y += bodyPrefabFootOffset;
+                transform.parent.GetComponent<CharacterModel>().body.gameObject.transform.position = result;
+                transform.parent.GetComponent<CharacterModel>().body.GetComponent<ModelLocator>().modelBaseTransform.position = result;
+                parentGameObject = null;
             }
-            float bodyPrefabFootOffset = Util.GetBodyPrefabFootOffset(bodyPrefab);
-            result.y += bodyPrefabFootOffset;
-            transform.parent.GetComponent<CharacterModel>().body.gameObject.transform.position = result;
-            transform.parent.GetComponent<CharacterModel>().body.GetComponent<ModelLocator>().modelBaseTransform.position = result;
-            parentGameObject = null;
-        }
-        transform.parent.GetComponent<CharacterModel>().body.GetComponent<ModelLocator>().modelBaseTransform.localEulerAngles = Vector3.zero;
-        if (transform.parent.GetComponent<CharacterModel>().body.GetComponent<CharacterDirection>())
-        {
-            transform.parent.GetComponent<CharacterModel>().body.GetComponent<CharacterDirection>().enabled = true;
-        }
-        if (ogScale != new Vector3(-69, -69, -69))
-        {
-            transform.parent.localScale = ogScale;
-            ogScale = new Vector3(-69, -69, -69);
-        }
-        if (ogLocation != new Vector3(-69, -69, -69))
-        {
-            transform.parent.GetComponent<CharacterModel>().body.GetComponent<ModelLocator>().modelBaseTransform.localPosition = ogLocation;
-            ogLocation = new Vector3(-69, -69, -69);
-        }
-        if (transform.parent.GetComponent<CharacterModel>().body.GetComponent<CapsuleCollider>())
-        {
-            transform.parent.GetComponent<CharacterModel>().body.GetComponent<CapsuleCollider>().enabled = true;
-        }
-        if (transform.parent.GetComponent<CharacterModel>().body.GetComponent<KinematicCharacterController.KinematicCharacterMotor>() && !transform.parent.GetComponent<CharacterModel>().body.GetComponent<KinematicCharacterController.KinematicCharacterMotor>().enabled)
-        {
-            Vector3 desired = transform.parent.GetComponent<CharacterModel>().body.gameObject.transform.position;
-            transform.parent.GetComponent<CharacterModel>().body.GetComponent<KinematicCharacterController.KinematicCharacterMotor>().enabled = true;
-            transform.parent.GetComponent<CharacterModel>().body.GetComponent<KinematicCharacterController.KinematicCharacterMotor>().SetPosition(desired);
-        }
-        foreach (var item in props)
-        {
-            if (item)
-                GameObject.Destroy(item);
-        }
-        props.Clear();
-        if (locations != null)
-        {
-            for (int i = 0; i < locations.Length; i++)
+            if (preserveParent)
             {
-                SpawnJoinSpot(locations[i]);
+                preserveParent = false;
             }
+            else
+            {
+                transform.parent.GetComponent<CharacterModel>().body.GetComponent<ModelLocator>().modelBaseTransform.localEulerAngles = Vector3.zero;
+                if (transform.parent.GetComponent<CharacterModel>().body.GetComponent<CharacterDirection>())
+                {
+                    transform.parent.GetComponent<CharacterModel>().body.GetComponent<CharacterDirection>().enabled = true;
+                }
+                if (ogScale != new Vector3(-69, -69, -69))
+                {
+                    transform.parent.localScale = ogScale;
+                    ogScale = new Vector3(-69, -69, -69);
+                }
+                if (ogLocation != new Vector3(-69, -69, -69))
+                {
+                    transform.parent.GetComponent<CharacterModel>().body.GetComponent<ModelLocator>().modelBaseTransform.localPosition = ogLocation;
+                    ogLocation = new Vector3(-69, -69, -69);
+                }
+                if (transform.parent.GetComponent<CharacterModel>().body.GetComponent<CapsuleCollider>())
+                {
+                    transform.parent.GetComponent<CharacterModel>().body.GetComponent<CapsuleCollider>().enabled = true;
+                }
+                if (transform.parent.GetComponent<CharacterModel>().body.GetComponent<KinematicCharacterController.KinematicCharacterMotor>() && !transform.parent.GetComponent<CharacterModel>().body.GetComponent<KinematicCharacterController.KinematicCharacterMotor>().enabled)
+                {
+                    Vector3 desired = transform.parent.GetComponent<CharacterModel>().body.gameObject.transform.position;
+                    transform.parent.GetComponent<CharacterModel>().body.GetComponent<KinematicCharacterController.KinematicCharacterMotor>().enabled = true;
+                    transform.parent.GetComponent<CharacterModel>().body.GetComponent<KinematicCharacterController.KinematicCharacterMotor>().SetPosition(desired);
+                }
+            }
+            if (preserveProps)
+            {
+                preserveProps = false;
+            }
+            else
+            {
+                foreach (var item in props)
+                {
+                    if (item)
+                        GameObject.Destroy(item);
+                }
+                props.Clear();
+            }
+            if (locations != null)
+            {
+                for (int i = 0; i < locations.Length; i++)
+                {
+                    SpawnJoinSpot(locations[i]);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            DebugClass.Log($"error during new animation: {e}");
         }
     }
     public void ScaleProps()
@@ -930,6 +955,10 @@ public class BoneMapper : MonoBehaviour
         foreach (var item in startEvents)
         {
             GameObject obj = new GameObject();
+            if (item[0] != "")
+            {
+                obj.name = $"{item[0]}_AudioObject";
+            }
             obj.transform.SetParent(transform);
             obj.transform.localPosition = new Vector3(0, -10000, 0);
             audioObjects.Add(obj);
@@ -1209,7 +1238,7 @@ public class BoneMapper : MonoBehaviour
                 {
                     currentClip.clip.ToString();
                     CustomEmotesAPI.Changed("none", this);
-                    NewAnimation(currentClip.joinSpots);
+                    NewAnimation(null);
                     if (currentClip.syncronizeAnimation || currentClip.syncronizeAudio)
                     {
                         CustomAnimationClip.syncPlayerCount[currentClip.syncPos]--;
@@ -1231,6 +1260,7 @@ public class BoneMapper : MonoBehaviour
                             }
                         }
                     }
+                    prevClip = currentClip;
                     currentClip = null;
                 }
                 catch (Exception)
@@ -1272,17 +1302,17 @@ public class BoneMapper : MonoBehaviour
     }
     public int SpawnJoinSpot(JoinSpot joinSpot)
     {
-        props.Add(GameObject.Instantiate(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/emotejoiner/emotespot1.prefab")));
+        props.Add(GameObject.Instantiate(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/emotejoiner/JoinVisual.prefab")));
         props[props.Count - 1].transform.SetParent(transform);
         //Vector3 scal = transform.lossyScale;
         //props[props.Count - 1].transform.localPosition = new Vector3(joinSpot.position.x / scal.x, joinSpot.position.y / scal.y, joinSpot.position.z / scal.z);
         //props[props.Count - 1].transform.localEulerAngles = joinSpot.rotation;
         //props[props.Count - 1].transform.localScale = new Vector3(joinSpot.scale.x / scal.x, joinSpot.scale.y / scal.y, joinSpot.scale.z / scal.z);
         props[props.Count - 1].name = joinSpot.name;
-        foreach (var rend in props[props.Count - 1].GetComponentsInChildren<SkinnedMeshRenderer>())
-        {
-            rend.material.shader = CustomEmotesAPI.standardShader;
-        }
+        //foreach (var rend in props[props.Count - 1].GetComponentsInChildren<SkinnedMeshRenderer>())
+        //{
+        //    rend.material.shader = CustomEmotesAPI.standardShader;
+        //}
         EmoteLocation location = props[props.Count - 1].AddComponent<EmoteLocation>();
         location.joinSpot = joinSpot;
         location.owner = this;
@@ -1339,7 +1369,7 @@ public class BoneMapper : MonoBehaviour
         try
         {
             currentClip.clip[0].ToString();
-            NewAnimation(currentClip.joinSpots);
+            NewAnimation(null);
             if (currentClip.syncronizeAnimation || currentClip.syncronizeAudio)
             {
                 if (CustomAnimationClip.syncPlayerCount[currentClip.syncPos] > 0)
@@ -1352,7 +1382,6 @@ public class BoneMapper : MonoBehaviour
                     AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos][currEvent], audioObjects[currentClip.syncPos]);
                 }
                 audioObjects[currentClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
-
                 if (CustomAnimationClip.syncPlayerCount[currentClip.syncPos] == 0 && currentClip.syncronizeAudio)
                 {
                     foreach (var item in allMappers)
@@ -1369,10 +1398,12 @@ public class BoneMapper : MonoBehaviour
                 uniqueSpot = -1;
             }
             BoneMapper.allMappers.Remove(this);
+            prevClip = currentClip;
             currentClip = null;
         }
         catch (Exception e)
         {
+            DebugClass.Log($"Had issues when destroying bonemapper: {e}");
             BoneMapper.allMappers.Remove(this);
         }
     }

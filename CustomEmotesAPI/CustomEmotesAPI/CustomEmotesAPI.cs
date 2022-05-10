@@ -62,6 +62,18 @@ namespace EmotesAPI
             //CreateNameTokenSpritePair("HERETIC_BODY_NAME", Assets.Load<Sprite>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/heretic.png"));
         }
         internal static List<string> allClipNames = new List<string>();
+        internal static List<int> blacklistedClips = new List<int>();
+        public static void BlackListEmote(string name)
+        {
+            for (int i = 0; i < allClipNames.Count; i++)
+            {
+                if (allClipNames[i] == name)
+                {
+                    blacklistedClips.Add(i);
+                    return;
+                }
+            }
+        }
         internal static void LoadResource(string resource)
         {
             Assets.AddBundle($"{resource}");
@@ -88,7 +100,7 @@ namespace EmotesAPI
             }
             return Input.GetKeyDown(entry.Value.MainKey);
         }
-        public const string VERSION = "1.5.0";
+        public const string VERSION = "1.5.4";
         internal static float Actual_MSX = 69;
         public static CustomEmotesAPI instance;
         public void Awake()
@@ -104,10 +116,6 @@ namespace EmotesAPI
             CustomEmotesAPI.LoadResource("moisture_animationreplacements"); // I don't remember what's in here that makes importing emotes work, don't @ me
             Settings.RunAll();
             Register.Init();
-
-            //GameObject joinSpot = Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/emotejoiner/emotespot1.prefab");
-            //joinSpot.AddComponent<NetworkIdentity>();
-            //joinSpot.RegisterNetworkPrefab();
 
             AnimationReplacements.RunAll();
             float WhosSteveJobs = 69420;
@@ -555,6 +563,10 @@ namespace EmotesAPI
             if (GetKeyPressed(Settings.RandomEmote))
             {
                 int rand = UnityEngine.Random.Range(0, allClipNames.Count);
+                while (blacklistedClips.Contains(rand))
+                {
+                    rand = UnityEngine.Random.Range(0, allClipNames.Count);
+                }
                 //foreach (var item in BoneMapper.allMappers)
                 //{
                 //    PlayAnimation(allClipNames[rand], item);
