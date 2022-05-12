@@ -152,6 +152,31 @@ namespace EmotesAPI
                     Actual_MSX = WhosSteveJobs;
                     WhosSteveJobs = 69420;
                 }
+                foreach (var item in BoneMapper.allMappers)
+                {
+                    try
+                    {
+                        foreach (var obj in BoneMapper.audioObjects2)
+                        {
+                            AkSoundEngine.PostEvent(BoneMapper.stopEvents[item.currentClip.syncPos][item.currEvent], BoneMapper.audioObjects2[item.currentClip.syncPos].audioObject);
+                            if (obj)
+                            {
+                                Destroy(obj);
+                            }
+                        }
+                        BoneMapper.activeAudioObjects.Clear();
+                        BoneMapper.audioObjects2.Clear();
+                        if (item)
+                        {
+                            item.audioObjects[item.currentClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
+                            AkSoundEngine.PostEvent(BoneMapper.stopEvents[item.currentClip.syncPos][item.currEvent], item.audioObjects[item.currentClip.syncPos]);
+                        }
+                    }
+                    catch (System.Exception e)
+                    {
+                        DebugClass.Log($"Error when cleaning up audio on scene exit: {e}");
+                    }
+                }
                 BoneMapper.allMappers.Clear();
                 localMapper = null;
             };
@@ -458,7 +483,7 @@ namespace EmotesAPI
         public static void PlayAnimation(string animationName, int pos = -2)
         {
             var identity = NetworkUser.readOnlyLocalPlayersList[0].master?.GetBody().gameObject.GetComponent<NetworkIdentity>();
-                new SyncAnimationToServer(identity.netId, animationName, pos).Send(R2API.Networking.NetworkDestination.Server);
+            new SyncAnimationToServer(identity.netId, animationName, pos).Send(R2API.Networking.NetworkDestination.Server);
 
 
             //if (!NetworkServer.active)
@@ -479,7 +504,7 @@ namespace EmotesAPI
                 if (item == mapper)
                 {
                     var identity = mapper.transform.parent.GetComponent<CharacterModel>().body.GetComponent<NetworkIdentity>();
-                        new SyncAnimationToServer(identity.netId, animationName, pos).Send(R2API.Networking.NetworkDestination.Server);
+                    new SyncAnimationToServer(identity.netId, animationName, pos).Send(R2API.Networking.NetworkDestination.Server);
 
                     //if (!NetworkServer.active)
                     //{

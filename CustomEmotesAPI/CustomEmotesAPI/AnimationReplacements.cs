@@ -488,11 +488,19 @@ public struct WorldProp
         joinSpots = _joinSpots;
     }
 }
+public class AudioObject : MonoBehaviour
+{
+    internal int spot;
+    internal int playerCount;
+    internal GameObject audioObject;
+}
 public class BoneMapper : MonoBehaviour
 {
     public static List<string[]> stopEvents = new List<string[]>();
     public static List<string[]> startEvents = new List<string[]>();
     internal List<GameObject> audioObjects = new List<GameObject>();
+    internal static List<AudioObject> audioObjects2 = new List<AudioObject>();
+    internal static List<int> activeAudioObjects = new List<int>();
     public SkinnedMeshRenderer smr1, smr2;
     public Animator a1, a2;
     public HealthComponent h;
@@ -514,7 +522,7 @@ public class BoneMapper : MonoBehaviour
     public List<GameObject> props = new List<GameObject>();
     public float scale = 1.0f;
     internal int desiredEvent = 0;
-    int currEvent = 0;
+    internal int currEvent = 0;
     public float autoWalkSpeed = 0;
     public bool overrideMoveSpeed = false;
     public GameObject currentEmoteSpot = null;
@@ -567,22 +575,29 @@ public class BoneMapper : MonoBehaviour
             if (currentClip.syncronizeAnimation || currentClip.syncronizeAudio)
             {
                 CustomAnimationClip.syncPlayerCount[currentClip.syncPos]--;
+                audioObjects2[currentClip.syncPos].playerCount--;
+                if (audioObjects2[currentClip.syncPos].playerCount == 0 && activeAudioObjects.Contains(audioObjects2[currentClip.syncPos].spot))
+                {
+                    activeAudioObjects.Remove(audioObjects2[currentClip.syncPos].spot);
+                }
             }
             if (stopEvents[currentClip.syncPos][currEvent] != "")
             {
                 if (!currentClip.syncronizeAudio)
                 {
-                    AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos][currEvent], audioObjects[currentClip.syncPos]);
+                    AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos][currEvent], this.gameObject);
                 }
                 audioObjects[currentClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
+
 
                 if (CustomAnimationClip.syncPlayerCount[currentClip.syncPos] == 0 && currentClip.syncronizeAudio)
                 {
                     foreach (var item in allMappers)
                     {
-                        AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos][currEvent], item.audioObjects[currentClip.syncPos]);
+                        //AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos][currEvent], item.audioObjects[currentClip.syncPos]);
                         item.audioObjects[currentClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
                     }
+                    AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos][currEvent], audioObjects2[currentClip.syncPos].audioObject);
                 }
             }
             if (uniqueSpot != -1 && CustomAnimationClip.uniqueAnimations[currentClip.syncPos][uniqueSpot])
@@ -696,7 +711,6 @@ public class BoneMapper : MonoBehaviour
         bool right = upperLegR && lowerLegR && footR;
         Transform LeftLegIK = null;
         Transform RightLegIK = null;
-        //DebugClass.Log($"----------{smr2.gameObject.ToString()}");
         if (!jank)
         {
             for (int i = 0; i < smr2.bones.Length; i++)
@@ -771,6 +785,11 @@ public class BoneMapper : MonoBehaviour
         if (currentClip.syncronizeAnimation || currentClip.syncronizeAudio)
         {
             CustomAnimationClip.syncPlayerCount[currentClip.syncPos]++;
+            audioObjects2[currentClip.syncPos].playerCount++;
+            if (audioObjects2[currentClip.syncPos].playerCount == 1)
+            {
+                activeAudioObjects.Add(audioObjects2[currentClip.syncPos].spot);
+            }
         }
         if (currentClip.syncronizeAnimation && CustomAnimationClip.syncPlayerCount[currentClip.syncPos] == 1)
         {
@@ -787,13 +806,13 @@ public class BoneMapper : MonoBehaviour
                 foreach (var item in allMappers)
                 {
                     item.currEvent = currEvent;
-                    AkSoundEngine.PostEvent(startEvents[currentClip.syncPos][currEvent], item.audioObjects[currentClip.syncPos]);
                 }
+                AkSoundEngine.PostEvent(startEvents[currentClip.syncPos][currEvent], audioObjects2[currentClip.syncPos].audioObject);
             }
             else if (!currentClip.syncronizeAudio)
             {
                 currEvent = UnityEngine.Random.Range(0, startEvents[currentClip.syncPos].Length);
-                AkSoundEngine.PostEvent(startEvents[currentClip.syncPos][currEvent], audioObjects[currentClip.syncPos]);
+                AkSoundEngine.PostEvent(startEvents[currentClip.syncPos][currEvent], this.gameObject);
             }
             audioObjects[currentClip.syncPos].transform.localPosition = Vector3.zero;
         }
@@ -1100,50 +1119,43 @@ public class BoneMapper : MonoBehaviour
     Vector3 ogScale = new Vector3(-69, -69, -69);
     Vector3 ogLocation = new Vector3(-69, -69, -69);
     Vector3 scaleDiff = Vector3.one;
-    void Update()
+    float rtpcUpdateTimer = 0;
+
+    void AudioFunctions()
     {
-        if (worldProp)
+        rtpcUpdateTimer += Time.deltaTime;
+        for (int i = 0; i < activeAudioObjects.Count; i++)
         {
-            return;
+            AkPositionArray ak = new AkPositionArray((uint)allMappers.Count);
+            foreach (var mapper in allMappers)
+            {
+
+                ak.Add(mapper.audioObjects[activeAudioObjects[i]].transform.position, new Vector3(1, 0, 0), new Vector3(0, 1, 0));
+            }
+            AkSoundEngine.SetMultiplePositions(audioObjects2[activeAudioObjects[i]].audioObject, ak, (ushort)ak.Count, AkMultiPositionType.MultiPositionType_MultiDirections);
         }
-        if (parentGameObject)
+        if (rtpcUpdateTimer > 3)
         {
-            if (positionLock)
+            rtpcUpdateTimer = 0;
+        }
+        for (int i = 0; i < CustomAnimationClip.syncPlayerCount.Count; i++)
+        {
+            if (CustomAnimationClip.syncPlayerCount[i] != 0)
             {
-                transform.parent.GetComponent<CharacterModel>().body.gameObject.transform.position = parentGameObject.transform.position;
-                transform.parent.GetComponent<CharacterModel>().body.GetComponent<ModelLocator>().modelBaseTransform.position = parentGameObject.transform.position;
-                transform.parent.GetComponent<CharacterModel>().body.GetComponent<CharacterMotor>().velocity = Vector3.zero;
-            }
-            if (rotationLock)
-            {
-                transform.parent.GetComponent<CharacterModel>().body.GetComponent<CharacterDirection>().enabled = false;
-                transform.parent.GetComponent<CharacterModel>().body.GetComponent<ModelLocator>().modelBaseTransform.eulerAngles = parentGameObject.transform.eulerAngles;
-            }
-            if (scaleLock)
-            {
-                transform.parent.localScale = new Vector3(parentGameObject.transform.localScale.x * scaleDiff.x, parentGameObject.transform.localScale.y * scaleDiff.y, parentGameObject.transform.localScale.z * scaleDiff.z);
+                CustomAnimationClip.syncTimer[i] += Time.deltaTime;
             }
         }
-        if (local)
+    }
+    void DimmingChecks()
+    {
+        float closestDimmingSource = 20f;
+        foreach (var item in allMappers)
         {
-            for (int i = 0; i < CustomAnimationClip.syncPlayerCount.Count; i++)
+            try
             {
-                if (CustomAnimationClip.syncPlayerCount[i] != 0)
+                if (item)
                 {
-                    CustomAnimationClip.syncTimer[i] += Time.deltaTime;
-                }
-            }
-            float closestDimmingSource = 20f;
-            interval += Time.deltaTime;
-            if (interval > 5f)
-            {
-                interval -= 5f;
-            }
-            foreach (var item in allMappers)
-            {
-                try
-                {
-                    if (item && item.a2.enabled && item.currentClip.dimAudioWhenClose)
+                    if (item.a2.enabled && item.currentClip.dimAudioWhenClose)
                     {
                         if (Vector3.Distance(item.transform.parent.position, transform.position) < closestDimmingSource)
                         {
@@ -1151,46 +1163,74 @@ public class BoneMapper : MonoBehaviour
                         }
                     }
                 }
-                catch (Exception)
-                {
-                }
-            }
-            if (closestDimmingSource < 20f && Settings.DimmingSpheres.Value && Settings.EmotesVolume.Value > 0)
-            {
-                Current_MSX = Mathf.Lerp(Current_MSX, (closestDimmingSource / 20f) * CustomEmotesAPI.Actual_MSX, Time.deltaTime * 3);
-                AkSoundEngine.SetRTPCValue("Volume_MSX", Current_MSX);
-            }
-            else if (Current_MSX != CustomEmotesAPI.Actual_MSX)
-            {
-                Current_MSX = Mathf.Lerp(Current_MSX, CustomEmotesAPI.Actual_MSX, Time.deltaTime * 3);
-                AkSoundEngine.SetRTPCValue("Volume_MSX", Current_MSX);
-            }
-            try
-            {
-                if ((attacking && currentClip.stopOnAttack) || (moving && currentClip.stopOnMove))
-                {
-                    CustomEmotesAPI.PlayAnimation("none");
-                }
             }
             catch (Exception)
             {
             }
         }
-        else
+        SetRTPCInDimming(closestDimmingSource);
+    }
+    void SetRTPCInDimming(float closestDimmingSource)
+    {
+        if (closestDimmingSource < 20f && Settings.DimmingSpheres.Value && Settings.EmotesVolume.Value > 0)
         {
-            try
+            Current_MSX = Mathf.Lerp(Current_MSX, (closestDimmingSource / 20f) * CustomEmotesAPI.Actual_MSX, Time.deltaTime * 3);
+            AkSoundEngine.SetRTPCValue("Volume_MSX", Current_MSX);
+        }
+        else if (Current_MSX != CustomEmotesAPI.Actual_MSX)
+        {
+            Current_MSX = Mathf.Lerp(Current_MSX, CustomEmotesAPI.Actual_MSX, Time.deltaTime * 3);
+            AkSoundEngine.SetRTPCValue("Volume_MSX", Current_MSX);
+        }
+    }
+    void LocalFunctions()
+    {
+        AudioFunctions();
+        DimmingChecks();
+        try
+        {
+            if ((attacking && currentClip.stopOnAttack) || (moving && currentClip.stopOnMove))
+            {
+                CustomEmotesAPI.PlayAnimation("none");
+            }
+        }
+        catch (Exception)
+        {
+        }
+    }
+    void GetLocal()
+    {
+        try
+        {
+            if (!CustomEmotesAPI.localMapper)
             {
                 var body = NetworkUser.readOnlyLocalPlayersList[0].master?.GetBody();
                 if (body.gameObject.GetComponent<ModelLocator>().modelTransform == transform.parent)
                 {
                     local = true;
+                    GameObject g = new GameObject();
+                    g.name = "AudioContainer";
+                    foreach (var item in audioObjects)
+                    {
+                        GameObject aObject = new GameObject();
+                        aObject.name = item.name;
+                        aObject.transform.parent = g.transform;
+                        AudioObject a = aObject.AddComponent<AudioObject>();
+                        a.playerCount = 0;
+                        a.audioObject = aObject;
+                        a.spot = audioObjects2.Count;
+                        audioObjects2.Add(a);
+                    }
                     CustomEmotesAPI.localMapper = this;
                 }
             }
-            catch (Exception)
-            {
-            }
         }
+        catch (Exception)
+        {
+        }
+    }
+    void TwoPartThing()
+    {
         if (a2.GetCurrentAnimatorStateInfo(0).IsName("none"))
         {
             if (!twopart)
@@ -1242,12 +1282,17 @@ public class BoneMapper : MonoBehaviour
                     if (currentClip.syncronizeAnimation || currentClip.syncronizeAudio)
                     {
                         CustomAnimationClip.syncPlayerCount[currentClip.syncPos]--;
+                        audioObjects2[currentClip.syncPos].playerCount--;
+                        if (audioObjects2[currentClip.syncPos].playerCount == 0 && activeAudioObjects.Contains(audioObjects2[currentClip.syncPos].spot))
+                        {
+                            activeAudioObjects.Remove(audioObjects2[currentClip.syncPos].spot);
+                        }
                     }
                     if (stopEvents[currentClip.syncPos][currEvent] != "")
                     {
                         if (!currentClip.syncronizeAudio)
                         {
-                            AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos][currEvent], audioObjects[currentClip.syncPos]);
+                            AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos][currEvent], this.gameObject);
                         }
                         audioObjects[currentClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
 
@@ -1255,9 +1300,10 @@ public class BoneMapper : MonoBehaviour
                         {
                             foreach (var item in allMappers)
                             {
-                                AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos][currEvent], item.audioObjects[currentClip.syncPos]);
+                                //AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos][currEvent], item.audioObjects[currentClip.syncPos]);
                                 item.audioObjects[currentClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
                             }
+                            AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos][currEvent], audioObjects2[currentClip.syncPos].audioObject);
                         }
                     }
                     prevClip = currentClip;
@@ -1273,6 +1319,9 @@ public class BoneMapper : MonoBehaviour
             //a1.enabled = false;
             twopart = false;
         }
+    }
+    void HealthAndAutoWalk()
+    {
         if (autoWalkSpeed != 0)
         {
             if (overrideMoveSpeed)
@@ -1299,6 +1348,45 @@ public class BoneMapper : MonoBehaviour
             }
             GameObject.Destroy(gameObject);
         }
+    }
+    void WorldPropAndParent()
+    {
+        if (parentGameObject)
+        {
+            if (positionLock)
+            {
+                transform.parent.GetComponent<CharacterModel>().body.gameObject.transform.position = parentGameObject.transform.position;
+                transform.parent.GetComponent<CharacterModel>().body.GetComponent<ModelLocator>().modelBaseTransform.position = parentGameObject.transform.position;
+                transform.parent.GetComponent<CharacterModel>().body.GetComponent<CharacterMotor>().velocity = Vector3.zero;
+            }
+            if (rotationLock)
+            {
+                transform.parent.GetComponent<CharacterModel>().body.GetComponent<CharacterDirection>().enabled = false;
+                transform.parent.GetComponent<CharacterModel>().body.GetComponent<ModelLocator>().modelBaseTransform.eulerAngles = parentGameObject.transform.eulerAngles;
+            }
+            if (scaleLock)
+            {
+                transform.parent.localScale = new Vector3(parentGameObject.transform.localScale.x * scaleDiff.x, parentGameObject.transform.localScale.y * scaleDiff.y, parentGameObject.transform.localScale.z * scaleDiff.z);
+            }
+        }
+    }
+    void Update()
+    {
+        if (worldProp)
+        {
+            return;
+        }
+        WorldPropAndParent();
+        if (local)
+        {
+            LocalFunctions();
+        }
+        else
+        {
+            GetLocal();
+        }
+        TwoPartThing();
+        HealthAndAutoWalk();
     }
     public int SpawnJoinSpot(JoinSpot joinSpot)
     {
@@ -1373,22 +1461,32 @@ public class BoneMapper : MonoBehaviour
             if (currentClip.syncronizeAnimation || currentClip.syncronizeAudio)
             {
                 if (CustomAnimationClip.syncPlayerCount[currentClip.syncPos] > 0)
+                {
                     CustomAnimationClip.syncPlayerCount[currentClip.syncPos]--;
+                    audioObjects2[currentClip.syncPos].playerCount--;
+                    if (audioObjects2[currentClip.syncPos].playerCount == 0 && activeAudioObjects.Contains(audioObjects2[currentClip.syncPos].spot))
+                    {
+                        activeAudioObjects.Remove(audioObjects2[currentClip.syncPos].spot);
+                    }
+                }
             }
             if (stopEvents[currentClip.syncPos][currEvent] != "")
             {
                 if (!currentClip.syncronizeAudio)
                 {
-                    AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos][currEvent], audioObjects[currentClip.syncPos]);
+                    AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos][currEvent], this.gameObject);
                 }
                 audioObjects[currentClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
+
                 if (CustomAnimationClip.syncPlayerCount[currentClip.syncPos] == 0 && currentClip.syncronizeAudio)
                 {
                     foreach (var item in allMappers)
                     {
-                        AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos][currEvent], item.audioObjects[currentClip.syncPos]);
+                        //AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos][currEvent], item.audioObjects[currentClip.syncPos]);
                         item.audioObjects[currentClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
+
                     }
+                    AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos][currEvent], audioObjects2[currentClip.syncPos].audioObject);
                 }
                 AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos][currEvent], audioObjects[currentClip.syncPos]);
             }
