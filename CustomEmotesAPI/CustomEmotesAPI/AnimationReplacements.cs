@@ -493,14 +493,17 @@ public class AudioObject : MonoBehaviour
     internal int spot;
     internal int playerCount;
     internal GameObject audioObject;
+    internal int activeObjectsSpot;
+}
+public class AudioContainer : MonoBehaviour
+{
+    internal List<GameObject> playingObjects = new List<GameObject>();
 }
 public class BoneMapper : MonoBehaviour
 {
     public static List<string[]> stopEvents = new List<string[]>();
     public static List<string[]> startEvents = new List<string[]>();
     internal List<GameObject> audioObjects = new List<GameObject>();
-    internal static List<AudioObject> audioObjects2 = new List<AudioObject>();
-    internal static List<int> activeAudioObjects = new List<int>();
     public SkinnedMeshRenderer smr1, smr2;
     public Animator a1, a2;
     public HealthComponent h;
@@ -572,42 +575,45 @@ public class BoneMapper : MonoBehaviour
         try
         {
             currentClip.clip[0].ToString();
-            if (currentClip.syncronizeAnimation || currentClip.syncronizeAudio)
+            try
             {
-                CustomAnimationClip.syncPlayerCount[currentClip.syncPos]--;
-                audioObjects2[currentClip.syncPos].playerCount--;
-                if (audioObjects2[currentClip.syncPos].playerCount == 0 && activeAudioObjects.Contains(audioObjects2[currentClip.syncPos].spot))
+                if (currentClip.syncronizeAnimation || currentClip.syncronizeAudio)
                 {
-                    activeAudioObjects.Remove(audioObjects2[currentClip.syncPos].spot);
+                    CustomAnimationClip.syncPlayerCount[currentClip.syncPos]--;
+                    RemoveAudioObject();
                 }
-            }
-            if (stopEvents[currentClip.syncPos][currEvent] != "")
-            {
-                if (!currentClip.syncronizeAudio)
+                if (stopEvents[currentClip.syncPos][currEvent] != "")
                 {
-                    AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos][currEvent], this.gameObject);
-                }
-                audioObjects[currentClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
-
-
-                if (CustomAnimationClip.syncPlayerCount[currentClip.syncPos] == 0 && currentClip.syncronizeAudio)
-                {
-                    foreach (var item in allMappers)
+                    if (!currentClip.syncronizeAudio)
                     {
-                        //AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos][currEvent], item.audioObjects[currentClip.syncPos]);
-                        item.audioObjects[currentClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
+                        AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos][currEvent], this.gameObject);
                     }
-                    AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos][currEvent], audioObjects2[currentClip.syncPos].audioObject);
+                    audioObjects[currentClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
+
+
+                    if (CustomAnimationClip.syncPlayerCount[currentClip.syncPos] == 0 && currentClip.syncronizeAudio)
+                    {
+                        foreach (var item in allMappers)
+                        {
+                            item.audioObjects[currentClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
+                        }
+                        AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos][currEvent], CustomEmotesAPI.audioContainers[currentClip.syncPos]);
+                    }
+                }
+                if (uniqueSpot != -1 && CustomAnimationClip.uniqueAnimations[currentClip.syncPos][uniqueSpot])
+                {
+                    CustomAnimationClip.uniqueAnimations[currentClip.syncPos][uniqueSpot] = false;
+                    uniqueSpot = -1;
                 }
             }
-            if (uniqueSpot != -1 && CustomAnimationClip.uniqueAnimations[currentClip.syncPos][uniqueSpot])
+            catch (Exception e)
             {
-                CustomAnimationClip.uniqueAnimations[currentClip.syncPos][uniqueSpot] = false;
-                uniqueSpot = -1;
+                DebugClass.Log($"had issue turning off audio before new audio played: {e}");
             }
         }
         catch (Exception)
         {
+
         }
         currEvent = 0;
         if (s != "none")
@@ -766,10 +772,6 @@ public class BoneMapper : MonoBehaviour
         {
             a1.enabled = false;
         }
-        //foreach (var item in stopEvents)
-        //{
-        //    AkSoundEngine.PostEvent(item, gameObject);
-        //}
         if (s == "none")
         {
             a2.Play("none", -1, 0f);
@@ -785,11 +787,7 @@ public class BoneMapper : MonoBehaviour
         if (currentClip.syncronizeAnimation || currentClip.syncronizeAudio)
         {
             CustomAnimationClip.syncPlayerCount[currentClip.syncPos]++;
-            audioObjects2[currentClip.syncPos].playerCount++;
-            if (audioObjects2[currentClip.syncPos].playerCount == 1)
-            {
-                activeAudioObjects.Add(audioObjects2[currentClip.syncPos].spot);
-            }
+            AddAudioObject();
         }
         if (currentClip.syncronizeAnimation && CustomAnimationClip.syncPlayerCount[currentClip.syncPos] == 1)
         {
@@ -807,7 +805,7 @@ public class BoneMapper : MonoBehaviour
                 {
                     item.currEvent = currEvent;
                 }
-                AkSoundEngine.PostEvent(startEvents[currentClip.syncPos][currEvent], audioObjects2[currentClip.syncPos].audioObject);
+                AkSoundEngine.PostEvent(startEvents[currentClip.syncPos][currEvent], CustomEmotesAPI.audioContainers[currentClip.syncPos]);
             }
             else if (!currentClip.syncronizeAudio)
             {
@@ -1120,32 +1118,6 @@ public class BoneMapper : MonoBehaviour
     Vector3 ogLocation = new Vector3(-69, -69, -69);
     Vector3 scaleDiff = Vector3.one;
     float rtpcUpdateTimer = 0;
-
-    void AudioFunctions()
-    {
-        rtpcUpdateTimer += Time.deltaTime;
-        for (int i = 0; i < activeAudioObjects.Count; i++)
-        {
-            AkPositionArray ak = new AkPositionArray((uint)allMappers.Count);
-            foreach (var mapper in allMappers)
-            {
-
-                ak.Add(mapper.audioObjects[activeAudioObjects[i]].transform.position, new Vector3(1, 0, 0), new Vector3(0, 1, 0));
-            }
-            AkSoundEngine.SetMultiplePositions(audioObjects2[activeAudioObjects[i]].audioObject, ak, (ushort)ak.Count, AkMultiPositionType.MultiPositionType_MultiDirections);
-        }
-        if (rtpcUpdateTimer > 3)
-        {
-            rtpcUpdateTimer = 0;
-        }
-        for (int i = 0; i < CustomAnimationClip.syncPlayerCount.Count; i++)
-        {
-            if (CustomAnimationClip.syncPlayerCount[i] != 0)
-            {
-                CustomAnimationClip.syncTimer[i] += Time.deltaTime;
-            }
-        }
-    }
     void DimmingChecks()
     {
         float closestDimmingSource = 20f;
@@ -1185,7 +1157,7 @@ public class BoneMapper : MonoBehaviour
     }
     void LocalFunctions()
     {
-        AudioFunctions();
+        //AudioFunctions();
         DimmingChecks();
         try
         {
@@ -1210,18 +1182,25 @@ public class BoneMapper : MonoBehaviour
                     local = true;
                     GameObject g = new GameObject();
                     g.name = "AudioContainer";
-                    foreach (var item in audioObjects)
-                    {
-                        GameObject aObject = new GameObject();
-                        aObject.name = item.name;
-                        aObject.transform.parent = g.transform;
-                        AudioObject a = aObject.AddComponent<AudioObject>();
-                        a.playerCount = 0;
-                        a.audioObject = aObject;
-                        a.spot = audioObjects2.Count;
-                        audioObjects2.Add(a);
-                    }
                     CustomEmotesAPI.localMapper = this;
+
+                    if (CustomEmotesAPI.audioContainers.Count == 0)
+                    {
+                        GameObject audioContainerHolder = new GameObject();
+                        audioContainerHolder.name = "Audio Container Holder";
+                        DontDestroyOnLoad(audioContainerHolder);
+                        foreach (var item in startEvents)
+                        {
+                            GameObject aObject = new GameObject();
+                            if (item[0] != "")
+                            {
+                                aObject.name = $"{item[0]}_AudioContainer";
+                            }
+                            var container = aObject.AddComponent<AudioContainer>();
+                            aObject.transform.SetParent(audioContainerHolder.transform);
+                            CustomEmotesAPI.audioContainers.Add(aObject);
+                        }
+                    }
                 }
             }
         }
@@ -1282,11 +1261,7 @@ public class BoneMapper : MonoBehaviour
                     if (currentClip.syncronizeAnimation || currentClip.syncronizeAudio)
                     {
                         CustomAnimationClip.syncPlayerCount[currentClip.syncPos]--;
-                        audioObjects2[currentClip.syncPos].playerCount--;
-                        if (audioObjects2[currentClip.syncPos].playerCount == 0 && activeAudioObjects.Contains(audioObjects2[currentClip.syncPos].spot))
-                        {
-                            activeAudioObjects.Remove(audioObjects2[currentClip.syncPos].spot);
-                        }
+                        RemoveAudioObject();
                     }
                     if (stopEvents[currentClip.syncPos][currEvent] != "")
                     {
@@ -1300,10 +1275,9 @@ public class BoneMapper : MonoBehaviour
                         {
                             foreach (var item in allMappers)
                             {
-                                //AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos][currEvent], item.audioObjects[currentClip.syncPos]);
                                 item.audioObjects[currentClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
                             }
-                            AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos][currEvent], audioObjects2[currentClip.syncPos].audioObject);
+                            AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos][currEvent], CustomEmotesAPI.audioContainers[currentClip.syncPos]);
                         }
                     }
                     prevClip = currentClip;
@@ -1448,12 +1422,23 @@ public class BoneMapper : MonoBehaviour
         //    }
         //}
     }
+    void AddAudioObject()
+    {
+        CustomEmotesAPI.audioContainers[currentClip.syncPos].GetComponent<AudioContainer>().playingObjects.Add(this.gameObject);
+    }
+    void RemoveAudioObject()
+    {
+        try
+        {
+            CustomEmotesAPI.audioContainers[currentClip.syncPos].GetComponent<AudioContainer>().playingObjects.Remove(this.gameObject);
+        }
+        catch (Exception e)
+        {
+            DebugClass.Log($"failed to remove object {this.gameObject} from playingObjects: {e}");
+        }
+    }
     void OnDestroy()
     {
-        //foreach (var item in allMappers)
-        //{
-        //    AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos], item.audioObjects[currentClip.syncPos]);
-        //}
         try
         {
             currentClip.clip[0].ToString();
@@ -1463,11 +1448,7 @@ public class BoneMapper : MonoBehaviour
                 if (CustomAnimationClip.syncPlayerCount[currentClip.syncPos] > 0)
                 {
                     CustomAnimationClip.syncPlayerCount[currentClip.syncPos]--;
-                    audioObjects2[currentClip.syncPos].playerCount--;
-                    if (audioObjects2[currentClip.syncPos].playerCount == 0 && activeAudioObjects.Contains(audioObjects2[currentClip.syncPos].spot))
-                    {
-                        activeAudioObjects.Remove(audioObjects2[currentClip.syncPos].spot);
-                    }
+                    RemoveAudioObject();
                 }
             }
             if (stopEvents[currentClip.syncPos][currEvent] != "")
@@ -1482,11 +1463,9 @@ public class BoneMapper : MonoBehaviour
                 {
                     foreach (var item in allMappers)
                     {
-                        //AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos][currEvent], item.audioObjects[currentClip.syncPos]);
                         item.audioObjects[currentClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
-
                     }
-                    AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos][currEvent], audioObjects2[currentClip.syncPos].audioObject);
+                    AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos][currEvent], CustomEmotesAPI.audioContainers[currentClip.syncPos]);
                 }
                 AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos][currEvent], audioObjects[currentClip.syncPos]);
             }

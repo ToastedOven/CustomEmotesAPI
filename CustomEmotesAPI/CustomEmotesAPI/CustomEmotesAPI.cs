@@ -100,9 +100,11 @@ namespace EmotesAPI
             }
             return Input.GetKeyDown(entry.Value.MainKey);
         }
-        public const string VERSION = "1.5.4";
+        public const string VERSION = "1.6.0";
         internal static float Actual_MSX = 69;
         public static CustomEmotesAPI instance;
+        public static List<GameObject> audioContainers = new List<GameObject>();
+        public static List<GameObject> activeAudioContainers = new List<GameObject>();
         public void Awake()
         {
             instance = this;
@@ -156,16 +158,10 @@ namespace EmotesAPI
                 {
                     try
                     {
-                        foreach (var obj in BoneMapper.audioObjects2)
+                        foreach (var thing in audioContainers)
                         {
-                            AkSoundEngine.PostEvent(BoneMapper.stopEvents[item.currentClip.syncPos][item.currEvent], BoneMapper.audioObjects2[item.currentClip.syncPos].audioObject);
-                            if (obj)
-                            {
-                                Destroy(obj);
-                            }
+                            AkSoundEngine.StopAll(thing);
                         }
-                        BoneMapper.activeAudioObjects.Clear();
-                        BoneMapper.audioObjects2.Clear();
                         if (item)
                         {
                             item.audioObjects[item.currentClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
@@ -546,8 +542,14 @@ namespace EmotesAPI
             {
                 if (item.emoter == mapper)
                 {
-                    item.emoter = null;
-                    item.SetVisible(true);
+                    try
+                    {
+                        item.emoter = null;
+                        item.SetVisible(true);
+                    }
+                    catch (System.Exception)
+                    {
+                    }
                 }
             }
             mapper.transform.parent.GetComponent<CharacterModel>().body.RecalculateStats();
@@ -637,6 +639,31 @@ namespace EmotesAPI
                         }
                         nearestMapper = null;
                     }
+                }
+            }
+            AudioFunctions();
+        }
+
+        void AudioFunctions()
+        {
+            for (int i = 0; i < CustomEmotesAPI.audioContainers.Count; i++)
+            {
+                AudioContainer ac = CustomEmotesAPI.audioContainers[i].GetComponent<AudioContainer>();
+                if (ac.playingObjects.Count != 0)
+                {
+                    AkPositionArray ak = new AkPositionArray((uint)ac.playingObjects.Count);
+                    foreach (var item in ac.playingObjects)
+                    {
+                        ak.Add(item.transform.position, new Vector3(1, 0, 0), new Vector3(0, 1, 0));
+                    }
+                    AkSoundEngine.SetMultiplePositions(CustomEmotesAPI.audioContainers[i], ak, (ushort)ak.Count, AkMultiPositionType.MultiPositionType_MultiDirections);
+                }
+            }
+            for (int i = 0; i < CustomAnimationClip.syncPlayerCount.Count; i++)
+            {
+                if (CustomAnimationClip.syncPlayerCount[i] != 0)
+                {
+                    CustomAnimationClip.syncTimer[i] += Time.deltaTime;
                 }
             }
         }
