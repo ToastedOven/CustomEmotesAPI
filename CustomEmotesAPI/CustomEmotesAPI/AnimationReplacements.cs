@@ -528,6 +528,7 @@ public class BoneMapper : MonoBehaviour
     internal int currEvent = 0;
     public float autoWalkSpeed = 0;
     public bool overrideMoveSpeed = false;
+    public bool autoWalk = false;
     public GameObject currentEmoteSpot = null;
     public bool worldProp = false;
     public bool ragdolling = false;
@@ -814,6 +815,7 @@ public class BoneMapper : MonoBehaviour
             }
             audioObjects[currentClip.syncPos].transform.localPosition = Vector3.zero;
         }
+        SetAnimationSpeed(1);
         if (currentClip.secondaryClip != null && currentClip.secondaryClip.Length != 0)
         {
             if (true)
@@ -856,11 +858,16 @@ public class BoneMapper : MonoBehaviour
         NewAnimation(currentClip.joinSpots);
         CustomEmotesAPI.Changed(s, this);
     }
+    public void SetAnimationSpeed(float speed)
+    {
+        a2.speed = speed;
+    }
     internal void NewAnimation(JoinSpot[] locations)
     {
         try
         {
             autoWalkSpeed = 0;
+            autoWalk = false;
             overrideMoveSpeed = false;
             if (parentGameObject && !preserveParent)
             {
@@ -1021,36 +1028,6 @@ public class BoneMapper : MonoBehaviour
         }
         int offset = 0;
         bool nuclear = true;
-        //for (int i = 0; i + offset < smr2.bones.Length; i++)
-        //{
-        //    try
-        //    {
-        //        if (!ignore.Contains(smr2.bones[i].name))
-        //        {
-        //            while (smr2.bones[i + offset].name != smr1.bones[i].name)
-        //            {
-        //                offset++;
-        //                if (i + offset > smr1.bones.Length - 1)
-        //                {
-        //                    nuclear = true;
-        //                    DebugClass.Log($"----------ah fuck");
-        //                    break;
-        //                }
-        //                else
-        //                {
-        //                    DebugClass.Log($"offset test {i + offset} [{smr2.bones[i + offset]}]   {i} [{smr1.bones[i]}]");
-        //                }
-        //            }
-        //            var s = new ConstraintSource();
-        //            s.sourceTransform = smr1.bones[i];
-        //            s.weight = 1;
-        //            smr2.bones[i + offset].gameObject.AddComponent<ParentConstraint>().AddSource(s);
-        //        }
-        //    }
-        //    catch (Exception)
-        //    {
-        //    }
-        //}
         if (nuclear)
         {
             foreach (var smr1bone in smr1.bones)
@@ -1302,7 +1279,10 @@ public class BoneMapper : MonoBehaviour
             {
                 transform.parent.GetComponent<CharacterModel>().body.moveSpeed = autoWalkSpeed;
             }
-            transform.parent.GetComponent<CharacterModel>().body.GetComponent<CharacterMotor>().moveDirection = transform.parent.GetComponent<CharacterModel>().body.GetComponent<CharacterDirection>().forward * autoWalkSpeed;
+            if (autoWalk)
+            {
+                transform.parent.GetComponent<CharacterModel>().body.GetComponent<CharacterMotor>().moveDirection = transform.parent.GetComponent<CharacterModel>().body.GetComponent<CharacterDirection>().forward * autoWalkSpeed;
+            }
         }
         if (h.health <= 0)
         {
@@ -1403,10 +1383,17 @@ public class BoneMapper : MonoBehaviour
     {
         GameObject.Destroy(props[propPos]);
     }
+    public void SetAutoWalk(float speed, bool overrideBaseMovement, bool autoWalk)
+    {
+        autoWalkSpeed = speed;
+        overrideMoveSpeed = overrideBaseMovement;
+        this.autoWalk = autoWalk;
+    }
     public void SetAutoWalk(float speed, bool overrideBaseMovement)
     {
         autoWalkSpeed = speed;
         overrideMoveSpeed = overrideBaseMovement;
+        autoWalk = true;
     }
     void FixedUpdate()
     {

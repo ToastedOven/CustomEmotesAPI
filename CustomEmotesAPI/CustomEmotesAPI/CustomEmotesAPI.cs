@@ -100,7 +100,7 @@ namespace EmotesAPI
             }
             return Input.GetKeyDown(entry.Value.MainKey);
         }
-        public const string VERSION = "1.6.0";
+        public const string VERSION = "1.6.1";
         internal static float Actual_MSX = 69;
         public static CustomEmotesAPI instance;
         public static List<GameObject> audioContainers = new List<GameObject>();
@@ -480,42 +480,11 @@ namespace EmotesAPI
         {
             var identity = NetworkUser.readOnlyLocalPlayersList[0].master?.GetBody().gameObject.GetComponent<NetworkIdentity>();
             new SyncAnimationToServer(identity.netId, animationName, pos).Send(R2API.Networking.NetworkDestination.Server);
-
-
-            //if (!NetworkServer.active)
-            //{
-            //}
-            //else
-            //{
-            //    new SyncAnimationToClients(identity.netId, animationName, pos).Send(R2API.Networking.NetworkDestination.Clients);
-
-            //    //GameObject bodyObject = Util.FindNetworkObject(identity.netId);
-            //    //bodyObject.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>().PlayAnim(animationName, pos);
-            //}
         }
         public static void PlayAnimation(string animationName, BoneMapper mapper, int pos = -2)
         {
-            foreach (var item in BoneMapper.allMappers)
-            {
-                if (item == mapper)
-                {
-                    var identity = mapper.transform.parent.GetComponent<CharacterModel>().body.GetComponent<NetworkIdentity>();
-                    new SyncAnimationToServer(identity.netId, animationName, pos).Send(R2API.Networking.NetworkDestination.Server);
-
-                    //if (!NetworkServer.active)
-                    //{
-                    //}
-                    //else
-                    //{
-                    //    new SyncAnimationToClients(identity.netId, animationName, pos).Send(R2API.Networking.NetworkDestination.Clients);
-
-                    //    //GameObject bodyObject = Util.FindNetworkObject(identity.netId);
-                    //    //bodyObject.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>().PlayAnim(animationName, pos);
-                    //}
-                    return;
-                }
-            }
-            DebugClass.Log($"BoneMapper of name {mapper.transform.name} was not found, L");
+            var identity = mapper.transform.parent.GetComponent<CharacterModel>().body.GetComponent<NetworkIdentity>();
+            new SyncAnimationToServer(identity.netId, animationName, pos).Send(R2API.Networking.NetworkDestination.Server);
         }
         public static BoneMapper localMapper = null;
         static BoneMapper nearestMapper = null;
