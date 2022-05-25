@@ -36,6 +36,7 @@ namespace EmotesAPI
         public static ConfigEntry<bool> Jinx;
         public static ConfigEntry<bool> Soldier;
         public static ConfigEntry<bool> DimmingSpheres;
+        public static ConfigEntry<bool> HideJoinSpots;
         //public static ConfigEntry<bool> RemoveAutoWalk;
         public static ConfigEntry<float> DontTouchThis;
 
@@ -133,6 +134,7 @@ namespace EmotesAPI
             Jinx = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Jinx Support", true, "Support for Jinx to animate");
             Soldier = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Soldier Support", true, "Support for Soldier to animate");
             DimmingSpheres = CustomEmotesAPI.instance.Config.Bind<bool>("Misc", "Dimming Spheres", true, "Turn off music dimming when near emotes that support dimming.");
+            HideJoinSpots = CustomEmotesAPI.instance.Config.Bind<bool>("Misc", "Hide Join Spots When Animating", false, "Hides all join spots when you are performing an animation, this loses some visual clarity but offers a more C I N E M A T I C experience");
             //RemoveAutoWalk = CustomEmotesAPI.instance.Config.Bind<bool>("Misc", "Remove AutoWalk Emotes From Random", true, "Prevents emotes with AutoWalk turned on from appearing with the random button.");
 
             emote0 = CustomEmotesAPI.instance.Config.Bind<string>("Data", "Bind for emotes0", "none", "Messing with this here is not reccomended, like at all");
@@ -184,10 +186,20 @@ namespace EmotesAPI
             ModSettingsManager.AddOption(new CheckBoxOption(Scout, true));
             ModSettingsManager.AddOption(new CheckBoxOption(Jinx, true));
             ModSettingsManager.AddOption(new CheckBoxOption(Soldier, true));
-            ModSettingsManager.AddOption(new CheckBoxOption(DimmingSpheres, true));
+            ModSettingsManager.AddOption(new CheckBoxOption(DimmingSpheres));
+            ModSettingsManager.AddOption(new CheckBoxOption(HideJoinSpots));
             //ModSettingsManager.AddOption(new CheckBoxOption(RemoveAutoWalk, false));
             //ModSettingsManager.AddOption(new CheckBoxOption(SolSupport, true));
             EmotesVolume.SettingChanged += EmotesVolume_SettingChanged;
+            HideJoinSpots.SettingChanged += HideJoinSpots_SettingChanged;
+        }
+
+        private static void HideJoinSpots_SettingChanged(object sender, EventArgs e)
+        {
+            if (!HideJoinSpots.Value)
+            {
+                EmoteLocation.ShowAllSpots();
+            }
         }
 
         private static void EmotesVolume_SettingChanged(object sender, EventArgs e)

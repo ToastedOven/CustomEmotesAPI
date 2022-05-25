@@ -122,7 +122,7 @@ internal static class AnimationReplacements
                 ApplyAnimationStuff(SurvivorCatalog.FindSurvivorDefFromBody(Addressables.LoadAssetAsync<GameObject>("RoR2/DLC1/Railgunner/RailgunnerBody.prefab").WaitForCompletion()), "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/railgunner.prefab");
                 SurvivorCatalog.FindSurvivorDefFromBody(Addressables.LoadAssetAsync<GameObject>("RoR2/DLC1/Railgunner/RailgunnerBody.prefab").WaitForCompletion()).bodyPrefab.GetComponentInChildren<BoneMapper>().scale = 1.05f;
 
-                ApplyAnimationStuff(Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Heretic/HereticBody.prefab").WaitForCompletion(), "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/heretic.prefab", 3);
+                ApplyAnimationStuff(Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Heretic/HereticBody.prefab").WaitForCompletion(), "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/heretricburried.prefab", 3);//this works
 
 
 
@@ -236,121 +236,132 @@ internal static class AnimationReplacements
     }
     internal static void ApplyAnimationStuff(GameObject bodyPrefab, GameObject animcontroller, int pos = 0, bool hidemeshes = true, bool jank = false)
     {
-        if (!animcontroller.GetComponentInChildren<Animator>().avatar.isHuman)
+        try
         {
-            DebugClass.Log($"{animcontroller}'s avatar isn't humanoid, please fix it in unity!");
-            return;
-        }
-        if (hidemeshes)
-        {
-            foreach (var item in animcontroller.GetComponentsInChildren<SkinnedMeshRenderer>())
+            if (!animcontroller.GetComponentInChildren<Animator>().avatar.isHuman)
             {
-                item.sharedMesh = null;
-            }
-            foreach (var item in animcontroller.GetComponentsInChildren<MeshFilter>())
-            {
-                item.sharedMesh = null;
+                DebugClass.Log($"{animcontroller}'s avatar isn't humanoid, please fix it in unity!");
+                return;
             }
         }
-        animcontroller.transform.parent = bodyPrefab.GetComponent<ModelLocator>().modelTransform;
-        animcontroller.transform.localPosition = Vector3.zero;
-        animcontroller.transform.localEulerAngles = Vector3.zero;
-        animcontroller.transform.localScale = Vector3.one;
-
-
-        var fab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Beetle/BeetleBody.prefab").WaitForCompletion();
-        if (fab == bodyPrefab)
+        catch (Exception e)
         {
-            List<Transform> t = new List<Transform>();
-            foreach (var item in bodyPrefab.GetComponentsInChildren<Transform>())
+            DebugClass.Log($"Had issue checking if avatar was humanoid: {e}");
+            throw;
+        }
+        try
+        {
+            if (hidemeshes)
             {
-                if (!item.name.Contains("Hurtbox") && !item.name.Contains("BeetleBody") && !item.name.Contains("Mesh") && !item.name.Contains("mdl"))
+                foreach (var item in animcontroller.GetComponentsInChildren<SkinnedMeshRenderer>())
                 {
-                    t.Add(item);
+                    item.sharedMesh = null;
+                }
+                foreach (var item in animcontroller.GetComponentsInChildren<MeshFilter>())
+                {
+                    item.sharedMesh = null;
                 }
             }
-            Transform temp = t[14];
-            t[14] = t[11];
-            t[11] = temp;
-            temp = t[15];
-            t[15] = t[12];
-            t[12] = temp;
-            temp = t[16];
-            t[16] = t[13];
-            t[13] = temp;
-            foreach (var item in bodyPrefab.GetComponentsInChildren<SkinnedMeshRenderer>())
-            {
-                item.bones = t.ToArray();
-            }
+        }
+        catch (Exception e)
+        {
+            DebugClass.Log($"Had trouble while hiding meshes: {e}");
+            throw;
+        }
+        try
+        {
+            animcontroller.transform.parent = bodyPrefab.GetComponent<ModelLocator>().modelTransform;
+            animcontroller.transform.localPosition = Vector3.zero;
+            animcontroller.transform.localEulerAngles = Vector3.zero;
+            animcontroller.transform.localScale = Vector3.one;
+        }
+        catch (Exception e)
+        {
+            DebugClass.Log($"Had trouble setting emote skeletons parent: {e}");
+            throw;
         }
 
-
-        SkinnedMeshRenderer smr1 = animcontroller.GetComponentsInChildren<SkinnedMeshRenderer>()[pos];
-        SkinnedMeshRenderer smr2 = bodyPrefab.GetComponent<ModelLocator>().modelTransform.GetComponentsInChildren<SkinnedMeshRenderer>()[pos];
-        int matchingBones = 0;
-        while (true)
+        SkinnedMeshRenderer smr1;
+        SkinnedMeshRenderer smr2;
+        try
         {
-            foreach (var smr1bone in smr1.bones)
-            {
-                foreach (var smr2bone in smr2.bones)
-                {
-                    if (smr1bone.name == smr2bone.name)
-                    {
-                        matchingBones++;
-                    }
-                }
-            }
-            if (matchingBones < 5 && pos + 1 < bodyPrefab.GetComponent<ModelLocator>().modelTransform.GetComponentsInChildren<SkinnedMeshRenderer>().Length)
-            {
-                pos++;
-                smr2 = bodyPrefab.GetComponent<ModelLocator>().modelTransform.GetComponentsInChildren<SkinnedMeshRenderer>()[pos];
-                matchingBones = 0;
-            }
-            else
-            {
-                break;
-            }
+            smr1 = animcontroller.GetComponentsInChildren<SkinnedMeshRenderer>()[pos];
         }
-        //animcontroller.AddComponent<NetworkIdentity>();
-        //animcontroller.RegisterNetworkPrefab();
-        var test = animcontroller.AddComponent<BoneMapper>();
-        test.jank = jank;
-        test.smr1 = smr1;
-        test.smr2 = smr2;
-        test.bodyPrefab = bodyPrefab;
-        for (int i = 0; i < smr1.bones.Length; i++)
+        catch (Exception e)
         {
-            if (smr1.bones[i].name != smr2.bones[i].name)
+            DebugClass.Log($"Had trouble setting emote skeletons SkinnedMeshRenderer: {e}");
+            throw;
+        }
+        try
+        {
+            smr2 = bodyPrefab.GetComponent<ModelLocator>().modelTransform.GetComponentsInChildren<SkinnedMeshRenderer>()[pos];
+        }
+        catch (Exception e)
+        {
+            DebugClass.Log($"Had trouble setting the original skeleton's skinned mesh renderer: {e}");
+            throw;
+        }
+        try
+        {
+            int matchingBones = 0;
+            while (true)
             {
-                DebugClass.Log($"Fixing {bodyPrefab.name} bone order for emotes");
-                List<Transform> trans = new List<Transform>();
-                foreach (var item in smr2.bones)
+                foreach (var smr1bone in smr1.bones)
                 {
-                    foreach (var item2 in smr1.bones)
+                    foreach (var smr2bone in smr2.bones)
                     {
-                        if (item.name == item2.name)
+                        if (smr1bone.name == smr2bone.name)
                         {
-                            trans.Add(item2);
+                            matchingBones++;
                         }
                     }
                 }
-                smr1.bones = trans.ToArray();
-                DebugClass.Log($"Done");
-                break;
+                if (matchingBones < 5 && pos + 1 < bodyPrefab.GetComponent<ModelLocator>().modelTransform.GetComponentsInChildren<SkinnedMeshRenderer>().Length)
+                {
+                    pos++;
+                    smr2 = bodyPrefab.GetComponent<ModelLocator>().modelTransform.GetComponentsInChildren<SkinnedMeshRenderer>()[pos];
+                    matchingBones = 0;
+                }
+                else
+                {
+                    break;
+                }
             }
         }
-        test.a1 = bodyPrefab.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<Animator>();
-        test.a2 = animcontroller.GetComponentInChildren<Animator>();
-
-        var nuts = Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/bandit.prefab");
-        float banditScale = Vector3.Distance(nuts.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.Head).position, nuts.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.LeftFoot).position);
-
-        float currScale = Vector3.Distance(animcontroller.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.Head).position, animcontroller.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.LeftFoot).position);
-
-        test.scale = currScale / banditScale;
-
-        test.h = bodyPrefab.GetComponentInChildren<HealthComponent>();
-        test.model = bodyPrefab.GetComponent<ModelLocator>().modelTransform.gameObject;
+        catch (Exception e)
+        {
+            DebugClass.Log($"Had issue while checking matching bones: {e}");
+            throw;
+        }
+        var test = animcontroller.AddComponent<BoneMapper>();
+        try
+        {
+            test.jank = jank;
+            test.smr1 = smr1;
+            test.smr2 = smr2;
+            test.bodyPrefab = bodyPrefab;
+            test.a1 = bodyPrefab.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<Animator>();
+            test.a2 = animcontroller.GetComponentInChildren<Animator>();
+        }
+        catch (Exception e)
+        {
+            DebugClass.Log($"Had issue when setting up BoneMapper settings 1: {e}");
+            throw;
+        }
+        try
+        {
+            var nuts = Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/bandit.prefab");
+            float banditScale = Vector3.Distance(nuts.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.Head).position, nuts.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.LeftFoot).position);
+            float currScale = Vector3.Distance(animcontroller.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.Head).position, animcontroller.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.LeftFoot).position);
+            test.scale = currScale / banditScale;
+            test.h = bodyPrefab.GetComponentInChildren<HealthComponent>();
+            test.model = bodyPrefab.GetComponent<ModelLocator>().modelTransform.gameObject;
+        }
+        catch (Exception e)
+        {
+            DebugClass.Log($"Had issue when setting up BoneMapper settings 2: {e}");
+            throw;
+        }
     }
 }
 public struct JoinSpot
@@ -1030,16 +1041,17 @@ public class BoneMapper : MonoBehaviour
         bool nuclear = true;
         if (nuclear)
         {
-            foreach (var smr1bone in smr1.bones)
+            foreach (var smr1bone in smr1.bones) //smr1 is the emote skeleton
             {
-                foreach (var smr2bone in smr2.bones)
+                foreach (var smr2bone in smr2.bones) //smr2 is the main skinned mesh renderer, which will receive parent constraints
                 {
-                    if (smr1bone.name == smr2bone.name && !smr2bone.GetComponent<ParentConstraint>())
+                    if (smr1bone.name == smr2bone.name/* + "_CustomEmotesAPIBone"*/ && !smr2bone.GetComponent<ParentConstraint>())
                     {
                         var s = new ConstraintSource();
                         s.sourceTransform = smr1bone;
                         s.weight = 1;
                         smr2bone.gameObject.AddComponent<ParentConstraint>().AddSource(s);
+                        //smr1bone.name = smr1bone.name.Remove(smr1bone.name.Length - "_CustomEmotesAPIBone".Length);
                     }
                 }
             }

@@ -11,18 +11,76 @@ using UnityEngine.Networking;
 public class EmoteLocation : MonoBehaviour
 {
     public static List<EmoteLocation> emoteLocations = new List<EmoteLocation>();
+    internal static bool visibile = true;
     public int spot;
     public int validPlayers = 0;
     internal BoneMapper owner;
     internal BoneMapper emoter;
     internal JoinSpot joinSpot;
 
+    public static void HideAllSpots()
+    {
+        visibile = false;
+        foreach (var item in emoteLocations)
+        {
+            try
+            {
+                foreach (var item2 in item.GetComponentsInChildren<Renderer>())
+                {
+                    item2.enabled = false;
+                }
+                foreach (var item2 in item.GetComponentsInChildren<ParticleSystemRenderer>())
+                {
+                    item2.enabled = false;
+                }
+            }
+            catch (Exception)
+            {
+            }
+        }
+    }
+    public static void ShowAllSpots()
+    {
+        visibile = true;
+        foreach (var item in emoteLocations)
+        {
+            try
+            {
+                foreach (var item2 in item.GetComponentsInChildren<Renderer>())
+                {
+                    item2.enabled = true;
+                }
+                foreach (var item2 in item.GetComponentsInChildren<ParticleSystemRenderer>())
+                {
+                    item2.enabled = true;
+                }
+            }
+            catch (Exception)
+            {
+            }
+        }
+    }
     void Start()
     {
         SetColor();
         //spot = emoteLocations.Count;
         emoteLocations.Add(this);
         StartCoroutine(setScale());
+        if (!visibile)
+        {
+            foreach (var item2 in GetComponentsInChildren<Renderer>())
+            {
+                item2.enabled = false;
+            }
+            foreach (var item2 in GetComponentsInChildren<ParticleSystemRenderer>())
+            {
+                item2.enabled = false;
+            }
+        }
+    }
+    void OnDestroy()
+    {
+        emoteLocations.Remove(this);
     }
     public void SetEmoterAndHideLocation(BoneMapper boneMapper)
     {

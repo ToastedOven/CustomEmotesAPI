@@ -100,7 +100,7 @@ namespace EmotesAPI
             }
             return Input.GetKeyDown(entry.Value.MainKey);
         }
-        public const string VERSION = "1.6.1";
+        public const string VERSION = "1.6.3";
         internal static float Actual_MSX = 69;
         public static CustomEmotesAPI instance;
         public static List<GameObject> audioContainers = new List<GameObject>();
@@ -175,6 +175,7 @@ namespace EmotesAPI
                 }
                 BoneMapper.allMappers.Clear();
                 localMapper = null;
+                EmoteLocation.visibile = true;
             };
             On.RoR2.AudioManager.VolumeConVar.SetString += (orig, self, newValue) =>
             {
@@ -528,6 +529,10 @@ namespace EmotesAPI
             }
             if (newAnimation != "none")
             {
+                if (mapper == localMapper && Settings.HideJoinSpots.Value)
+                {
+                    EmoteLocation.HideAllSpots();
+                }
                 if (mapper.transform.name == "templar")
                 {
                     mapper.transform.parent.Find("ClayBruiserCannonMesh").gameObject.SetActive(false);
@@ -535,6 +540,10 @@ namespace EmotesAPI
             }
             else
             {
+                if (mapper == localMapper && Settings.HideJoinSpots.Value)
+                {
+                    EmoteLocation.ShowAllSpots();
+                }
                 if (mapper.transform.name == "templar")
                 {
                     mapper.transform.parent.Find("ClayBruiserCannonMesh").gameObject.SetActive(true);
