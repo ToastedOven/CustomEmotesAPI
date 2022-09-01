@@ -100,11 +100,12 @@ namespace EmotesAPI
             }
             return Input.GetKeyDown(entry.Value.MainKey);
         }
-        public const string VERSION = "1.6.3";
+        public const string VERSION = "1.8.1";
         internal static float Actual_MSX = 69;
         public static CustomEmotesAPI instance;
         public static List<GameObject> audioContainers = new List<GameObject>();
         public static List<GameObject> activeAudioContainers = new List<GameObject>();
+        //Vector3 prevCamPosition = Vector3.zero;
         public void Awake()
         {
             instance = this;
@@ -132,6 +133,15 @@ namespace EmotesAPI
             //    if (NetworkServer.active)
             //    {
             //        new SyncEmoteLocations()
+            //    }
+            //};
+            //On.RoR2.CameraRigController.Update += (orig, self) =>
+            //{
+            //    orig(self);
+            //    if (self.target && self.target.transform.position != prevCamPosition)
+            //    {
+            //        prevCamPosition = self.target.transform.position;
+            //        DebugClass.Log($"--------------  {self.target.transform.position}");
             //    }
             //};
             On.RoR2.SceneCatalog.OnActiveSceneChanged += (orig, self, scene) =>
@@ -230,137 +240,7 @@ namespace EmotesAPI
                         }
                     }
                 }
-                //bool didOrig = false;
-                //try
-                //{
-                //    if (self.hasEffectiveAuthority && self.GetFieldValue<InputBankTest>("bodyInputs"))
-                //    {
-                //        LocalUser localUser;
-                //        Rewired.Player player;
-                //        CameraRigController cameraRigController;
-                //        bool doIt = false;
-                //        bool newState = false;
-                //        bool newState2 = false;
-                //        localUser = self.networkUser.localUser;
-                //        player = self.networkUser.inputPlayer;
-                //        cameraRigController = self.networkUser.cameraRigController;
-                //        doIt = localUser != null && player != null && cameraRigController && !localUser.isUIFocused && cameraRigController.isControlAllowed;
-                //        if (doIt)
-                //        {
-                //            player = self.networkUser.inputPlayer;
-                //            newState = player.GetButton(7) && !CustomEmotesAPI.GetKey(Settings.EmoteWheel); //left click
-                //            newState2 = player.GetButton(8) && !CustomEmotesAPI.GetKey(Settings.EmoteWheel); //right click
-                //            bool newState3 = player.GetButton(9);
-                //            bool newState4 = player.GetButton(10);
-                //            BoneMapper.attacking = newState || newState2 || newState3 || newState4;
-                //            orig(self);
-                //            didOrig = true;
-                //            BoneMapper.moving = self.GetFieldValue<InputBankTest>("bodyInputs").moveVector != Vector3.zero || player.GetButton(4);
-                //            self.GetFieldValue<InputBankTest>("bodyInputs").skill1.PushState(newState);
-                //            self.GetFieldValue<InputBankTest>("bodyInputs").skill2.PushState(newState2);
-                //        }
-                //        else
-                //        {
-                //            orig(self);
-                //            didOrig = true;
-                //        }
-                //    }
-                //    else
-                //    {
-                //        orig(self);
-                //        didOrig = true;
-                //    }
-                //}
-                //catch (System.Exception)
-                //{
-                //    if (!didOrig)
-                //        orig(self);
-                //}
-                //if (self.hasEffectiveAuthority && self.GetFieldValue<InputBankTest>("bodyInputs"))
-                //{
-                //    bool newState = false;
-                //    bool newState2 = false;
-                //    bool newState3 = false;
-                //    bool newState4 = false;
-                //    bool newState5 = false;
-                //    bool newState6 = false;
-                //    bool newState7 = false;
-                //    bool newState8 = false;
-                //    bool newState9 = false;
-                //    LocalUser localUser;
-                //    Rewired.Player player;
-                //    CameraRigController cameraRigController;
-                //    bool doIt = false;
-                //    if (!self.networkUser)
-                //    {
-                //        localUser = null;
-                //        player = null;
-                //        cameraRigController = null;
-                //        doIt = false;
-                //    }
-                //    else
-                //    {
-                //        localUser = self.networkUser.localUser;
-                //        player = self.networkUser.inputPlayer;
-                //        cameraRigController = self.networkUser.cameraRigController;
-                //        doIt = localUser != null && player != null && cameraRigController && !localUser.isUIFocused && cameraRigController.isControlAllowed;
-                //    }
-                //    if (doIt)
-                //    {
-                //        bool flag = self.GetFieldValue<CharacterBody>("body").isSprinting;
-                //        if (self.GetFieldValue<bool>("sprintInputPressReceived"))
-                //        {
-                //            self.SetFieldValue("sprintInputPressReceived", false);
-                //            flag = !flag;
-                //        }
-                //        if (flag)
-                //        {
-                //            Vector3 aimDirection = self.GetFieldValue<InputBankTest>("bodyInputs").aimDirection;
-                //            aimDirection.y = 0f;
-                //            aimDirection.Normalize();
-                //            Vector3 moveVector = self.GetFieldValue<InputBankTest>("bodyInputs").moveVector;
-                //            moveVector.y = 0f;
-                //            moveVector.Normalize();
-                //            if ((self.GetFieldValue<CharacterBody>("body").bodyFlags & CharacterBody.BodyFlags.SprintAnyDirection) == CharacterBody.BodyFlags.None && Vector3.Dot(aimDirection, moveVector) < self.GetFieldValue<float>("sprintMinAimMoveDot"))
-                //            {
-                //                flag = false;
-                //            }
-                //        }
-                //        newState = player.GetButton(7) && !CustomEmotesAPI.GetKey(Settings.EmoteWheel); //left click
-                //        newState2 = player.GetButton(8) && !CustomEmotesAPI.GetKey(Settings.EmoteWheel); //right click
-                //        newState3 = player.GetButton(9);
-                //        newState4 = player.GetButton(10);
-                //        newState5 = player.GetButton(5);
-                //        newState6 = player.GetButton(4);
-                //        newState7 = flag;
-                //        newState8 = player.GetButton(6);
-                //        newState9 = player.GetButton(28);
-                //    }
-                //    BoneMapper.attacking = newState || newState2 || newState3 || newState4;
-                //    BoneMapper.moving = self.GetFieldValue<InputBankTest>("bodyInputs").moveVector != Vector3.zero || player.GetButton(4);
-                //    self.GetFieldValue<InputBankTest>("bodyInputs").skill1.PushState(newState);
-                //    self.GetFieldValue<InputBankTest>("bodyInputs").skill2.PushState(newState2);
-                //    self.GetFieldValue<InputBankTest>("bodyInputs").skill3.PushState(newState3);
-                //    self.GetFieldValue<InputBankTest>("bodyInputs").skill4.PushState(newState4);
-                //    self.GetFieldValue<InputBankTest>("bodyInputs").interact.PushState(newState5);
-                //    self.GetFieldValue<InputBankTest>("bodyInputs").jump.PushState(newState6);
-                //    self.GetFieldValue<InputBankTest>("bodyInputs").sprint.PushState(newState7);
-                //    self.GetFieldValue<InputBankTest>("bodyInputs").activateEquipment.PushState(newState8);
-                //    self.GetFieldValue<InputBankTest>("bodyInputs").ping.PushState(newState9);
-                //    self.InvokeMethod("CheckPinging");
-                //}
             };
-            //On.RoR2.PlayerCharacterMasterController.Update += (orig, self) =>
-            //{
-            //    DebugClass.Log($"----------{self.transform.name}");
-            //    if (self.transform.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>() && self.transform.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>().overrideMoveSpeed)
-            //    {
-            //        DebugClass.Log($"----------nut");
-            //        DebugClass.Log($"----------{self.transform.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>().overrideMoveSpeed}");
-            //        return;
-            //    }
-            //    orig(self);
-            //};
             AddNonAnimatingEmote("none");
         }
         public static int RegisterWorldProp(GameObject worldProp, JoinSpot[] joinSpots)
@@ -385,6 +265,33 @@ namespace EmotesAPI
             if (visible)
                 allClipNames.Add(emoteName);
             BoneMapper.animClips.Add(emoteName, null);
+        }
+        public static void AddCustomAnimation(AnimationClipParams animationClipParams)
+        {
+            if (BoneMapper.animClips.ContainsKey(animationClipParams.animationClip[0].name))
+            {
+                Debug.Log($"EmotesError: [{animationClipParams.animationClip[0].name}] is already defined as a custom emote but is trying to be added. Skipping");
+                return;
+            }
+            if (!animationClipParams.animationClip[0].isHumanMotion)
+            {
+                Debug.Log($"EmotesError: [{animationClipParams.animationClip[0].name}] is not a humanoid animation!");
+                return;
+            }
+            if (animationClipParams.rootBonesToIgnore == null)
+                animationClipParams.rootBonesToIgnore = new HumanBodyBones[0];
+            if (animationClipParams.soloBonesToIgnore == null)
+                animationClipParams.soloBonesToIgnore = new HumanBodyBones[0];
+            if (animationClipParams._wwiseEventName == null)
+                animationClipParams._wwiseEventName = new string[] { "" };
+            if (animationClipParams._wwiseStopEvent == null)
+                animationClipParams._wwiseStopEvent = new string[] { "" };
+            if (animationClipParams.joinSpots == null)
+                animationClipParams.joinSpots = new JoinSpot[0];
+            CustomAnimationClip clip = new CustomAnimationClip(animationClipParams.animationClip, animationClipParams.looping, animationClipParams._wwiseEventName, animationClipParams._wwiseStopEvent, animationClipParams.rootBonesToIgnore, animationClipParams.soloBonesToIgnore, animationClipParams.secondaryAnimation, animationClipParams.dimWhenClose, animationClipParams.stopWhenMove, animationClipParams.stopWhenAttack, animationClipParams.visible, animationClipParams.syncAnim, animationClipParams.syncAudio, animationClipParams.startPref, animationClipParams.joinPref, animationClipParams.joinSpots, animationClipParams.useSafePositionReset, animationClipParams.customName);
+            if (animationClipParams.visible)
+                allClipNames.Add(animationClipParams.animationClip[0].name);
+            BoneMapper.animClips.Add(animationClipParams.animationClip[0].name, clip);
         }
         public static void AddCustomAnimation(AnimationClip[] animationClip, bool looping, string[] _wwiseEventName = null, string[] _wwiseStopEvent = null, HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip[] secondaryAnimation = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true, bool syncAnim = false, bool syncAudio = false, int startPref = -1, int joinPref = -1, JoinSpot[] joinSpots = null)
         {
@@ -537,6 +444,10 @@ namespace EmotesAPI
                 {
                     mapper.transform.parent.Find("ClayBruiserCannonMesh").gameObject.SetActive(false);
                 }
+                if (mapper.transform.name == "PlayableScavenger")
+                {
+                    mapper.transform.parent.GetComponent<ChildLocator>().FindChild("Weapon").gameObject.SetActive(false);
+                }
             }
             else
             {
@@ -547,6 +458,10 @@ namespace EmotesAPI
                 if (mapper.transform.name == "templar")
                 {
                     mapper.transform.parent.Find("ClayBruiserCannonMesh").gameObject.SetActive(true);
+                }
+                if (mapper.transform.name == "PlayableScavenger")
+                {
+                    mapper.transform.parent.GetComponent<ChildLocator>().FindChild("Weapon").gameObject.SetActive(true);
                 }
             }
         }
@@ -561,6 +476,12 @@ namespace EmotesAPI
         internal static void JoinedProp(GameObject emoteSpot, BoneMapper joiner, BoneMapper host)
         {
             emoteSpotJoined_Prop(emoteSpot, joiner, host);
+        }
+        public delegate void AnimationJoined(string joinedAnimation, BoneMapper joiner, BoneMapper host);
+        public static event AnimationJoined animJoined;
+        internal static void Joined(string joinedAnimation, BoneMapper joiner, BoneMapper host)
+        {
+            animJoined(joinedAnimation, joiner, host);
         }
 
         void Update()
@@ -614,6 +535,7 @@ namespace EmotesAPI
                         if (nearestMapper)
                         {
                             PlayAnimation(nearestMapper.currentClip.clip[0].name);
+                            Joined(nearestMapper.currentClip.clip[0].name, localMapper, nearestMapper); //this is not networked and only sent locally FYI
                         }
                         nearestMapper = null;
                     }

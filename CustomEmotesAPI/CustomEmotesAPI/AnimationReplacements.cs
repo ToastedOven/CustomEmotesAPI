@@ -216,6 +216,11 @@ internal static class AnimationReplacements
                         var skele = Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/soldier.prefab");
                         CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
                     }
+                    else if (item.bodyPrefab.name == "DragonScavengerBody" && Settings.Scavenger.Value)
+                    {
+                        var skele = Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/PlayableScavenger.prefab");
+                        CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
+                    }
                     //else
                     //{
                     //    DebugClass.Log($"----------{item.bodyPrefab.name}");
@@ -399,6 +404,8 @@ public class CustomAnimationClip : MonoBehaviour
     internal bool visibility;
     public int startPref, joinPref;
     public JoinSpot[] joinSpots;
+    public bool useSafePositionReset;
+    public string customName;
 
 
     internal bool syncronizeAnimation;
@@ -407,7 +414,7 @@ public class CustomAnimationClip : MonoBehaviour
     public static List<int> syncPlayerCount = new List<int>();
     public static List<List<bool>> uniqueAnimations = new List<List<bool>>();
 
-    internal CustomAnimationClip(AnimationClip[] _clip, bool _loop/*, bool _shouldSyncronize = false*/, string[] _wwiseEventName = null, string[] _wwiseStopEvent = null, HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip[] _secondaryClip = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true, bool syncAnim = false, bool syncAudio = false, int startPreference = -1, int joinPreference = -1, JoinSpot[] _joinSpots = null)
+    internal CustomAnimationClip(AnimationClip[] _clip, bool _loop/*, bool _shouldSyncronize = false*/, string[] _wwiseEventName = null, string[] _wwiseStopEvent = null, HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip[] _secondaryClip = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true, bool syncAnim = false, bool syncAudio = false, int startPreference = -1, int joinPreference = -1, JoinSpot[] _joinSpots = null, bool safePositionReset = false, string customName = "NO_CUSTOM_NAME")
     {
         if (rootBonesToIgnore == null)
             rootBonesToIgnore = new HumanBodyBones[0];
@@ -487,6 +494,8 @@ public class CustomAnimationClip : MonoBehaviour
         if (_joinSpots == null)
             _joinSpots = new JoinSpot[0];
         joinSpots = _joinSpots;
+        this.useSafePositionReset = safePositionReset;
+        this.customName = customName;
     }
 }
 public struct WorldProp
@@ -547,6 +556,9 @@ public class BoneMapper : MonoBehaviour
     public int uniqueSpot = -1;
     public bool preserveProps = false;
     public bool preserveParent = false;
+    internal bool useSafePositionReset = false;
+    public List<EmoteLocation> emoteLocations = new List<EmoteLocation>();
+    List<string> dontAnimateUs = new List<string>();
 
     public void PlayAnim(string s, int pos, int eventNum)
     {
@@ -572,18 +584,12 @@ public class BoneMapper : MonoBehaviour
                 return;
             }
         }
-        bool footL = false;
-        bool footR = false;
-        bool upperLegR = false;
-        bool upperLegL = false;
-        bool lowerLegR = false;
-        bool lowerLegL = false;
         a2.enabled = true;
         if (a2.transform.parent.GetComponent<InverseKinematics>() && a2.name != "loader")
         {
             a2.transform.parent.GetComponent<InverseKinematics>().enabled = false;
         }
-        List<string> dontAnimateUs = new List<string>();
+        dontAnimateUs.Clear();
         try
         {
             currentClip.clip[0].ToString();
@@ -672,117 +678,7 @@ public class BoneMapper : MonoBehaviour
             {
                 pos = UnityEngine.Random.Range(0, currentClip.clip.Length);
             }
-            foreach (var item in currentClip.soloIgnoredBones)
-            {
-                if (item == HumanBodyBones.LeftFoot)
-                {
-                    footL = true;
-                }
-                if (item == HumanBodyBones.RightFoot)
-                {
-                    footR = true;
-                }
-                if (item == HumanBodyBones.LeftLowerLeg)
-                {
-                    lowerLegL = true;
-                }
-                if (item == HumanBodyBones.LeftUpperLeg)
-                {
-                    upperLegL = true;
-                }
-                if (item == HumanBodyBones.RightLowerLeg)
-                {
-                    lowerLegR = true;
-                }
-                if (item == HumanBodyBones.RightUpperLeg)
-                {
-                    upperLegR = true;
-                }
-                if (a2.GetBoneTransform(item))
-                    dontAnimateUs.Add(a2.GetBoneTransform(item).name);
-            }
-            foreach (var item in currentClip.rootIgnoredBones)
-            {
-
-                if (item == HumanBodyBones.LeftUpperLeg || item == HumanBodyBones.Hips)
-                {
-                    upperLegL = true;
-                    lowerLegL = true;
-                    footL = true;
-                }
-                if (item == HumanBodyBones.RightUpperLeg || item == HumanBodyBones.Hips)
-                {
-                    upperLegR = true;
-                    lowerLegR = true;
-                    footR = true;
-                }
-                if (a2.GetBoneTransform(item))
-                    dontAnimateUs.Add(a2.GetBoneTransform(item).name);
-                foreach (var bone in a2.GetBoneTransform(item).GetComponentsInChildren<Transform>())
-                {
-
-                    dontAnimateUs.Add(bone.name);
-                }
-            }
-        }
-        bool left = upperLegL && lowerLegL && footL;
-        bool right = upperLegR && lowerLegR && footR;
-        Transform LeftLegIK = null;
-        Transform RightLegIK = null;
-        if (!jank)
-        {
-            for (int i = 0; i < smr2.bones.Length; i++)
-            {
-                try
-                {
-                    if (right && (smr2.bones[i].gameObject.ToString() == "IKLegTarget.r (UnityEngine.GameObject)" || smr2.bones[i].gameObject.ToString() == "FootControl.r (UnityEngine.GameObject)"))
-                    {
-                        RightLegIK = smr2.bones[i];
-                    }
-                    else if (left && (smr2.bones[i].gameObject.ToString() == "IKLegTarget.l (UnityEngine.GameObject)" || smr2.bones[i].gameObject.ToString() == "FootControl.l (UnityEngine.GameObject)"))
-                    {
-                        LeftLegIK = smr2.bones[i];
-                    }
-                    if (smr2.bones[i].gameObject.GetComponent<ParentConstraint>() && !dontAnimateUs.Contains(smr2.bones[i].name))
-                    {
-                        //DebugClass.Log($"-{i}---------{smr2.bones[i].gameObject}");
-                        smr2.bones[i].gameObject.GetComponent<ParentConstraint>().constraintActive = true;
-                    }
-                    else if (dontAnimateUs.Contains(smr2.bones[i].name))
-                    {
-                        //DebugClass.Log($"dontanimateme-{i}---------{smr2.bones[i].gameObject}");
-                        smr2.bones[i].gameObject.GetComponent<ParentConstraint>().constraintActive = false;
-                    }
-                }
-                catch (Exception e)
-                {
-                    DebugClass.Log($"{e}");
-                }
-            }
-            if (left && LeftLegIK)//we can leave ik for the legs
-            {
-                if (LeftLegIK.gameObject.GetComponent<ParentConstraint>())
-                    LeftLegIK.gameObject.GetComponent<ParentConstraint>().constraintActive = false;
-                foreach (var item in LeftLegIK.gameObject.GetComponentsInChildren<Transform>())
-                {
-                    if (item.gameObject.GetComponent<ParentConstraint>())
-                        item.gameObject.GetComponent<ParentConstraint>().constraintActive = false;
-                }
-            }
-            if (right && RightLegIK)
-            {
-                if (RightLegIK.gameObject.GetComponent<ParentConstraint>())
-                    RightLegIK.gameObject.GetComponent<ParentConstraint>().constraintActive = false;
-                foreach (var item in RightLegIK.gameObject.GetComponentsInChildren<Transform>())
-                {
-                    if (item.gameObject.GetComponent<ParentConstraint>())
-                        item.gameObject.GetComponent<ParentConstraint>().constraintActive = false;
-                }
-            }
-        }
-        else
-        {
-            a1.enabled = false;
+            LockBones();
         }
         if (s == "none")
         {
@@ -877,6 +773,7 @@ public class BoneMapper : MonoBehaviour
     {
         try
         {
+            emoteLocations.Clear();
             autoWalkSpeed = 0;
             autoWalk = false;
             overrideMoveSpeed = false;
@@ -894,9 +791,46 @@ public class BoneMapper : MonoBehaviour
                 }
                 float bodyPrefabFootOffset = Util.GetBodyPrefabFootOffset(bodyPrefab);
                 result.y += bodyPrefabFootOffset;
-                transform.parent.GetComponent<CharacterModel>().body.gameObject.transform.position = result;
-                transform.parent.GetComponent<CharacterModel>().body.GetComponent<ModelLocator>().modelBaseTransform.position = result;
+                //CapsuleCollider capsule = transform.parent.GetComponent<CharacterModel>().body.gameObject.GetComponent<CapsuleCollider>();
+                if (!useSafePositionReset/* && capsule*/)
+                {
+                    Rigidbody rigidbody = transform.parent.GetComponent<CharacterModel>().body.gameObject.GetComponent<Rigidbody>();
+                    /*
+                                        if (!useSafePositionReset && capsule)
+                                        {
+                                            Rigidbody rigidbody = transform.parent.GetComponent<CharacterModel>().body.gameObject.GetComponent<Rigidbody>();
+                                            RaycastHit hit;
+                                            transform.parent.GetComponent<CharacterModel>().body.gameObject.transform.position += new Vector3(0, 2, 0);
+                                            transform.parent.GetComponent<CharacterModel>().body.GetComponent<ModelLocator>().modelBaseTransform.position += new Vector3(0, 2, 0);
+                                            while (rigidbody.SweepTest(rigidbody.transform.forward, out hit, 0)
+ */
+                    //var direction = new Vector3 { [capsule.direction] = 1 };
+                    //var offset = capsule.height / 2 - capsule.radius;
+                    //int num = 0;
+                    //int num2 = capsule.enabled ? 1 : 0;
+                    //do
+                    //{
+                    //} while (num > num2);
+                    //num = rigidbody.SweepTestAll(rigidbody.transform.forward, 0, QueryTriggerInteraction.Collide).Length;
+                    //num = Physics.OverlapCapsule(capsule.center - direction * offset, capsule.center + direction * offset, capsule.radius).Length;
+                    rigidbody.AddForce(new Vector3(0, 1, 0), ForceMode.VelocityChange);
+                    transform.parent.GetComponent<CharacterModel>().body.gameObject.transform.position += new Vector3(.1f, 2, .1f);
+                    transform.parent.GetComponent<CharacterModel>().body.GetComponent<ModelLocator>().modelBaseTransform.position += new Vector3(0, 10, 0);
+                }
+                else
+                {
+                    transform.parent.GetComponent<CharacterModel>().body.gameObject.transform.position = result;
+                    transform.parent.GetComponent<CharacterModel>().body.GetComponent<ModelLocator>().modelBaseTransform.position = result;
+                }
                 parentGameObject = null;
+            }
+            try
+            {
+                useSafePositionReset = currentClip.useSafePositionReset;
+            }
+            catch (Exception)
+            {
+                useSafePositionReset = true;
             }
             if (preserveParent)
             {
@@ -1089,7 +1023,20 @@ public class BoneMapper : MonoBehaviour
             scaleDiff = ogScale / scale;
         else
             scaleDiff = ogScale;
+
+        //RoR2.Navigation.NodeGraph nodeGraph = SceneInfo.instance.GetNodeGraph(RoR2.Navigation.MapNodeGroup.GraphType.Ground);
+        //List<RoR2.Navigation.NodeGraph.Node> nodes = new List<RoR2.Navigation.NodeGraph.Node>(nodeGraph.nodes);
+        //nodes.Add(new RoR2.Navigation.NodeGraph.Node
+        //{
+        //    position = youAreTheFather.transform.position,
+        //    forbiddenHulls = HullMask.None,
+        //    flags = RoR2.Navigation.NodeFlags.None,
+        //});
+        //nodeGraph.nodes = nodes.ToArray();
+
         parentGameObject = youAreTheFather;
+        //parentGameObject.transform.position += new Vector3(0, 0.060072f, 0);
+        //startingPos = transform.position/* + new Vector3(0, 0.060072f, 0)*/;
         positionLock = lockPosition;
         rotationLock = lockRotation;
         scaleLock = lockScale;
@@ -1216,20 +1163,7 @@ public class BoneMapper : MonoBehaviour
                     }
                     if (!jank)
                     {
-                        for (int i = 0; i < smr2.bones.Length; i++)
-                        {
-                            try
-                            {
-                                if (smr2.bones[i].gameObject.GetComponent<ParentConstraint>())
-                                {
-                                    smr2.bones[i].gameObject.GetComponent<ParentConstraint>().constraintActive = false;
-                                }
-                            }
-                            catch (Exception)
-                            {
-                                break;
-                            }
-                        }
+                        UnlockBones();
                     }
                 }
                 //DebugClass.Log($"----------{a1}");
@@ -1298,20 +1232,7 @@ public class BoneMapper : MonoBehaviour
         }
         if (h.health <= 0)
         {
-            for (int i = 0; i < smr2.bones.Length; i++)
-            {
-                try
-                {
-                    if (smr2.bones[i].gameObject.GetComponent<ParentConstraint>())
-                    {
-                        smr2.bones[i].gameObject.GetComponent<ParentConstraint>().constraintActive = false;
-                    }
-                }
-                catch (Exception)
-                {
-                    break;
-                }
-            }
+            UnlockBones();
             GameObject.Destroy(gameObject);
         }
     }
@@ -1321,7 +1242,7 @@ public class BoneMapper : MonoBehaviour
         {
             if (positionLock)
             {
-                transform.parent.GetComponent<CharacterModel>().body.gameObject.transform.position = parentGameObject.transform.position;
+                transform.parent.GetComponent<CharacterModel>().body.gameObject.transform.position = parentGameObject.transform.position + new Vector3(0, 1, 0);
                 transform.parent.GetComponent<CharacterModel>().body.GetComponent<ModelLocator>().modelBaseTransform.position = parentGameObject.transform.position;
                 transform.parent.GetComponent<CharacterModel>().body.GetComponent<CharacterMotor>().velocity = Vector3.zero;
             }
@@ -1370,6 +1291,7 @@ public class BoneMapper : MonoBehaviour
         EmoteLocation location = props[props.Count - 1].AddComponent<EmoteLocation>();
         location.joinSpot = joinSpot;
         location.owner = this;
+        emoteLocations.Add(location);
         return props.Count - 1;
     }
     public void JoinEmoteSpot()
@@ -1479,8 +1401,145 @@ public class BoneMapper : MonoBehaviour
         }
         catch (Exception e)
         {
-            DebugClass.Log($"Had issues when destroying bonemapper: {e}");
+            //DebugClass.Log($"Had issues when destroying bonemapper: {e}");
             BoneMapper.allMappers.Remove(this);
+        }
+    }
+    public void UnlockBones()
+    {
+        for (int i = 0; i < smr2.bones.Length; i++)
+        {
+            try
+            {
+                if (smr2.bones[i].gameObject.GetComponent<ParentConstraint>())
+                {
+                    smr2.bones[i].gameObject.GetComponent<ParentConstraint>().constraintActive = false;
+                }
+            }
+            catch (Exception)
+            {
+                break;
+            }
+        }
+    }
+    public void LockBones()
+    {
+        bool footL = false;
+        bool footR = false;
+        bool upperLegR = false;
+        bool upperLegL = false;
+        bool lowerLegR = false;
+        bool lowerLegL = false;
+        foreach (var item in currentClip.soloIgnoredBones)
+        {
+            if (item == HumanBodyBones.LeftFoot)
+            {
+                footL = true;
+            }
+            if (item == HumanBodyBones.RightFoot)
+            {
+                footR = true;
+            }
+            if (item == HumanBodyBones.LeftLowerLeg)
+            {
+                lowerLegL = true;
+            }
+            if (item == HumanBodyBones.LeftUpperLeg)
+            {
+                upperLegL = true;
+            }
+            if (item == HumanBodyBones.RightLowerLeg)
+            {
+                lowerLegR = true;
+            }
+            if (item == HumanBodyBones.RightUpperLeg)
+            {
+                upperLegR = true;
+            }
+            if (a2.GetBoneTransform(item))
+                dontAnimateUs.Add(a2.GetBoneTransform(item).name);
+        }
+        foreach (var item in currentClip.rootIgnoredBones)
+        {
+
+            if (item == HumanBodyBones.LeftUpperLeg || item == HumanBodyBones.Hips)
+            {
+                upperLegL = true;
+                lowerLegL = true;
+                footL = true;
+            }
+            if (item == HumanBodyBones.RightUpperLeg || item == HumanBodyBones.Hips)
+            {
+                upperLegR = true;
+                lowerLegR = true;
+                footR = true;
+            }
+            if (a2.GetBoneTransform(item))
+                dontAnimateUs.Add(a2.GetBoneTransform(item).name);
+            foreach (var bone in a2.GetBoneTransform(item).GetComponentsInChildren<Transform>())
+            {
+
+                dontAnimateUs.Add(bone.name);
+            }
+        }
+        bool left = upperLegL && lowerLegL && footL;
+        bool right = upperLegR && lowerLegR && footR;
+        Transform LeftLegIK = null;
+        Transform RightLegIK = null;
+        if (!jank)
+        {
+            for (int i = 0; i < smr2.bones.Length; i++)
+            {
+                try
+                {
+                    if (right && (smr2.bones[i].gameObject.ToString() == "IKLegTarget.r (UnityEngine.GameObject)" || smr2.bones[i].gameObject.ToString() == "FootControl.r (UnityEngine.GameObject)"))
+                    {
+                        RightLegIK = smr2.bones[i];
+                    }
+                    else if (left && (smr2.bones[i].gameObject.ToString() == "IKLegTarget.l (UnityEngine.GameObject)" || smr2.bones[i].gameObject.ToString() == "FootControl.l (UnityEngine.GameObject)"))
+                    {
+                        LeftLegIK = smr2.bones[i];
+                    }
+                    if (smr2.bones[i].gameObject.GetComponent<ParentConstraint>() && !dontAnimateUs.Contains(smr2.bones[i].name))
+                    {
+                        //DebugClass.Log($"-{i}---------{smr2.bones[i].gameObject}");
+                        smr2.bones[i].gameObject.GetComponent<ParentConstraint>().constraintActive = true;
+                    }
+                    else if (dontAnimateUs.Contains(smr2.bones[i].name))
+                    {
+                        //DebugClass.Log($"dontanimateme-{i}---------{smr2.bones[i].gameObject}");
+                        smr2.bones[i].gameObject.GetComponent<ParentConstraint>().constraintActive = false;
+                    }
+                }
+                catch (Exception e)
+                {
+                    DebugClass.Log($"{e}");
+                }
+            }
+            if (left && LeftLegIK)//we can leave ik for the legs
+            {
+                if (LeftLegIK.gameObject.GetComponent<ParentConstraint>())
+                    LeftLegIK.gameObject.GetComponent<ParentConstraint>().constraintActive = false;
+                foreach (var item in LeftLegIK.gameObject.GetComponentsInChildren<Transform>())
+                {
+                    if (item.gameObject.GetComponent<ParentConstraint>())
+                        item.gameObject.GetComponent<ParentConstraint>().constraintActive = false;
+                }
+            }
+            if (right && RightLegIK)
+            {
+                if (RightLegIK.gameObject.GetComponent<ParentConstraint>())
+                    RightLegIK.gameObject.GetComponent<ParentConstraint>().constraintActive = false;
+                foreach (var item in RightLegIK.gameObject.GetComponentsInChildren<Transform>())
+                {
+                    if (item.gameObject.GetComponent<ParentConstraint>())
+                        item.gameObject.GetComponent<ParentConstraint>().constraintActive = false;
+                }
+            }
+        }
+        else
+        {
+            a1.enabled = false;
         }
     }
 }

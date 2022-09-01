@@ -49,6 +49,7 @@ class SyncSpotJoinedToClient : INetMessage
             DebugClass.Log($"spotObject is null!!!");
         }
         BoneMapper joinerMapper = bodyObject.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>();
+        joinerMapper.PlayAnim("none", 0);
         if (worldProp)
         {
             joinerMapper.currentEmoteSpot = spotObject.GetComponentsInChildren<EmoteLocation>()[posInArray].gameObject;
