@@ -36,6 +36,9 @@ namespace EmotesAPI
         public static ConfigEntry<bool> Jinx;
         public static ConfigEntry<bool> Soldier;
         public static ConfigEntry<bool> Scavenger;
+        public static ConfigEntry<bool> Goku;
+        public static ConfigEntry<bool> Trunks;
+        public static ConfigEntry<bool> Vegeta;
         public static ConfigEntry<bool> DimmingSpheres;
         public static ConfigEntry<bool> HideJoinSpots;
         //public static ConfigEntry<bool> RemoveAutoWalk;
@@ -135,6 +138,11 @@ namespace EmotesAPI
             Jinx = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Jinx Support", true, "Support for Jinx to animate");
             Soldier = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Soldier Support", true, "Support for Soldier to animate");
             Scavenger = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Scavenger Support", true, "Support for Scavenger to animate");
+
+            Goku = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Goku Support", true, "Support for Goku to animate");
+            Trunks = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Trunks Support", true, "Support for Trunks to animate");
+            Vegeta = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Vegeta Support", true, "Support for Vegeta to animate");
+
             DimmingSpheres = CustomEmotesAPI.instance.Config.Bind<bool>("Misc", "Dimming Spheres", true, "Turn off music dimming when near emotes that support dimming.");
             HideJoinSpots = CustomEmotesAPI.instance.Config.Bind<bool>("Misc", "Hide Join Spots When Animating", false, "Hides all join spots when you are performing an animation, this loses some visual clarity but offers a more C I N E M A T I C experience");
             //RemoveAutoWalk = CustomEmotesAPI.instance.Config.Bind<bool>("Misc", "Remove AutoWalk Emotes From Random", true, "Prevents emotes with AutoWalk turned on from appearing with the random button.");

@@ -25,5 +25,7 @@ namespace EmotesAPI
         public JoinSpot[] joinSpots = null;
         public bool useSafePositionReset = false;
         public string customName = "NO_CUSTOM_NAME";
+        public Action<BoneMapper> customPostEventCodeSync = null;
+        public Action<BoneMapper> customPostEventCodeNoSync = null;
     }
 }

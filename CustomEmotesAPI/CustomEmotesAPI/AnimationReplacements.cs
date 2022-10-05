@@ -221,6 +221,21 @@ internal static class AnimationReplacements
                         var skele = Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/PlayableScavenger.prefab");
                         CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
                     }
+                    else if (item.bodyPrefab.name == "GokuBody" && Settings.Goku.Value)
+                    {
+                        var skele = Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/goku1.prefab");
+                        CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
+                    }
+                    else if (item.bodyPrefab.name == "TrunksBody" && Settings.Trunks.Value)
+                    {
+                        var skele = Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/trunks.prefab");
+                        CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
+                    }
+                    else if (item.bodyPrefab.name == "VegetaBody" && Settings.Vegeta.Value)
+                    {
+                        var skele = Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/vegeta.prefab");
+                        CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
+                    }
                     //else
                     //{
                     //    DebugClass.Log($"----------{item.bodyPrefab.name}");
@@ -406,6 +421,8 @@ public class CustomAnimationClip : MonoBehaviour
     public JoinSpot[] joinSpots;
     public bool useSafePositionReset;
     public string customName;
+    public Action<BoneMapper> customPostEventCodeSync;
+    public Action<BoneMapper> customPostEventCodeNoSync;
 
 
     internal bool syncronizeAnimation;
@@ -414,7 +431,7 @@ public class CustomAnimationClip : MonoBehaviour
     public static List<int> syncPlayerCount = new List<int>();
     public static List<List<bool>> uniqueAnimations = new List<List<bool>>();
 
-    internal CustomAnimationClip(AnimationClip[] _clip, bool _loop/*, bool _shouldSyncronize = false*/, string[] _wwiseEventName = null, string[] _wwiseStopEvent = null, HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip[] _secondaryClip = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true, bool syncAnim = false, bool syncAudio = false, int startPreference = -1, int joinPreference = -1, JoinSpot[] _joinSpots = null, bool safePositionReset = false, string customName = "NO_CUSTOM_NAME")
+    internal CustomAnimationClip(AnimationClip[] _clip, bool _loop/*, bool _shouldSyncronize = false*/, string[] _wwiseEventName = null, string[] _wwiseStopEvent = null, HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip[] _secondaryClip = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true, bool syncAnim = false, bool syncAudio = false, int startPreference = -1, int joinPreference = -1, JoinSpot[] _joinSpots = null, bool safePositionReset = false, string customName = "NO_CUSTOM_NAME", Action<BoneMapper> _customPostEventCodeSync = null, Action<BoneMapper> _customPostEventCodeNoSync = null)
     {
         if (rootBonesToIgnore == null)
             rootBonesToIgnore = new HumanBodyBones[0];
@@ -430,6 +447,8 @@ public class CustomAnimationClip : MonoBehaviour
         visibility = visible;
         joinPref = joinPreference;
         startPref = startPreference;
+        customPostEventCodeSync = _customPostEventCodeSync;
+        customPostEventCodeNoSync = _customPostEventCodeNoSync;
         //int count = 0;
         //float timer = 0;
         //if (_wwiseEventName != "" && _wwiseStopEvent == "")
@@ -545,7 +564,7 @@ public class BoneMapper : MonoBehaviour
     public List<GameObject> props = new List<GameObject>();
     public float scale = 1.0f;
     internal int desiredEvent = 0;
-    internal int currEvent = 0;
+    public int currEvent = 0;
     public float autoWalkSpeed = 0;
     public bool overrideMoveSpeed = false;
     public bool autoWalk = false;
@@ -713,12 +732,26 @@ public class BoneMapper : MonoBehaviour
                 {
                     item.currEvent = currEvent;
                 }
-                AkSoundEngine.PostEvent(startEvents[currentClip.syncPos][currEvent], CustomEmotesAPI.audioContainers[currentClip.syncPos]);
+                if (currentClip.customPostEventCodeSync != null)
+                {
+                    currentClip.customPostEventCodeSync.Invoke(this);
+                }
+                else
+                {
+                    AkSoundEngine.PostEvent(startEvents[currentClip.syncPos][currEvent], CustomEmotesAPI.audioContainers[currentClip.syncPos]);
+                }
             }
             else if (!currentClip.syncronizeAudio)
             {
                 currEvent = UnityEngine.Random.Range(0, startEvents[currentClip.syncPos].Length);
-                AkSoundEngine.PostEvent(startEvents[currentClip.syncPos][currEvent], this.gameObject);
+                if (currentClip.customPostEventCodeNoSync != null)
+                {
+                    currentClip.customPostEventCodeNoSync.Invoke(this);
+                }
+                else
+                {
+                    AkSoundEngine.PostEvent(startEvents[currentClip.syncPos][currEvent], this.gameObject);
+                }
             }
             audioObjects[currentClip.syncPos].transform.localPosition = Vector3.zero;
         }
@@ -979,6 +1012,7 @@ public class BoneMapper : MonoBehaviour
             {
                 foreach (var smr2bone in smr2.bones) //smr2 is the main skinned mesh renderer, which will receive parent constraints
                 {
+                    //DebugClass.Log($"--------------  {smr2bone.gameObject.name}   {smr1bone.gameObject.name}      {smr2bone.GetComponent<ParentConstraint>()}");
                     if (smr1bone.name == smr2bone.name/* + "_CustomEmotesAPIBone"*/ && !smr2bone.GetComponent<ParentConstraint>())
                     {
                         var s = new ConstraintSource();
