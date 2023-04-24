@@ -50,6 +50,29 @@ internal static class AnimationReplacements
                 {
                     s.joy = item.gameObject.GetComponent<Image>();
                 }
+                if (item.gameObject.name == "CurrentEmote")
+                {
+                    EmoteWheel.dontPlayButton = item.gameObject;
+                }
+            }
+
+
+            if (CustomEmotesAPI.audioContainers.Count == 0)
+            {
+                GameObject audioContainerHolder = new GameObject();
+                audioContainerHolder.name = "Audio Container Holder";
+                UnityEngine.Object.DontDestroyOnLoad(audioContainerHolder);
+                foreach (var item in BoneMapper.startEvents)
+                {
+                    GameObject aObject = new GameObject();
+                    if (item[0] != "")
+                    {
+                        aObject.name = $"{item[0]}_AudioContainer";
+                    }
+                    var container = aObject.AddComponent<AudioContainer>();
+                    aObject.transform.SetParent(audioContainerHolder.transform);
+                    CustomEmotesAPI.audioContainers.Add(aObject);
+                }
             }
         };
     }
@@ -66,10 +89,17 @@ internal static class AnimationReplacements
 
         Import("RoR2/DLC1/ClayGrenadier/ClayGrenadierBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/claygrenadier.prefab");
         Import("RoR2/Base/Bison/BisonBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/bison.prefab");
-        //Import("RoR2/Base/Bell/BellBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/brass contraption2.prefab");
         Import("RoR2/DLC1/FlyingVermin/FlyingVerminBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/flyingvermin1.prefab");
-
-
+        //Import("RoR2/DLC1/VoidJailer/VoidJailerBody.prefab", "@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/voidjailer2.prefab");
+        //Import("RoR2/Base/Bell/BellBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/brass contraption2.prefab");
+        Import("RoR2/Base/Vulture/VultureBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/Vulture_emoteskeleton.prefab");
+        Import("RoR2/DLC1/MajorAndMinorConstruct/MinorConstructBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/minorConstruct2.prefab");
+        //Import("", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/.prefab");
+        //Import("", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/.prefab");
+        //Import("", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/.prefab");
+        //Import("", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/.prefab");
+        //Import("", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/.prefab");
+        //Import("", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/.prefab");
         //CustomEmotesAPI.ImportArmature(Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Beetle/BeetleBody.prefab").WaitForCompletion(), Assets.Load<GameObject>("@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/beetle.prefab"));
     }
     internal static void Import(string prefab, string skeleton)
@@ -236,6 +266,47 @@ internal static class AnimationReplacements
                         var skele = Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/vegeta.prefab");
                         CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
                     }
+
+
+
+                    else if (item.bodyPrefab.name == "NemmandoBody" && Settings.Nemmando.Value)
+                    {
+                        var skele = Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/nemmando8.prefab");
+                        CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
+                    }
+                    else if (item.bodyPrefab.name == "AmpBody" && Settings.Amp.Value)
+                    {
+                        var skele = Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/amp2.prefab");
+                        CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
+                    }
+                    else if (item.bodyPrefab.name == "PathfinderBody" && Settings.Pathfinder.Value)
+                    {
+                        var skele = Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/pathfinder1.prefab");
+                        CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
+                    }
+                    else if (item.bodyPrefab.name == "TF2MedicBody" && Settings.TF2Medic.Value)
+                    {
+                        var skele = Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/medic3.prefab");
+                        CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
+                    }
+                    else if (item.bodyPrefab.name == "ExecutionerBody" && Settings.Executioner.Value)
+                    {
+                        var skele = Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/executioner2.prefab");
+                        CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
+                    }
+                    else if (item.bodyPrefab.name == "SpearmanBody" && Settings.Spearman.Value)
+                    {
+                        var skele = Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/SpearManEmoteSkeleton.prefab");
+                        CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
+                    }
+                    else if (item.bodyPrefab.name == "VoidJailerSurvivor" && Settings.VoidJailer.Value)
+                    {
+                        var skele = Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/voidjailer2.prefab");
+                        CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
+                    }
+
+
+
                     //else
                     //{
                     //    DebugClass.Log($"----------{item.bodyPrefab.name}");
@@ -326,7 +397,7 @@ internal static class AnimationReplacements
             int matchingBones = 0;
             while (true)
             {
-                foreach (var smr1bone in smr1.bones)
+                foreach (var smr1bone in smr1.bones) //smr is SkinnedMeshRenderer
                 {
                     foreach (var smr2bone in smr2.bones)
                     {
@@ -553,6 +624,7 @@ public class BoneMapper : MonoBehaviour
     bool twopart = false;
     public static Dictionary<string, CustomAnimationClip> animClips = new Dictionary<string, CustomAnimationClip>();
     public CustomAnimationClip currentClip = null;
+    public string currentClipName = "none";
     public CustomAnimationClip prevClip = null;
     internal static float Current_MSX = 69;
     internal static List<BoneMapper> allMappers = new List<BoneMapper>();
@@ -645,7 +717,7 @@ public class BoneMapper : MonoBehaviour
             }
             catch (Exception e)
             {
-                DebugClass.Log($"had issue turning off audio before new audio played: {e}");
+                DebugClass.Log($"had issue turning off audio before new audio played: {e}\n Notable items for debugging: [currentClip: {currentClip}] [currentClip.syncPos: {currentClip.syncPos}] [currEvent: {currEvent}]");
             }
         }
         catch (Exception)
@@ -653,6 +725,7 @@ public class BoneMapper : MonoBehaviour
 
         }
         currEvent = 0;
+        currentClipName = s;
         if (s != "none")
         {
             prevClip = currentClip;
@@ -714,6 +787,7 @@ public class BoneMapper : MonoBehaviour
         if (currentClip.syncronizeAnimation || currentClip.syncronizeAudio)
         {
             CustomAnimationClip.syncPlayerCount[currentClip.syncPos]++;
+            //DebugClass.Log($"--------------  adding audio object {currentClip.syncPos}");
             AddAudioObject();
         }
         if (currentClip.syncronizeAnimation && CustomAnimationClip.syncPlayerCount[currentClip.syncPos] == 1)
@@ -1013,7 +1087,7 @@ public class BoneMapper : MonoBehaviour
                 foreach (var smr2bone in smr2.bones) //smr2 is the main skinned mesh renderer, which will receive parent constraints
                 {
                     //DebugClass.Log($"--------------  {smr2bone.gameObject.name}   {smr1bone.gameObject.name}      {smr2bone.GetComponent<ParentConstraint>()}");
-                    if (smr1bone.name == smr2bone.name/* + "_CustomEmotesAPIBone"*/ && !smr2bone.GetComponent<ParentConstraint>())
+                    if (smr1bone.name == smr2bone.name/* + "_CustomEmotesAPIBone"*/ /*smr2bone.name != "head_jnt" && smr2bone.name != "head_jnt_end" && smr2bone.name != "arm_left_jnt" && smr2bone.name != "clavicle_right_jnt" && smr2bone.name != "spine_04_jnt"*/)
                     {
                         var s = new ConstraintSource();
                         s.sourceTransform = smr1bone;
@@ -1091,8 +1165,8 @@ public class BoneMapper : MonoBehaviour
     void DimmingChecks()
     {
         float closestDimmingSource = 20f;
-        foreach (var item in allMappers)
-        {
+        foreach (var item in allMappers)// With the 20 Larva moon2 test https://cdn.discordapp.com/attachments/483371638340059156/1100077546256740412/Risk_of_Rain_2_7BN1yOoLBo.jpg
+        {                               // this section consumes about 7 of the 60 fps that I lose when they play an emote. Not great, but not terrible either, I will look elsewhere for optimization
             try
             {
                 if (item)
@@ -1111,6 +1185,7 @@ public class BoneMapper : MonoBehaviour
             }
         }
         SetRTPCInDimming(closestDimmingSource);
+        //////////////////////////////////////////////////////////////////////////// end of section
     }
     void SetRTPCInDimming(float closestDimmingSource)
     {
@@ -1122,6 +1197,10 @@ public class BoneMapper : MonoBehaviour
         else if (Current_MSX != CustomEmotesAPI.Actual_MSX)
         {
             Current_MSX = Mathf.Lerp(Current_MSX, CustomEmotesAPI.Actual_MSX, Time.deltaTime * 3);
+            if(Current_MSX + .01f > CustomEmotesAPI.Actual_MSX)
+            {
+                Current_MSX = CustomEmotesAPI.Actual_MSX;
+            }
             AkSoundEngine.SetRTPCValue("Volume_MSX", Current_MSX);
         }
     }
@@ -1149,28 +1228,31 @@ public class BoneMapper : MonoBehaviour
                 var body = NetworkUser.readOnlyLocalPlayersList[0].master?.GetBody();
                 if (body.gameObject.GetComponent<ModelLocator>().modelTransform == transform.parent)
                 {
-                    local = true;
-                    GameObject g = new GameObject();
-                    g.name = "AudioContainer";
                     CustomEmotesAPI.localMapper = this;
 
-                    if (CustomEmotesAPI.audioContainers.Count == 0)
-                    {
-                        GameObject audioContainerHolder = new GameObject();
-                        audioContainerHolder.name = "Audio Container Holder";
-                        DontDestroyOnLoad(audioContainerHolder);
-                        foreach (var item in startEvents)
-                        {
-                            GameObject aObject = new GameObject();
-                            if (item[0] != "")
-                            {
-                                aObject.name = $"{item[0]}_AudioContainer";
-                            }
-                            var container = aObject.AddComponent<AudioContainer>();
-                            aObject.transform.SetParent(audioContainerHolder.transform);
-                            CustomEmotesAPI.audioContainers.Add(aObject);
-                        }
-                    }
+                    local = true;
+
+
+                    //GameObject g = new GameObject();
+                    //g.name = "AudioContainer";
+
+                    //if (CustomEmotesAPI.audioContainers.Count == 0)
+                    //{
+                    //    GameObject audioContainerHolder = new GameObject();
+                    //    audioContainerHolder.name = "Audio Container Holder";
+                    //    UnityEngine.Object.DontDestroyOnLoad(audioContainerHolder);
+                    //    foreach (var item in BoneMapper.startEvents)
+                    //    {
+                    //        GameObject aObject = new GameObject();
+                    //        if (item[0] != "")
+                    //        {
+                    //            aObject.name = $"{item[0]}_AudioContainer";
+                    //        }
+                    //        var container = aObject.AddComponent<AudioContainer>();
+                    //        aObject.transform.SetParent(audioContainerHolder.transform);
+                    //        CustomEmotesAPI.audioContainers.Add(aObject);
+                    //    }
+                    //}
                 }
             }
         }
@@ -1190,7 +1272,7 @@ public class BoneMapper : MonoBehaviour
             {
                 if (a2.enabled)
                 {
-                    if (smr2.transform.parent.gameObject.name == "mdlVoidSurvivor" || smr2.transform.parent.gameObject.name == "mdlMage" || smr2.transform.parent.gameObject.name == "mdlJinx" || smr2.transform.parent.gameObject.name.StartsWith("mdlHouse"))
+                    if (smr2.transform.parent.gameObject.name == "mdlVoidSurvivor" || smr2.transform.parent.gameObject.name == "mdlMage" || smr2.transform.parent.gameObject.name == "mdlJinx" || smr2.transform.parent.gameObject.name.StartsWith("mdlHouse") || smr2.transform.parent.gameObject.name.StartsWith("mdlVoidJailer"))
                     {
                         smr2.transform.parent.gameObject.SetActive(false);
                         smr2.transform.parent.gameObject.SetActive(true);
@@ -1537,7 +1619,7 @@ public class BoneMapper : MonoBehaviour
                     if (smr2.bones[i].gameObject.GetComponent<ParentConstraint>() && !dontAnimateUs.Contains(smr2.bones[i].name))
                     {
                         //DebugClass.Log($"-{i}---------{smr2.bones[i].gameObject}");
-                        smr2.bones[i].gameObject.GetComponent<ParentConstraint>().constraintActive = true;
+                        smr2.bones[i].gameObject.GetComponent<ParentConstraint>().constraintActive = true; //this is like, 99% of fps loss right here. Unfortunate
                     }
                     else if (dontAnimateUs.Contains(smr2.bones[i].name))
                     {

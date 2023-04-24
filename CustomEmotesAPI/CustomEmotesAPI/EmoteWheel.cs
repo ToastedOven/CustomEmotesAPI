@@ -23,6 +23,7 @@ using RoR2.UI;
 public class EmoteWheel : MonoBehaviour
 {
     internal GameObject text;
+    internal static GameObject dontPlayButton;
 
     internal List<GameObject> gameObjects = new List<GameObject>();
     internal Image joy;
@@ -36,7 +37,9 @@ public class EmoteWheel : MonoBehaviour
     int activePage = 1; //0 left, 1 middle, 2 right
 
     GameObject selected;
+    int selectedNum;
     float XScale = 1, YScale = 1;
+    string bLock = "asd";
     void Start()
     {
         transform.localPosition = new Vector3(0, 2000, 0);
@@ -68,6 +71,7 @@ public class EmoteWheel : MonoBehaviour
                     }
                 }
                 selected = gameObjects[0];
+                selectedNum = 0;
                 events = input.GetFieldValue<RoR2.UI.MPEventSystem>("eventSystem");
                 RefreshWheels();
                 started = true;
@@ -94,9 +98,20 @@ public class EmoteWheel : MonoBehaviour
                     {
                         dist = Vector2.Distance(new Vector2(item.GetComponent<RectTransform>().localPosition.x + (Screen.width / 2), item.GetComponent<RectTransform>().localPosition.y + (Screen.height / 2)), (Vector2)Input.mousePosition);
                         selected = item;
+                        selectedNum = gameObjects.IndexOf(selected);
                     }
                     item.GetComponent<RectTransform>().localScale = new Vector3(0.6771638f, 0.6771638f, 0.6771638f);
                 }
+                if (dist > Vector2.Distance(new Vector2(dontPlayButton.GetComponent<RectTransform>().localPosition.x + (Screen.width / 2), dontPlayButton.GetComponent<RectTransform>().localPosition.y + (Screen.height / 2)), (Vector2)Input.mousePosition))
+                {
+                    dist = Vector2.Distance(new Vector2(dontPlayButton.GetComponent<RectTransform>().localPosition.x + (Screen.width / 2), dontPlayButton.GetComponent<RectTransform>().localPosition.y + (Screen.height / 2)), (Vector2)Input.mousePosition);
+                    selected = dontPlayButton;
+                    selectedNum = gameObjects.IndexOf(selected);
+                }
+                dontPlayButton.GetComponent<RectTransform>().localScale = new Vector3(0.6771638f, 0.6771638f, 0.6771638f);
+
+
+
                 selected.GetComponent<RectTransform>().localScale = new Vector3(0.9771638f, 0.9771638f, 0.9771638f);
             }
             else
@@ -172,6 +187,16 @@ public class EmoteWheel : MonoBehaviour
                 events.cursorOpenerCount += 1;
             }
             transform.localPosition = v;
+            if (CustomEmotesAPI.GetKeyPressed(Settings.SetCurrentEmoteToWheel) && selected != null && CustomEmotesAPI.allClipNames.Contains(CustomEmotesAPI.localMapper.currentClipName))
+            {
+                selected.GetComponentInChildren<TextMeshProUGUI>().text = CustomEmotesAPI.localMapper.currentClipName;
+                SaveWheelFromGame(activePage, selectedNum, CustomEmotesAPI.localMapper.currentClipName);
+                int actualPage = activePage == 0 ? 1 : activePage == 1 ? 0 : 2;
+                int number = (actualPage * 8) + selectedNum;
+                ScrollManager.circularButtons[number].GetComponentInChildren<HGTextMeshProUGUI>().text = CustomEmotesAPI.localMapper.currentClipName;
+                bLock = CustomEmotesAPI.localMapper.currentClipName;
+                RefreshWheels();
+            }
         }
         else
         {
@@ -187,13 +212,15 @@ public class EmoteWheel : MonoBehaviour
                     }
                     else
                     {
-                        CustomEmotesAPI.PlayAnimation(selected.GetComponentInChildren<TextMeshProUGUI>().text);
+                        if (bLock != selected.GetComponentInChildren<TextMeshProUGUI>().text && !selected.GetComponentInChildren<TextMeshProUGUI>().text.StartsWith("Continue Playing Current E"))
+                            CustomEmotesAPI.PlayAnimation(selected.GetComponentInChildren<TextMeshProUGUI>().text);
                     }
                 }
                 catch (Exception e)
                 {
                     DebugClass.Log(e);
                 }
+                bLock = "asd";
                 if (events.cursorOpenerForGamepadCount > 0)
                 {
                     events.cursorOpenerForGamepadCount -= 1;
@@ -204,6 +231,10 @@ public class EmoteWheel : MonoBehaviour
             StartCoroutine(SwitchPage(middlePage));
             activePage = 1;
         }
+    }
+    private void SaveWheelFromGame(int currentPage, int currentSelected, string newEmoteName)
+    {
+        ButtonScript.SaveSettingFromGame(currentPage, currentSelected, newEmoteName);
     }
 
     private IEnumerator SwitchPage(string[] newPage, bool instant = true)

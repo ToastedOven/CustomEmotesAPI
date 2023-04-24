@@ -15,6 +15,7 @@ using R2API.Networking.Interfaces;
 using System.Globalization;
 using BepInEx.Configuration;
 using UnityEngine.AddressableAssets;
+using TMPro;
 
 namespace EmotesAPI
 {
@@ -100,7 +101,7 @@ namespace EmotesAPI
             }
             return Input.GetKeyDown(entry.Value.MainKey);
         }
-        public const string VERSION = "1.8.2";
+        public const string VERSION = "1.10.2";
         internal static float Actual_MSX = 69;
         public static CustomEmotesAPI instance;
         public static List<GameObject> audioContainers = new List<GameObject>();
@@ -109,6 +110,7 @@ namespace EmotesAPI
         public void Awake()
         {
             instance = this;
+            R2API.Utils.CommandHelper.AddToConsoleWhenReady();
             DebugClass.SetLogger(base.Logger);
             CustomEmotesAPI.LoadResource("customemotespackage");
             CustomEmotesAPI.LoadResource("fineilldoitmyself");
@@ -383,7 +385,11 @@ namespace EmotesAPI
             rigToAnimate.GetComponent<Animator>().runtimeAnimatorController = GameObject.Instantiate<GameObject>(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commando.prefab")).GetComponent<Animator>().runtimeAnimatorController;
             AnimationReplacements.ApplyAnimationStuff(bodyPrefab, rigToAnimate, meshPos, hideMeshes);
         }
-
+        [ConCommand(commandName = "PlayEmote", flags = ConVarFlags.None, helpText = "Plays emote in first argument (case sensitive)")]
+        private static void SlowmoCommand(ConCommandArgs args)
+        {
+            PlayAnimation(args[0]);
+        }
         public static void PlayAnimation(string animationName, int pos = -2)
         {
             var identity = NetworkUser.readOnlyLocalPlayersList[0].master?.GetBody().gameObject.GetComponent<NetworkIdentity>();
@@ -415,6 +421,10 @@ namespace EmotesAPI
         public static event AnimationChanged animChanged;
         internal static void Changed(string newAnimation, BoneMapper mapper) //is a neat game made by a developer who endorses nsfw content while calling it a fine game for kids
         {
+            if (mapper == localMapper)
+            {
+                EmoteWheel.dontPlayButton.GetComponentInChildren<TextMeshProUGUI>().text = $"Continue Playing Current Emote:\r\n{newAnimation}";
+            }
             foreach (var item in EmoteLocation.emoteLocations)
             {
                 if (item.emoter == mapper)
@@ -448,6 +458,19 @@ namespace EmotesAPI
                 {
                     mapper.transform.parent.GetComponent<ChildLocator>().FindChild("Weapon").gameObject.SetActive(false);
                 }
+                if (mapper.transform.name == "nemmando8")
+                {
+                    mapper.transform.parent.GetComponent<ChildLocator>().FindChild("SwordModel").gameObject.SetActive(false);
+                }
+                if (mapper.transform.name == "medic3")
+                {
+                    mapper.transform.parent.GetComponent<ChildLocator>().FindChild("Medigun").gameObject.SetActive(false);
+                    mapper.transform.parent.GetComponent<ChildLocator>().FindChild("Crossbow").gameObject.SetActive(false);
+                }
+                if (mapper.transform.name == "SpearManEmoteSkeleton")
+                {
+                    mapper.transform.parent.GetComponent<ChildLocator>().FindChild("spear").gameObject.SetActive(false);
+                }
             }
             else
             {
@@ -462,6 +485,19 @@ namespace EmotesAPI
                 if (mapper.transform.name == "PlayableScavenger")
                 {
                     mapper.transform.parent.GetComponent<ChildLocator>().FindChild("Weapon").gameObject.SetActive(true);
+                }
+                if (mapper.transform.name == "nemmando8")
+                {
+                    mapper.transform.parent.GetComponent<ChildLocator>().FindChild("SwordModel").gameObject.SetActive(true);
+                }
+                if (mapper.transform.name == "medic3")
+                {
+                    mapper.transform.parent.GetComponent<ChildLocator>().FindChild("Medigun").gameObject.SetActive(true);
+                    mapper.transform.parent.GetComponent<ChildLocator>().FindChild("Crossbow").gameObject.SetActive(true);
+                }
+                if (mapper.transform.name == "SpearManEmoteSkeleton")
+                {
+                    mapper.transform.parent.GetComponent<ChildLocator>().FindChild("spear").gameObject.SetActive(true);
                 }
             }
         }
@@ -501,43 +537,58 @@ namespace EmotesAPI
             }
             if (GetKeyPressed(Settings.JoinEmote))
             {
-                if (localMapper)
+                try
                 {
-                    if (localMapper.currentEmoteSpot)
+                    if (localMapper)
                     {
-                        localMapper.JoinEmoteSpot();
-                    }
-                    else
-                    {
-                        foreach (var mapper in BoneMapper.allMappers)
+                        if (localMapper.currentEmoteSpot)
                         {
-                            try
+                            localMapper.JoinEmoteSpot();
+                        }
+                        else
+                        {
+                            foreach (var mapper in BoneMapper.allMappers)
                             {
-                                if (mapper != localMapper)
+                                try
                                 {
-                                    if (!nearestMapper && (mapper.currentClip.syncronizeAnimation || mapper.currentClip.syncronizeAudio))
+                                    if (mapper != localMapper)
                                     {
-                                        nearestMapper = mapper;
-                                    }
-                                    else if (nearestMapper)
-                                    {
-                                        if ((mapper.currentClip.syncronizeAnimation || mapper.currentClip.syncronizeAudio) && Vector3.Distance(localMapper.transform.position, mapper.transform.position) < Vector3.Distance(localMapper.transform.position, nearestMapper.transform.position))
+                                        if (!nearestMapper && (mapper.currentClip.syncronizeAnimation || mapper.currentClip.syncronizeAudio))
                                         {
                                             nearestMapper = mapper;
                                         }
+                                        else if (nearestMapper)
+                                        {
+                                            if ((mapper.currentClip.syncronizeAnimation || mapper.currentClip.syncronizeAudio) && Vector3.Distance(localMapper.transform.position, mapper.transform.position) < Vector3.Distance(localMapper.transform.position, nearestMapper.transform.position))
+                                            {
+                                                nearestMapper = mapper;
+                                            }
+                                        }
                                     }
                                 }
+                                catch (System.Exception)
+                                {
+                                }
                             }
-                            catch (System.Exception)
+                            if (nearestMapper)
                             {
+                                PlayAnimation(nearestMapper.currentClip.clip[0].name);
+                                Joined(nearestMapper.currentClip.clip[0].name, localMapper, nearestMapper); //this is not networked and only sent locally FYI
                             }
+                            nearestMapper = null;
                         }
-                        if (nearestMapper)
-                        {
-                            PlayAnimation(nearestMapper.currentClip.clip[0].name);
-                            Joined(nearestMapper.currentClip.clip[0].name, localMapper, nearestMapper); //this is not networked and only sent locally FYI
-                        }
-                        nearestMapper = null;
+                    }
+                }
+                catch (System.Exception e)
+                {
+                    DebugClass.Log($"had issue while attempting to join an emote as a client: {e}\nNotable info: [nearestMapper: {nearestMapper}] [localMapper: {localMapper}]");
+                    try
+                    {
+                        nearestMapper.currentClip.ToString();
+                        DebugClass.Log($"[nearestMapper.currentClip: {nearestMapper.currentClip.ToString()}] [nearestMapper.currentClip.clip[0]: {nearestMapper.currentClip.clip[0]}]");
+                    }
+                    catch (System.Exception)
+                    {
                     }
                 }
             }

@@ -20,6 +20,88 @@ public class ButtonScript : MonoBehaviour
         gameObject.transform.parent.transform.parent.transform.parent.transform.parent.transform.parent.Find("Wheels").gameObject.SetActive(true);
         gameObject.transform.parent.transform.parent.transform.parent.transform.parent.gameObject.SetActive(false);
     }
+    internal static void SaveSettingFromGame(int currentPage /*0 left, 1 middle, 2 right*/, int currentSelected, string newEmoteName) //Don't look at this function, I'm embarrassed 
+    {
+        int actualPage = currentPage == 0 ? 1 : currentPage == 1 ? 0 : 2;
+        int number = (actualPage * 8) + currentSelected;
+        switch (number)
+        {
+            case 0:
+                Settings.emote0.Value = newEmoteName;
+                break;
+            case 1:
+                Settings.emote1.Value = newEmoteName;
+                break;
+            case 2:
+                Settings.emote2.Value = newEmoteName;
+                break;
+            case 3:
+                Settings.emote3.Value = newEmoteName;
+                break;
+            case 4:
+                Settings.emote4.Value = newEmoteName;
+                break;
+            case 5:
+                Settings.emote5.Value = newEmoteName;
+                break;
+            case 6:
+                Settings.emote6.Value = newEmoteName;
+                break;
+            case 7:
+                Settings.emote7.Value = newEmoteName;
+                break;
+            case 8:
+                Settings.emote8.Value = newEmoteName;
+                break;
+            case 9:
+                Settings.emote9.Value = newEmoteName;
+                break;
+            case 10:
+                Settings.emote10.Value = newEmoteName;
+                break;
+            case 11:
+                Settings.emote11.Value = newEmoteName;
+                break;
+            case 12:
+                Settings.emote12.Value = newEmoteName;
+                break;
+            case 13:
+                Settings.emote13.Value = newEmoteName;
+                break;
+            case 14:
+                Settings.emote14.Value = newEmoteName;
+                break;
+            case 15:
+                Settings.emote15.Value = newEmoteName;
+                break;
+            case 16:
+                Settings.emote16.Value = newEmoteName;
+                break;
+            case 17:
+                Settings.emote17.Value = newEmoteName;
+                break;
+            case 18:
+                Settings.emote18.Value = newEmoteName;
+                break;
+            case 19:
+                Settings.emote19.Value = newEmoteName;
+                break;
+            case 20:
+                Settings.emote20.Value = newEmoteName;
+                break;
+            case 21:
+                Settings.emote21.Value = newEmoteName;
+                break;
+            case 22:
+                Settings.emote22.Value = newEmoteName;
+                break;
+            case 23:
+                Settings.emote23.Value = newEmoteName;
+                break;
+            default:
+                break;
+        }
+    }
     internal void SaveSettings()
     {
         Settings.emote0.Value = ScrollManager.circularButtons[0].GetComponentInChildren<HGTextMeshProUGUI>().text;

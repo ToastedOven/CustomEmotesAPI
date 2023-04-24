@@ -39,16 +39,25 @@ namespace EmotesAPI
 
         public static T Load<T>(string assetName) where T : UnityEngine.Object
         {
-            if (assetName.Contains(":"))
+            try
             {
-                string[] path = assetName.Split(':');
+                assetName = assetName.ToLower();
+                if (assetName.Contains(":"))
+                {
+                    string[] path = assetName.Split(':');
 
-                assetName = path[1].ToLower();
+                    assetName = path[1].ToLower();
+                }
+                if (assetName.StartsWith("assets/"))
+                    assetName = assetName.Remove(0, "assets/".Length);
+                int index = AssetIndices[assetName];
+                return AssetBundles[index].LoadAsset<T>($"assets/{assetName}");
             }
-            if (assetName.StartsWith("assets/"))
-                assetName = assetName.Remove(0, "assets/".Length);
-            int index = AssetIndices[assetName];
-            return AssetBundles[index].LoadAsset<T>($"assets/{assetName}");
+            catch (Exception e)
+            {
+                DebugClass.Log($"Couldn't load asset [{assetName}] exception: {e}");
+                return null;
+            }
         }
     }
 }

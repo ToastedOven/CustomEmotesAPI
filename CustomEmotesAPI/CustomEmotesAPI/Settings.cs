@@ -19,6 +19,7 @@ namespace EmotesAPI
         public static ConfigEntry<KeyboardShortcut> Right;
         public static ConfigEntry<KeyboardShortcut> RandomEmote;
         public static ConfigEntry<KeyboardShortcut> JoinEmote;
+        public static ConfigEntry<KeyboardShortcut> SetCurrentEmoteToWheel;
         public static ConfigEntry<float> EmotesVolume;
         public static ConfigEntry<bool> SolSupport;
         public static ConfigEntry<bool> Paladin;
@@ -39,6 +40,13 @@ namespace EmotesAPI
         public static ConfigEntry<bool> Goku;
         public static ConfigEntry<bool> Trunks;
         public static ConfigEntry<bool> Vegeta;
+        public static ConfigEntry<bool> Nemmando;
+        public static ConfigEntry<bool> Executioner;
+        public static ConfigEntry<bool> Amp;
+        public static ConfigEntry<bool> Pathfinder;
+        public static ConfigEntry<bool> TF2Medic;
+        public static ConfigEntry<bool> Spearman;
+        public static ConfigEntry<bool> VoidJailer;
         public static ConfigEntry<bool> DimmingSpheres;
         public static ConfigEntry<bool> HideJoinSpots;
         //public static ConfigEntry<bool> RemoveAutoWalk;
@@ -122,6 +130,7 @@ namespace EmotesAPI
             EmotesVolume = CustomEmotesAPI.instance.Config.Bind<float>("Controls", "Emotes Volume", 50, "Emotes \"Should\" be controlled by Volume SFX as well, but this is a seperate slider if you want a different audio balance.");
             RandomEmote = CustomEmotesAPI.instance.Config.Bind<KeyboardShortcut>("Controls", "Play Random Emote", new KeyboardShortcut(KeyCode.G), "Plays a random emote from all available emotes");
             JoinEmote = CustomEmotesAPI.instance.Config.Bind<KeyboardShortcut>("Controls", "Join Nearest Syncing Emote", new KeyboardShortcut(KeyCode.V), "Picks the nearest player with a syncing emote and joins them");
+            SetCurrentEmoteToWheel = CustomEmotesAPI.instance.Config.Bind<KeyboardShortcut>("Controls", "Bind Current Emote To Wheel", new KeyboardShortcut(KeyCode.B), "Whenever you are performing an emote, if you pull up the emote wheel and press this key while hovering over an emote slot, it will bind the current emote to the selected slot.");
             SolSupport = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Aurelion Sol Support", true, "Support for Aurelion Sol to animate, this will break his model a little bit but if you don't mind that feel free to leave this on");
             Paladin = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Paladin Support", true, "Support for Paladin to animate");
             Enforcer = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Enforcer Support", true, "Support for Enforcer to animate");
@@ -138,10 +147,17 @@ namespace EmotesAPI
             Jinx = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Jinx Support", true, "Support for Jinx to animate");
             Soldier = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Soldier Support", true, "Support for Soldier to animate");
             Scavenger = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Scavenger Support", true, "Support for Scavenger to animate");
-
             Goku = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Goku Support", true, "Support for Goku to animate");
             Trunks = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Trunks Support", true, "Support for Trunks to animate");
             Vegeta = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Vegeta Support", true, "Support for Vegeta to animate");
+
+            Nemmando = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Nemmando Support", true, "Support for Nemmando to animate");
+            Executioner = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Executioner Support", true, "Support for Executioner to animate");
+            Amp = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Amp Support", true, "Support for Amp to animate");
+            Pathfinder = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Pathfinder Support", true, "Support for Pathfinder to animate");
+            TF2Medic = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "TF2Medic Support", true, "Support for TF2Medic to animate");
+            Spearman = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Spearman Support", true, "Support for Spearman to animate");
+            VoidJailer = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "VoidJailer Support", true, "Support for VoidJailer to animate");
 
             DimmingSpheres = CustomEmotesAPI.instance.Config.Bind<bool>("Misc", "Dimming Spheres", true, "Turn off music dimming when near emotes that support dimming.");
             HideJoinSpots = CustomEmotesAPI.instance.Config.Bind<bool>("Misc", "Hide Join Spots When Animating", false, "Hides all join spots when you are performing an animation, this loses some visual clarity but offers a more C I N E M A T I C experience");
@@ -176,6 +192,7 @@ namespace EmotesAPI
 
             ModSettingsManager.AddOption(new GenericButtonOption("Customize Emote Wheel", "Controls", PressButton));
             ModSettingsManager.AddOption(new KeyBindOption(EmoteWheel));
+            ModSettingsManager.AddOption(new KeyBindOption(SetCurrentEmoteToWheel));
             ModSettingsManager.AddOption(new KeyBindOption(Left));
             ModSettingsManager.AddOption(new KeyBindOption(Right));
             ModSettingsManager.AddOption(new SliderOption(EmotesVolume));
@@ -197,6 +214,16 @@ namespace EmotesAPI
             ModSettingsManager.AddOption(new CheckBoxOption(Jinx, true));
             ModSettingsManager.AddOption(new CheckBoxOption(Soldier, true));
             ModSettingsManager.AddOption(new CheckBoxOption(Scavenger, true));
+            ModSettingsManager.AddOption(new CheckBoxOption(Goku, true));
+            ModSettingsManager.AddOption(new CheckBoxOption(Vegeta, true));
+            ModSettingsManager.AddOption(new CheckBoxOption(Trunks, true));
+            ModSettingsManager.AddOption(new CheckBoxOption(Nemmando, true));
+            ModSettingsManager.AddOption(new CheckBoxOption(Executioner, true));
+            ModSettingsManager.AddOption(new CheckBoxOption(Amp, true));
+            ModSettingsManager.AddOption(new CheckBoxOption(TF2Medic, true));
+            ModSettingsManager.AddOption(new CheckBoxOption(Pathfinder, true));
+            ModSettingsManager.AddOption(new CheckBoxOption(Spearman, true));
+            ModSettingsManager.AddOption(new CheckBoxOption(VoidJailer, true));
             ModSettingsManager.AddOption(new CheckBoxOption(DimmingSpheres));
             ModSettingsManager.AddOption(new CheckBoxOption(HideJoinSpots));
             //ModSettingsManager.AddOption(new CheckBoxOption(RemoveAutoWalk, false));
