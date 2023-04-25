@@ -81,7 +81,9 @@ internal static class AnimationReplacements
     {
         Import("RoR2/Base/Brother/BrotherBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/brother.prefab");
         Import("RoR2/Base/ClayBruiser/ClayBruiserBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/templar.prefab");
-
+        DebugClass.Log("adding beetle");
+        Import("RoR2/Base/Beetle/BeetleBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/beetle_emoteskeleton.prefab", false);
+        DebugClass.Log("added beetle");
         Import("RoR2/DLC1/AcidLarva/AcidLarvaBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/AcidLarva1.prefab");
         Import("RoR2/Base/Titan/TitanGoldBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/Aurelionite.prefab");
         Import("RoR2/Base/Beetle/BeetleGuardBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/Beetle guard.prefab");
@@ -91,9 +93,9 @@ internal static class AnimationReplacements
         Import("RoR2/Base/Bison/BisonBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/bison.prefab");
         Import("RoR2/DLC1/FlyingVermin/FlyingVerminBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/flyingvermin1.prefab");
         //Import("RoR2/DLC1/VoidJailer/VoidJailerBody.prefab", "@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/voidjailer2.prefab");
-        //Import("RoR2/Base/Bell/BellBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/brass contraption2.prefab");
+        Import("RoR2/Base/Bell/BellBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/brass contraption2.prefab");
         Import("RoR2/Base/Vulture/VultureBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/Vulture_emoteskeleton.prefab");
-        Import("RoR2/DLC1/MajorAndMinorConstruct/MinorConstructBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/minorConstruct2.prefab");
+        Import("RoR2/DLC1/MajorAndMinorConstruct/MinorConstructBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/minorConstruct4.prefab");
         //Import("", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/.prefab");
         //Import("", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/.prefab");
         //Import("", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/.prefab");
@@ -102,9 +104,9 @@ internal static class AnimationReplacements
         //Import("", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/.prefab");
         //CustomEmotesAPI.ImportArmature(Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Beetle/BeetleBody.prefab").WaitForCompletion(), Assets.Load<GameObject>("@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/beetle.prefab"));
     }
-    internal static void Import(string prefab, string skeleton)
+    internal static void Import(string prefab, string skeleton, bool _hidemeshes = true)
     {
-        CustomEmotesAPI.ImportArmature(Addressables.LoadAssetAsync<GameObject>(prefab).WaitForCompletion(), Assets.Load<GameObject>(skeleton));
+        CustomEmotesAPI.ImportArmature(Addressables.LoadAssetAsync<GameObject>(prefab).WaitForCompletion(), Assets.Load<GameObject>(skeleton), hideMeshes: _hidemeshes);
     }
     internal static void ChangeAnims()
     {
@@ -392,38 +394,42 @@ internal static class AnimationReplacements
             DebugClass.Log($"Had trouble setting the original skeleton's skinned mesh renderer: {e}");
             throw;
         }
-        try
+        if (animcontroller.name != "beetle_emoteskeleton")
         {
-            int matchingBones = 0;
-            while (true)
+            try
             {
-                foreach (var smr1bone in smr1.bones) //smr is SkinnedMeshRenderer
+                int matchingBones = 0;
+                while (true)
                 {
-                    foreach (var smr2bone in smr2.bones)
+                    foreach (var smr1bone in smr1.bones) //smr is SkinnedMeshRenderer
                     {
-                        if (smr1bone.name == smr2bone.name)
+                        foreach (var smr2bone in smr2.bones)
                         {
-                            matchingBones++;
+                            if (smr1bone.name == smr2bone.name)
+                            {
+                                matchingBones++;
+                            }
                         }
                     }
-                }
-                if (matchingBones < 5 && pos + 1 < bodyPrefab.GetComponent<ModelLocator>().modelTransform.GetComponentsInChildren<SkinnedMeshRenderer>().Length)
-                {
-                    pos++;
-                    smr2 = bodyPrefab.GetComponent<ModelLocator>().modelTransform.GetComponentsInChildren<SkinnedMeshRenderer>()[pos];
-                    matchingBones = 0;
-                }
-                else
-                {
-                    break;
+                    if (matchingBones < 5 && pos + 1 < bodyPrefab.GetComponent<ModelLocator>().modelTransform.GetComponentsInChildren<SkinnedMeshRenderer>().Length)
+                    {
+                        pos++;
+                        smr2 = bodyPrefab.GetComponent<ModelLocator>().modelTransform.GetComponentsInChildren<SkinnedMeshRenderer>()[pos];
+                        matchingBones = 0;
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
             }
+            catch (Exception e)
+            {
+                DebugClass.Log($"Had issue while checking matching bones: {e}");
+                throw;
+            }
         }
-        catch (Exception e)
-        {
-            DebugClass.Log($"Had issue while checking matching bones: {e}");
-            throw;
-        }
+            
         var test = animcontroller.AddComponent<BoneMapper>();
         try
         {
@@ -1082,20 +1088,51 @@ public class BoneMapper : MonoBehaviour
         bool nuclear = true;
         if (nuclear)
         {
-            foreach (var smr1bone in smr1.bones) //smr1 is the emote skeleton
+            //foreach (var smr1bone in smr1.bones) //smr1 is the emote skeleton
+            //{
+            //    foreach (var smr2bone in smr2.bones) //smr2 is the main skinned mesh renderer, which will receive parent constraints
+            //    {
+            //        //DebugClass.Log($"--------------  {smr2bone.gameObject.name}   {smr1bone.gameObject.name}      {smr2bone.GetComponent<ParentConstraint>()}");
+            //        if (smr1bone.name == smr2bone.name/* + "_CustomEmotesAPIBone"*/ /*smr2bone.name != "head_jnt" && smr2bone.name != "head_jnt_end" && smr2bone.name != "arm_left_jnt" && smr2bone.name != "clavicle_right_jnt" && smr2bone.name != "spine_04_jnt"*/)
+            //        {
+            //            var s = new ConstraintSource();
+            //            s.sourceTransform = smr1bone;
+            //            s.weight = 1;
+            //            smr2bone.gameObject.AddComponent<EmoteConstraint>().AddSource(ref smr2bone, ref smr1bone);
+            //            //smr1bone.name = smr1bone.name.Remove(smr1bone.name.Length - "_CustomEmotesAPIBone".Length);
+            //        }
+            //    }
+            //}
+            if (smr1.transform.parent.name == "beetle_emoteskeleton")
             {
-                foreach (var smr2bone in smr2.bones) //smr2 is the main skinned mesh renderer, which will receive parent constraints
+                List<Transform> t = new List<Transform>();
+                foreach (var item in bodyPrefab.GetComponentsInChildren<Transform>())
                 {
-                    //DebugClass.Log($"--------------  {smr2bone.gameObject.name}   {smr1bone.gameObject.name}      {smr2bone.GetComponent<ParentConstraint>()}");
-                    if (smr1bone.name == smr2bone.name/* + "_CustomEmotesAPIBone"*/ /*smr2bone.name != "head_jnt" && smr2bone.name != "head_jnt_end" && smr2bone.name != "arm_left_jnt" && smr2bone.name != "clavicle_right_jnt" && smr2bone.name != "spine_04_jnt"*/)
+                    if (item.name == "beetle_emoteskeleton")
                     {
-                        var s = new ConstraintSource();
-                        s.sourceTransform = smr1bone;
-                        s.weight = 1;
-                        smr2bone.gameObject.AddComponent<ParentConstraint>().AddSource(s);
-                        //smr1bone.name = smr1bone.name.Remove(smr1bone.name.Length - "_CustomEmotesAPIBone".Length);
+                        break;
+                    }
+                    if (!item.name.Contains("Hurtbox") && !item.name.Contains("BeetleBody") && !item.name.Contains("Mesh") && !item.name.Contains("mdl"))
+                    {
+                        t.Add(item);
                     }
                 }
+                Transform temp = t[14];
+                t[14] = t[11];
+                t[11] = temp;
+                temp = t[15];
+                t[15] = t[12];
+                t[12] = temp;
+                temp = t[16];
+                t[16] = t[13];
+                t[13] = temp;
+
+                DebugClass.Log($"doing fancy assignment for beetle");
+                AssignBones(smr1.bones, t.ToArray());
+            }
+            else
+            {
+                AssignBones(smr1.bones, smr2.bones);
             }
         }
         if (jank)
@@ -1104,15 +1141,30 @@ public class BoneMapper : MonoBehaviour
             {
                 try
                 {
-                    if (smr2.bones[i].gameObject.GetComponent<ParentConstraint>())
+                    if (smr2.bones[i].gameObject.GetComponent<EmoteConstraint>())
                     {
                         //DebugClass.Log($"-{i}---------{smr2.bones[i].gameObject}");
-                        smr2.bones[i].gameObject.GetComponent<ParentConstraint>().constraintActive = true;
+                        smr2.bones[i].gameObject.GetComponent<EmoteConstraint>().constraintActive = true;
                     }
                 }
                 catch (Exception e)
                 {
                     DebugClass.Log($"{e}");
+                }
+            }
+            //a1.enabled = false;
+        }
+    }
+    internal void AssignBones(Transform[] boneArray1, Transform[] boneArray2)
+    {
+        for (int i = 0; i < boneArray1.Length; i++)
+        {
+            for (int x = 0; x < boneArray2.Length; x++)
+            {
+                DebugClass.Log($"--------------  {boneArray1[i].gameObject.name}   {boneArray2[x].gameObject.name}");
+                if (boneArray1[i].name == boneArray2[x].name/* + "_CustomEmotesAPIBone"*/ /*boneArray2[x].name != "head_jnt" && boneArray2[x].name != "head_jnt_end" && boneArray2[x].name != "arm_left_jnt" && boneArray2[x].name != "clavicle_right_jnt" && boneArray2[x].name != "spine_04_jnt"*/)
+                {
+                    boneArray2[x].gameObject.AddComponent<EmoteConstraint>().AddSource(ref boneArray2[x], ref boneArray1[i]);
                 }
             }
         }
@@ -1124,6 +1176,14 @@ public class BoneMapper : MonoBehaviour
         if (parentGameObject)
         {
             NewAnimation(null);
+        }
+        if (!transform.parent.GetComponent<CharacterModel>())
+        {
+            return;
+        }
+        if (!transform.parent.GetComponent<CharacterModel>().body.GetComponent<KinematicCharacterController.KinematicCharacterMotor>())
+        {
+            return;
         }
         ogLocation = transform.parent.GetComponent<CharacterModel>().body.GetComponent<ModelLocator>().modelBaseTransform.localPosition;
         ogScale = transform.parent.localScale;
@@ -1197,7 +1257,7 @@ public class BoneMapper : MonoBehaviour
         else if (Current_MSX != CustomEmotesAPI.Actual_MSX)
         {
             Current_MSX = Mathf.Lerp(Current_MSX, CustomEmotesAPI.Actual_MSX, Time.deltaTime * 3);
-            if(Current_MSX + .01f > CustomEmotesAPI.Actual_MSX)
+            if (Current_MSX + .01f > CustomEmotesAPI.Actual_MSX)
             {
                 Current_MSX = CustomEmotesAPI.Actual_MSX;
             }
@@ -1337,13 +1397,19 @@ public class BoneMapper : MonoBehaviour
     {
         if (autoWalkSpeed != 0)
         {
-            if (overrideMoveSpeed)
+            CharacterModel model = transform.parent.GetComponent<CharacterModel>();
+            if (model)
             {
-                transform.parent.GetComponent<CharacterModel>().body.moveSpeed = autoWalkSpeed;
-            }
-            if (autoWalk)
-            {
-                transform.parent.GetComponent<CharacterModel>().body.GetComponent<CharacterMotor>().moveDirection = transform.parent.GetComponent<CharacterModel>().body.GetComponent<CharacterDirection>().forward * autoWalkSpeed;
+                if (overrideMoveSpeed)
+                {
+                    model.body.moveSpeed = autoWalkSpeed;
+                }
+                CharacterMotor motor = model.body.GetComponent<CharacterMotor>();
+                CharacterDirection direction = model.body.GetComponent<CharacterDirection>();
+                if (autoWalk && motor && direction)
+                {
+                    motor.moveDirection = direction.forward * autoWalkSpeed;
+                }
             }
         }
         if (h.health <= 0)
@@ -1527,9 +1593,9 @@ public class BoneMapper : MonoBehaviour
         {
             try
             {
-                if (smr2.bones[i].gameObject.GetComponent<ParentConstraint>())
+                if (smr2.bones[i].gameObject.GetComponent<EmoteConstraint>())
                 {
-                    smr2.bones[i].gameObject.GetComponent<ParentConstraint>().constraintActive = false;
+                    smr2.bones[i].gameObject.GetComponent<EmoteConstraint>().constraintActive = false;
                 }
             }
             catch (Exception)
@@ -1537,6 +1603,7 @@ public class BoneMapper : MonoBehaviour
                 break;
             }
         }
+        a1.enabled = true;
     }
     public void LockBones()
     {
@@ -1604,6 +1671,7 @@ public class BoneMapper : MonoBehaviour
         Transform RightLegIK = null;
         if (!jank)
         {
+            a1.enabled = false;
             for (int i = 0; i < smr2.bones.Length; i++)
             {
                 try
@@ -1616,15 +1684,15 @@ public class BoneMapper : MonoBehaviour
                     {
                         LeftLegIK = smr2.bones[i];
                     }
-                    if (smr2.bones[i].gameObject.GetComponent<ParentConstraint>() && !dontAnimateUs.Contains(smr2.bones[i].name))
+                    if (smr2.bones[i].gameObject.GetComponent<EmoteConstraint>() && !dontAnimateUs.Contains(smr2.bones[i].name))
                     {
                         //DebugClass.Log($"-{i}---------{smr2.bones[i].gameObject}");
-                        smr2.bones[i].gameObject.GetComponent<ParentConstraint>().constraintActive = true; //this is like, 99% of fps loss right here. Unfortunate
+                        smr2.bones[i].gameObject.GetComponent<EmoteConstraint>().constraintActive = true; //this is like, 99% of fps loss right here. Unfortunate
                     }
                     else if (dontAnimateUs.Contains(smr2.bones[i].name))
                     {
                         //DebugClass.Log($"dontanimateme-{i}---------{smr2.bones[i].gameObject}");
-                        smr2.bones[i].gameObject.GetComponent<ParentConstraint>().constraintActive = false;
+                        smr2.bones[i].gameObject.GetComponent<EmoteConstraint>().constraintActive = false;
                     }
                 }
                 catch (Exception e)
@@ -1634,22 +1702,22 @@ public class BoneMapper : MonoBehaviour
             }
             if (left && LeftLegIK)//we can leave ik for the legs
             {
-                if (LeftLegIK.gameObject.GetComponent<ParentConstraint>())
-                    LeftLegIK.gameObject.GetComponent<ParentConstraint>().constraintActive = false;
+                if (LeftLegIK.gameObject.GetComponent<EmoteConstraint>())
+                    LeftLegIK.gameObject.GetComponent<EmoteConstraint>().constraintActive = false;
                 foreach (var item in LeftLegIK.gameObject.GetComponentsInChildren<Transform>())
                 {
-                    if (item.gameObject.GetComponent<ParentConstraint>())
-                        item.gameObject.GetComponent<ParentConstraint>().constraintActive = false;
+                    if (item.gameObject.GetComponent<EmoteConstraint>())
+                        item.gameObject.GetComponent<EmoteConstraint>().constraintActive = false;
                 }
             }
             if (right && RightLegIK)
             {
-                if (RightLegIK.gameObject.GetComponent<ParentConstraint>())
-                    RightLegIK.gameObject.GetComponent<ParentConstraint>().constraintActive = false;
+                if (RightLegIK.gameObject.GetComponent<EmoteConstraint>())
+                    RightLegIK.gameObject.GetComponent<EmoteConstraint>().constraintActive = false;
                 foreach (var item in RightLegIK.gameObject.GetComponentsInChildren<Transform>())
                 {
-                    if (item.gameObject.GetComponent<ParentConstraint>())
-                        item.gameObject.GetComponent<ParentConstraint>().constraintActive = false;
+                    if (item.gameObject.GetComponent<EmoteConstraint>())
+                        item.gameObject.GetComponent<EmoteConstraint>().constraintActive = false;
                 }
             }
         }
