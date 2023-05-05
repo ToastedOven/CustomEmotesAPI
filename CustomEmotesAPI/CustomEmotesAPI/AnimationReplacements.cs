@@ -14,6 +14,11 @@ using UnityEngine.Networking;
 using R2API;
 using System.Collections;
 using R2API.Networking.Interfaces;
+using UnityEngine.UIElements;
+using System.Net.NetworkInformation;
+using System.Text;
+using IL.RoR2.Projectile;
+using RoR2.Projectile;
 
 [assembly: SecurityPermission(SecurityAction.RequestMinimum, SkipVerification = true)]
 internal static class AnimationReplacements
@@ -48,7 +53,7 @@ internal static class AnimationReplacements
                 }
                 if (item.gameObject.name == "Center")
                 {
-                    s.joy = item.gameObject.GetComponent<Image>();
+                    s.joy = item.gameObject.GetComponent<UnityEngine.UI.Image>();
                 }
                 if (item.gameObject.name == "CurrentEmote")
                 {
@@ -81,32 +86,170 @@ internal static class AnimationReplacements
     {
         Import("RoR2/Base/Brother/BrotherBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/brother.prefab");
         Import("RoR2/Base/ClayBruiser/ClayBruiserBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/templar.prefab");
-        DebugClass.Log("adding beetle");
-        Import("RoR2/Base/Beetle/BeetleBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/beetle_emoteskeleton.prefab", false);
-        DebugClass.Log("added beetle");
+        var fab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Beetle/BeetleBody.prefab").WaitForCompletion();
+        if (fab.GetComponentInChildren<SkinnedMeshRenderer>().bones.Length == 0)
+        {
+            List<Transform> t = new List<Transform>();
+            //this is the fucking stupid but it works (minus claws)
+            foreach (var item in fab.GetComponentsInChildren<Transform>())
+            {
+                if (!item.name.Contains("Hurtbox") && !item.name.Contains("BeetleBody") && !item.name.Contains("Mesh") && !item.name.Contains("mdl"))
+                {
+                    t.Add(item);
+                }
+            }
+            Transform temp = t[14];
+            t[14] = t[11];
+            t[11] = temp;
+            temp = t[15];
+            t[15] = t[12];
+            t[12] = temp;
+            temp = t[16];
+            t[16] = t[13];
+            t[13] = temp;
+            foreach (var item in fab.GetComponentsInChildren<SkinnedMeshRenderer>())
+            {
+                item.bones = t.ToArray();
+            }
+
+
+
+            var meshes = fab.GetComponentsInChildren<SkinnedMeshRenderer>();
+            meshes[0].sharedMesh = Assets.Load<Mesh>("@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/beetleMesh.mesh");
+
+
+            //var meshes = fab.GetComponentsInChildren<SkinnedMeshRenderer>();
+            //meshes[0].sharedMesh = Assets.Load<GameObject>("@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/beetle_emoteskeleton.prefab").GetComponentInChildren<SkinnedMeshRenderer>().sharedMesh;
+        }
+        Import("RoR2/Base/Beetle/BeetleBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/beetle_emoteskeleton.prefab");
         Import("RoR2/DLC1/AcidLarva/AcidLarvaBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/AcidLarva1.prefab");
         Import("RoR2/Base/Titan/TitanGoldBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/Aurelionite.prefab");
         Import("RoR2/Base/Beetle/BeetleGuardBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/Beetle guard.prefab");
         Import("RoR2/Base/Beetle/BeetleQueen2Body.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/beetle queen1.prefab");
-
         Import("RoR2/DLC1/ClayGrenadier/ClayGrenadierBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/claygrenadier.prefab");
         Import("RoR2/Base/Bison/BisonBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/bison.prefab");
         Import("RoR2/DLC1/FlyingVermin/FlyingVerminBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/flyingvermin1.prefab");
-        //Import("RoR2/DLC1/VoidJailer/VoidJailerBody.prefab", "@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/voidjailer2.prefab");
         Import("RoR2/Base/Bell/BellBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/brass contraption2.prefab");
+        Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Bell/BellBody.prefab").WaitForCompletion().GetComponentInChildren<BoneMapper>().enableAnimatorOnDeath = false;
         Import("RoR2/Base/Vulture/VultureBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/Vulture_emoteskeleton.prefab");
         Import("RoR2/DLC1/MajorAndMinorConstruct/MinorConstructBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/minorConstruct4.prefab");
-        //Import("", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/.prefab");
-        //Import("", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/.prefab");
-        //Import("", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/.prefab");
-        //Import("", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/.prefab");
-        //Import("", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/.prefab");
-        //Import("", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/.prefab");
+        Addressables.LoadAssetAsync<GameObject>("RoR2/DLC1/MajorAndMinorConstruct/MinorConstructBody.prefab").WaitForCompletion().GetComponentInChildren<BoneMapper>().transform.localPosition += new Vector3(0, 3, 0);
+
+        Import("RoR2/DLC1/VoidJailer/VoidJailerBody.prefab", "@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/voidjailer2.prefab");
+        Import("RoR2/DLC1/Vermin/VerminBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/vermin1.prefab");
+        Import("RoR2/Base/LemurianBruiser/LemurianBruiserBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/elderlemurian.prefab");
+        Import("RoR2/DLC1/Gup/GupBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/gup.prefab");
+        Import("RoR2/DLC1/Gup/GeepBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/geep.prefab");
+        Import("RoR2/DLC1/Gup/GipBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/gip.prefab");
+        Import("RoR2/Base/GreaterWisp/GreaterWispBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/greaterwisp.prefab");
+        Import("RoR2/Base/HermitCrab/HermitCrabBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/hermitcrab.prefab");
+        Import("RoR2/Base/Imp/ImpBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/imp.prefab");
+        Import("RoR2/Base/Jellyfish/JellyfishBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/jellyfish.prefab");
+        Import("RoR2/Base/Lemurian/LemurianBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/lemurian.prefab");
+        Import("RoR2/Base/Wisp/WispBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/lesserwisp.prefab");
+        Import("RoR2/Base/LunarExploder/LunarExploderBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/lunarexploder.prefab");
+        Import("RoR2/Base/LunarGolem/LunarGolemBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/lunargolem.prefab");
+        Import("RoR2/Base/LunarWisp/LunarWispBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/lunarwisp.prefab");
+        Import("RoR2/Base/MiniMushroom/MiniMushroomBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/minimushroom.prefab");
+        Import("RoR2/Base/Parent/ParentBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/Parent1.prefab");
+        Import("RoR2/Base/RoboBallBoss/RoboBallMiniBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/solusprobe.prefab");
+        Import("RoR2/Base/RoboBallBoss/RoboBallBossBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/soluscontrolunit.prefab");
+        Import("RoR2/Base/RoboBallBoss/SuperRoboBallBossBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/alloyworshipunit.prefab");
+        Import("RoR2/Base/Golem/GolemBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/stonegolem.prefab");
+        Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Golem/GolemBody.prefab").WaitForCompletion().GetComponentInChildren<PrintController>().maxPrintHeight = 15;
+        Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Golem/GolemBody.prefab").WaitForCompletion().GetComponentInChildren<BoneMapper>().transform.localPosition -= new Vector3(0, .8f, 0);
+        Import("RoR2/DLC1/VoidBarnacle/VoidBarnacleBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/voidbarnacle.prefab");
+        Import("RoR2/Base/Nullifier/NullifierBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/voidreaver.prefab");
+        Import("RoR2/Base/Grandparent/GrandParentBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/grandparent.prefab");
+        Import("RoR2/Base/ImpBoss/ImpBossBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/impoverlord.prefab");
+        Import("RoR2/DLC1/EliteVoid/VoidInfestorBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/voidinfestor.prefab");
+        Import("RoR2/Base/Scav/ScavBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/Scavenger.prefab");
+        Import("RoR2/Base/Titan/TitanBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/stonetitan.prefab");
+        Import("RoR2/DLC1/VoidMegaCrab/VoidMegaCrabBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/pussydevastator.prefab");
+        Import("RoR2/DLC1/MajorAndMinorConstruct/MegaConstructBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/megaconstruct.prefab");
+        Import("RoR2/Base/Vagrant/VagrantBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/vagrant.prefab");
+        Import("RoR2/Base/MagmaWorm/MagmaWormBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/worm1.prefab");
+        Import("RoR2/Base/ElectricWorm/ElectricWormBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/worm2.prefab");
+        Import("RoR2/Base/Gravekeeper/GravekeeperBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/grovetender.prefab");
+        Import("RoR2/Base/ClayBoss/ClayBossBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/dunestrider.prefab");
+        Addressables.LoadAssetAsync<GameObject>("RoR2/Base/ClayBoss/ClayBossBody.prefab").WaitForCompletion().GetComponentInChildren<BoneMapper>().transform.localPosition += new Vector3(0, 5, 0);
+        Import("RoR2/DLC1/VoidRaidCrab/MiniVoidRaidCrabBodyPhase1.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/voidling1.prefab");
+        Import("RoR2/DLC1/VoidRaidCrab/MiniVoidRaidCrabBodyPhase2.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/voidling2.prefab");
+        Import("RoR2/DLC1/VoidRaidCrab/MiniVoidRaidCrabBodyPhase3.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/voidling3.prefab");
+        Import("RoR2/Base/Engi/EngiWalkerTurretBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/notenemies/walkingturret.prefab");
+        Addressables.LoadAssetAsync<GameObject>("RoR2/Base/ClayBoss/ClayBossBody.prefab").WaitForCompletion().GetComponentInChildren<BoneMapper>().scale = .9f;
+        Import("RoR2/Base/Engi/EngiTurretBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/notenemies/turret.prefab");
+
+
+        DebugBones("RoR2/Base/Drones/EmergencyDroneBody.prefab");
+        DebugBones("RoR2/Base/Drones/EquipmentDroneBody.prefab");
+        DebugBones("RoR2/Base/Drones/Drone1Body.prefab");
+        DebugBones("RoR2/Base/Drones/Drone2Body.prefab");
+        DebugBones("RoR2/Base/Drones/Turret1Body.prefab");
+        DebugBones("RoR2/Base/Drones/FlameDroneBody.prefab");
+        DebugBones("RoR2/Base/Drones/MissileDroneBody.prefab");
+        DebugBones("RoR2/Base/Drones/MegaDroneBody.prefab");
+        DebugBones("RoR2/DLC1/DroneCommander/DroneCommanderBody.prefab");
+        DebugBones("RoR2/Base/Drones/BackupDroneBody.prefab");
+
+
+        Import("RoR2/Base/Shopkeeper/ShopkeeperBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/notenemies/newt.prefab");
+        Import("RoR2/Base/Drones/BackupDroneBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/notenemies/backupdrone.prefab");
+        Import("RoR2/Base/Drones/Turret1Body.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/notenemies/buyableturret.prefab");
+        Import("RoR2/DLC1/DroneCommander/DroneCommanderBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/notenemies/dronecommander.prefab");
+        Import("RoR2/Base/Drones/EmergencyDroneBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/notenemies/emergency.prefab");
+        Import("RoR2/Base/Drones/EquipmentDroneBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/notenemies/equipmentdrone.prefab");
+        Import("RoR2/Base/Drones/FlameDroneBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/notenemies/flamedrone.prefab");
+        Import("RoR2/Base/Drones/Drone1Body.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/notenemies/gunnerdrone.prefab");
+        Import("RoR2/Base/Drones/Drone2Body.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/notenemies/healdrone.prefab");
+        Import("RoR2/Base/Drones/MegaDroneBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/notenemies/megadrone.prefab");
+        Import("RoR2/Base/Drones/MissileDroneBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/notenemies/missiledrone.prefab");
+
+
+
+        Import("RoR2/Base/Nullifier/NullifierAllyBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/voidreaverfrien.prefab");
+        Import("RoR2/Base/BeetleGland/BeetleGuardAllyBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/Beetle guardfrien.prefab");
+        Import("RoR2/DLC1/VoidJailer/VoidJailerAllyBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/voidjailer2frien.prefab");
+        Import("RoR2/DLC1/VoidMegaCrab/VoidMegaCrabAllyBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/pussydevastatorfrien.prefab");
+        //Import("", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/minorConstruct4frien.prefab");
+        Import("RoR2/Base/RoboBallBuddy/RoboBallGreenBuddyBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/solusprobefrien1.prefab");
+        Import("RoR2/Base/RoboBallBuddy/RoboBallRedBuddyBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/solusprobefrien2.prefab");
+        //Import("", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/notenemies/.prefab");
+        //Import("", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/notenemies/.prefab");
+        //Import("", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/notenemies/.prefab");
         //CustomEmotesAPI.ImportArmature(Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Beetle/BeetleBody.prefab").WaitForCompletion(), Assets.Load<GameObject>("@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/beetle.prefab"));
     }
-    internal static void Import(string prefab, string skeleton, bool _hidemeshes = true)
+    public static void DebugBones(string resource, int pos = 0)
     {
-        CustomEmotesAPI.ImportArmature(Addressables.LoadAssetAsync<GameObject>(prefab).WaitForCompletion(), Assets.Load<GameObject>(skeleton), hideMeshes: _hidemeshes);
+        StringBuilder sb = new StringBuilder();
+        var fab = Addressables.LoadAssetAsync<GameObject>(resource).WaitForCompletion();
+        sb.Append($"{fab.ToString()}\n");
+        var meshes = fab.GetComponentsInChildren<SkinnedMeshRenderer>();
+        sb.Append($"rendererererer: {meshes[pos]}\n");
+        sb.Append($"bone count: {meshes[pos].bones.Length}\n");
+        sb.Append($"mesh count: {meshes.Length}\n");
+        sb.Append($"root bone: {meshes[pos].rootBone.name}\n");
+        sb.Append($"{resource}:\n");
+        if (meshes[pos].bones.Length == 0)
+        {
+            sb.Append("No bones");
+        }
+        else
+        {
+            sb.Append("[");
+            foreach (var bone in meshes[pos].bones)
+            {
+                sb.Append($"'{bone.name}', ");
+            }
+            sb.Remove(sb.Length - 2, 2);
+            sb.Append("]");
+        }
+        sb.Append("\n\n");
+        DebugClass.Log(sb.ToString());
+    }
+    internal static void Import(string prefab, string skeleton, bool hidemesh = true)
+    {
+        CustomEmotesAPI.ImportArmature(Addressables.LoadAssetAsync<GameObject>(prefab).WaitForCompletion(), Assets.Load<GameObject>(skeleton), hideMeshes: hidemesh);
     }
     internal static void ChangeAnims()
     {
@@ -303,7 +446,7 @@ internal static class AnimationReplacements
                     }
                     else if (item.bodyPrefab.name == "VoidJailerSurvivor" && Settings.VoidJailer.Value)
                     {
-                        var skele = Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/voidjailer2.prefab");
+                        var skele = Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/voidjailer_emoteskeleton.prefab");
                         CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
                     }
 
@@ -361,9 +504,18 @@ internal static class AnimationReplacements
             DebugClass.Log($"Had trouble while hiding meshes: {e}");
             throw;
         }
+        Transform modelTransform;
+        if (bodyPrefab.GetComponent<ModelLocator>())
+        {
+            modelTransform = bodyPrefab.GetComponent<ModelLocator>().modelTransform;
+        }
+        else
+        {
+            modelTransform = bodyPrefab.GetComponentInChildren<Animator>().transform;
+        }
         try
         {
-            animcontroller.transform.parent = bodyPrefab.GetComponent<ModelLocator>().modelTransform;
+            animcontroller.transform.parent = modelTransform;
             animcontroller.transform.localPosition = Vector3.zero;
             animcontroller.transform.localEulerAngles = Vector3.zero;
             animcontroller.transform.localScale = Vector3.one;
@@ -387,49 +539,45 @@ internal static class AnimationReplacements
         }
         try
         {
-            smr2 = bodyPrefab.GetComponent<ModelLocator>().modelTransform.GetComponentsInChildren<SkinnedMeshRenderer>()[pos];
+            smr2 = modelTransform.GetComponentsInChildren<SkinnedMeshRenderer>()[pos];
         }
         catch (Exception e)
         {
             DebugClass.Log($"Had trouble setting the original skeleton's skinned mesh renderer: {e}");
             throw;
         }
-        if (animcontroller.name != "beetle_emoteskeleton")
+        try
         {
-            try
+            int matchingBones = 0;
+            while (true)
             {
-                int matchingBones = 0;
-                while (true)
+                foreach (var smr1bone in smr1.bones) //smr is SkinnedMeshRenderer
                 {
-                    foreach (var smr1bone in smr1.bones) //smr is SkinnedMeshRenderer
+                    foreach (var smr2bone in smr2.bones)
                     {
-                        foreach (var smr2bone in smr2.bones)
+                        if (smr1bone.name == smr2bone.name)
                         {
-                            if (smr1bone.name == smr2bone.name)
-                            {
-                                matchingBones++;
-                            }
+                            matchingBones++;
                         }
                     }
-                    if (matchingBones < 5 && pos + 1 < bodyPrefab.GetComponent<ModelLocator>().modelTransform.GetComponentsInChildren<SkinnedMeshRenderer>().Length)
-                    {
-                        pos++;
-                        smr2 = bodyPrefab.GetComponent<ModelLocator>().modelTransform.GetComponentsInChildren<SkinnedMeshRenderer>()[pos];
-                        matchingBones = 0;
-                    }
-                    else
-                    {
-                        break;
-                    }
+                }
+                if (matchingBones < 1 && pos + 1 < modelTransform.GetComponentsInChildren<SkinnedMeshRenderer>().Length)
+                {
+                    pos++;
+                    smr2 = modelTransform.GetComponentsInChildren<SkinnedMeshRenderer>()[pos];
+                    matchingBones = 0;
+                }
+                else
+                {
+                    break;
                 }
             }
-            catch (Exception e)
-            {
-                DebugClass.Log($"Had issue while checking matching bones: {e}");
-                throw;
-            }
         }
-            
+        catch (Exception e)
+        {
+            DebugClass.Log($"Had issue while checking matching bones: {e}");
+            throw;
+        }
         var test = animcontroller.AddComponent<BoneMapper>();
         try
         {
@@ -437,7 +585,7 @@ internal static class AnimationReplacements
             test.smr1 = smr1;
             test.smr2 = smr2;
             test.bodyPrefab = bodyPrefab;
-            test.a1 = bodyPrefab.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<Animator>();
+            test.a1 = modelTransform.GetComponentInChildren<Animator>();
             test.a2 = animcontroller.GetComponentInChildren<Animator>();
         }
         catch (Exception e)
@@ -452,7 +600,7 @@ internal static class AnimationReplacements
             float currScale = Vector3.Distance(animcontroller.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.Head).position, animcontroller.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.LeftFoot).position);
             test.scale = currScale / banditScale;
             test.h = bodyPrefab.GetComponentInChildren<HealthComponent>();
-            test.model = bodyPrefab.GetComponent<ModelLocator>().modelTransform.gameObject;
+            test.model = modelTransform.gameObject;
         }
         catch (Exception e)
         {
@@ -485,15 +633,15 @@ public struct JoinSpot
 public class CustomAnimationClip : MonoBehaviour
 {
     public AnimationClip[] clip, secondaryClip; //DONT SUPPORT MULTI CLIP ANIMATIONS TO SYNC     //but why not? how hard could it be, I'm sure I left that note for a reason....  //it was for a reason, but it works now
-    internal bool looping;
-    internal string wwiseEvent;
-    internal bool syncronizeAudio;
-    internal List<HumanBodyBones> soloIgnoredBones;
-    internal List<HumanBodyBones> rootIgnoredBones;
-    internal bool dimAudioWhenClose;
-    internal bool stopOnAttack;
-    internal bool stopOnMove;
-    internal bool visibility;
+    public bool looping;
+    public string wwiseEvent;
+    public bool syncronizeAudio;
+    public List<HumanBodyBones> soloIgnoredBones;
+    public List<HumanBodyBones> rootIgnoredBones;
+    public bool dimAudioWhenClose;
+    public bool stopOnAttack;
+    public bool stopOnMove;
+    public bool visibility;
     public int startPref, joinPref;
     public JoinSpot[] joinSpots;
     public bool useSafePositionReset;
@@ -502,7 +650,7 @@ public class CustomAnimationClip : MonoBehaviour
     public Action<BoneMapper> customPostEventCodeNoSync;
 
 
-    internal bool syncronizeAnimation;
+    public bool syncronizeAnimation;
     public int syncPos;
     public static List<float> syncTimer = new List<float>();
     public static List<int> syncPlayerCount = new List<int>();
@@ -656,6 +804,7 @@ public class BoneMapper : MonoBehaviour
     internal bool useSafePositionReset = false;
     public List<EmoteLocation> emoteLocations = new List<EmoteLocation>();
     List<string> dontAnimateUs = new List<string>();
+    public bool enableAnimatorOnDeath = true;
 
     public void PlayAnim(string s, int pos, int eventNum)
     {
@@ -1103,36 +1252,21 @@ public class BoneMapper : MonoBehaviour
             //        }
             //    }
             //}
-            if (smr1.transform.parent.name == "beetle_emoteskeleton")
+            for (int i = 0; i < smr1.bones.Length; i++)
             {
-                List<Transform> t = new List<Transform>();
-                foreach (var item in bodyPrefab.GetComponentsInChildren<Transform>())
+                for (int x = 0; x < smr2.bones.Length; x++)
                 {
-                    if (item.name == "beetle_emoteskeleton")
+                    //DebugClass.Log($"--------------  {smr2bone.gameObject.name}   {smr1bone.gameObject.name}      {smr2bone.GetComponent<ParentConstraint>()}");
+                    if (smr1.bones[i].name == smr2.bones[x].name/* + "_CustomEmotesAPIBone"*/ /*smr2.bones[x].name != "head_jnt" && smr2.bones[x].name != "head_jnt_end" && smr2.bones[x].name != "arm_left_jnt" && smr2.bones[x].name != "clavicle_right_jnt" && smr2.bones[x].name != "spine_04_jnt"*/)
                     {
-                        break;
-                    }
-                    if (!item.name.Contains("Hurtbox") && !item.name.Contains("BeetleBody") && !item.name.Contains("Mesh") && !item.name.Contains("mdl"))
-                    {
-                        t.Add(item);
+                        var s = new ConstraintSource();
+                        s.sourceTransform = smr1.bones[i];
+                        s.weight = 1;
+                        //DebugClass.Log($"{smr2.name}--- i is equal to {x}  ------ {smr2.bones[x].name}");
+                        smr2.bones[x].gameObject.AddComponent<EmoteConstraint>().AddSource(ref smr2.bones[x], ref smr1.bones[i]);
+                        //smr1bone.name = smr1bone.name.Remove(smr1bone.name.Length - "_CustomEmotesAPIBone".Length);
                     }
                 }
-                Transform temp = t[14];
-                t[14] = t[11];
-                t[11] = temp;
-                temp = t[15];
-                t[15] = t[12];
-                t[12] = temp;
-                temp = t[16];
-                t[16] = t[13];
-                t[13] = temp;
-
-                DebugClass.Log($"doing fancy assignment for beetle");
-                AssignBones(smr1.bones, t.ToArray());
-            }
-            else
-            {
-                AssignBones(smr1.bones, smr2.bones);
             }
         }
         if (jank)
@@ -1144,7 +1278,7 @@ public class BoneMapper : MonoBehaviour
                     if (smr2.bones[i].gameObject.GetComponent<EmoteConstraint>())
                     {
                         //DebugClass.Log($"-{i}---------{smr2.bones[i].gameObject}");
-                        smr2.bones[i].gameObject.GetComponent<EmoteConstraint>().constraintActive = true;
+                        smr2.bones[i].gameObject.GetComponent<EmoteConstraint>().ActivateConstraints();
                     }
                 }
                 catch (Exception e)
@@ -1153,20 +1287,6 @@ public class BoneMapper : MonoBehaviour
                 }
             }
             //a1.enabled = false;
-        }
-    }
-    internal void AssignBones(Transform[] boneArray1, Transform[] boneArray2)
-    {
-        for (int i = 0; i < boneArray1.Length; i++)
-        {
-            for (int x = 0; x < boneArray2.Length; x++)
-            {
-                DebugClass.Log($"--------------  {boneArray1[i].gameObject.name}   {boneArray2[x].gameObject.name}");
-                if (boneArray1[i].name == boneArray2[x].name/* + "_CustomEmotesAPIBone"*/ /*boneArray2[x].name != "head_jnt" && boneArray2[x].name != "head_jnt_end" && boneArray2[x].name != "arm_left_jnt" && boneArray2[x].name != "clavicle_right_jnt" && boneArray2[x].name != "spine_04_jnt"*/)
-                {
-                    boneArray2[x].gameObject.AddComponent<EmoteConstraint>().AddSource(ref boneArray2[x], ref boneArray1[i]);
-                }
-            }
         }
     }
     public GameObject parentGameObject;
@@ -1332,7 +1452,7 @@ public class BoneMapper : MonoBehaviour
             {
                 if (a2.enabled)
                 {
-                    if (smr2.transform.parent.gameObject.name == "mdlVoidSurvivor" || smr2.transform.parent.gameObject.name == "mdlMage" || smr2.transform.parent.gameObject.name == "mdlJinx" || smr2.transform.parent.gameObject.name.StartsWith("mdlHouse") || smr2.transform.parent.gameObject.name.StartsWith("mdlVoidJailer"))
+                    if (smr2.transform.parent.gameObject.name == "mdlVoidSurvivor" || smr2.transform.parent.gameObject.name == "mdlMage" || smr2.transform.parent.gameObject.name == "mdlJinx" || smr2.transform.parent.gameObject.name.StartsWith("mdlHouse"))
                     {
                         smr2.transform.parent.gameObject.SetActive(false);
                         smr2.transform.parent.gameObject.SetActive(true);
@@ -1412,10 +1532,13 @@ public class BoneMapper : MonoBehaviour
                 }
             }
         }
-        if (h.health <= 0)
+        if (h)
         {
-            UnlockBones();
-            GameObject.Destroy(gameObject);
+            if (h.health <= 0)
+            {
+                UnlockBones(enableAnimatorOnDeath);
+                GameObject.Destroy(gameObject);
+            }
         }
     }
     void WorldPropAndParent()
@@ -1587,15 +1710,16 @@ public class BoneMapper : MonoBehaviour
             BoneMapper.allMappers.Remove(this);
         }
     }
-    public void UnlockBones()
+    public void UnlockBones(bool animatorEnabled = true)
     {
+        //CustomEmotesAPI.instance.wackActive(this);
         for (int i = 0; i < smr2.bones.Length; i++)
         {
             try
             {
                 if (smr2.bones[i].gameObject.GetComponent<EmoteConstraint>())
                 {
-                    smr2.bones[i].gameObject.GetComponent<EmoteConstraint>().constraintActive = false;
+                    smr2.bones[i].gameObject.GetComponent<EmoteConstraint>().DeactivateConstraints();
                 }
             }
             catch (Exception)
@@ -1603,7 +1727,7 @@ public class BoneMapper : MonoBehaviour
                 break;
             }
         }
-        a1.enabled = true;
+        a1.enabled = animatorEnabled;
     }
     public void LockBones()
     {
@@ -1687,12 +1811,12 @@ public class BoneMapper : MonoBehaviour
                     if (smr2.bones[i].gameObject.GetComponent<EmoteConstraint>() && !dontAnimateUs.Contains(smr2.bones[i].name))
                     {
                         //DebugClass.Log($"-{i}---------{smr2.bones[i].gameObject}");
-                        smr2.bones[i].gameObject.GetComponent<EmoteConstraint>().constraintActive = true; //this is like, 99% of fps loss right here. Unfortunate
+                        smr2.bones[i].gameObject.GetComponent<EmoteConstraint>().ActivateConstraints(); //this is like, 99% of fps loss right here. Unfortunate
                     }
                     else if (dontAnimateUs.Contains(smr2.bones[i].name))
                     {
                         //DebugClass.Log($"dontanimateme-{i}---------{smr2.bones[i].gameObject}");
-                        smr2.bones[i].gameObject.GetComponent<EmoteConstraint>().constraintActive = false;
+                        smr2.bones[i].gameObject.GetComponent<EmoteConstraint>().DeactivateConstraints();
                     }
                 }
                 catch (Exception e)
@@ -1703,21 +1827,21 @@ public class BoneMapper : MonoBehaviour
             if (left && LeftLegIK)//we can leave ik for the legs
             {
                 if (LeftLegIK.gameObject.GetComponent<EmoteConstraint>())
-                    LeftLegIK.gameObject.GetComponent<EmoteConstraint>().constraintActive = false;
+                    LeftLegIK.gameObject.GetComponent<EmoteConstraint>().DeactivateConstraints();
                 foreach (var item in LeftLegIK.gameObject.GetComponentsInChildren<Transform>())
                 {
                     if (item.gameObject.GetComponent<EmoteConstraint>())
-                        item.gameObject.GetComponent<EmoteConstraint>().constraintActive = false;
+                        item.gameObject.GetComponent<EmoteConstraint>().DeactivateConstraints();
                 }
             }
             if (right && RightLegIK)
             {
                 if (RightLegIK.gameObject.GetComponent<EmoteConstraint>())
-                    RightLegIK.gameObject.GetComponent<EmoteConstraint>().constraintActive = false;
+                    RightLegIK.gameObject.GetComponent<EmoteConstraint>().DeactivateConstraints();
                 foreach (var item in RightLegIK.gameObject.GetComponentsInChildren<Transform>())
                 {
                     if (item.gameObject.GetComponent<EmoteConstraint>())
-                        item.gameObject.GetComponent<EmoteConstraint>().constraintActive = false;
+                        item.gameObject.GetComponent<EmoteConstraint>().DeactivateConstraints();
                 }
             }
         }

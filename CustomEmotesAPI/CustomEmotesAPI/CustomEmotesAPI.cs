@@ -16,6 +16,7 @@ using System.Globalization;
 using BepInEx.Configuration;
 using UnityEngine.AddressableAssets;
 using TMPro;
+using System.Collections;
 
 namespace EmotesAPI
 {
@@ -454,7 +455,7 @@ namespace EmotesAPI
                 {
                     mapper.transform.parent.Find("ClayBruiserCannonMesh").gameObject.SetActive(false);
                 }
-                if (mapper.transform.name == "PlayableScavenger")
+                if (mapper.transform.name == "PlayableScavenger" || mapper.transform.name == "Scavenger")
                 {
                     mapper.transform.parent.GetComponent<ChildLocator>().FindChild("Weapon").gameObject.SetActive(false);
                 }
@@ -482,7 +483,7 @@ namespace EmotesAPI
                 {
                     mapper.transform.parent.Find("ClayBruiserCannonMesh").gameObject.SetActive(true);
                 }
-                if (mapper.transform.name == "PlayableScavenger")
+                if (mapper.transform.name == "PlayableScavenger" || mapper.transform.name == "Scavenger")
                 {
                     mapper.transform.parent.GetComponent<ChildLocator>().FindChild("Weapon").gameObject.SetActive(true);
                 }
@@ -617,6 +618,20 @@ namespace EmotesAPI
                     CustomAnimationClip.syncTimer[i] += Time.deltaTime;
                 }
             }
+        }
+        internal void wackActive(BoneMapper mapper)
+        {
+            StartCoroutine(wackActive2(mapper));
+        }
+        internal IEnumerator wackActive2(BoneMapper mapper)
+        {
+            DebugClass.Log($"{mapper.a1.gameObject.name}");
+            mapper.a1.gameObject.SetActive(false);
+            yield return new WaitForSeconds(5f);
+            mapper.a1.enabled = true;
+            mapper.a1.gameObject.SetActive(true);
+            DebugClass.Log($"reenabling");
+
         }
     }
 }
