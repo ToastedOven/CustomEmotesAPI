@@ -85,6 +85,7 @@ internal static class AnimationReplacements
     internal static void EnemyArmatures()
     {
         Import("RoR2/Base/Brother/BrotherBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/brother.prefab");
+        Import("RoR2/Base/Brother/BrotherHurtBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/brotherhurt.prefab");
         Import("RoR2/Base/ClayBruiser/ClayBruiserBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/templar.prefab");
         var fab = Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Beetle/BeetleBody.prefab").WaitForCompletion();
         if (fab.GetComponentInChildren<SkinnedMeshRenderer>().bones.Length == 0)
@@ -123,7 +124,10 @@ internal static class AnimationReplacements
         }
         Import("RoR2/Base/Beetle/BeetleBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/beetle_emoteskeleton.prefab");
         Import("RoR2/DLC1/AcidLarva/AcidLarvaBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/AcidLarva1.prefab");
+        Addressables.LoadAssetAsync<GameObject>("RoR2/DLC1/AcidLarva/AcidLarvaBody.prefab").WaitForCompletion().GetComponentInChildren<BoneMapper>().scale = .6f;
         Import("RoR2/Base/Titan/TitanGoldBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/Aurelionite.prefab");
+        Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Titan/TitanGoldBody.prefab").WaitForCompletion().GetComponentInChildren<BoneMapper>().scale = 5.7f;
+
         Import("RoR2/Base/Beetle/BeetleGuardBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/Beetle guard.prefab");
         Import("RoR2/Base/Beetle/BeetleQueen2Body.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/beetle queen1.prefab");
         Import("RoR2/DLC1/ClayGrenadier/ClayGrenadierBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/claygrenadier.prefab");
@@ -134,7 +138,6 @@ internal static class AnimationReplacements
         Import("RoR2/Base/Vulture/VultureBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/Vulture_emoteskeleton.prefab");
         Import("RoR2/DLC1/MajorAndMinorConstruct/MinorConstructBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/minorConstruct4.prefab");
         Addressables.LoadAssetAsync<GameObject>("RoR2/DLC1/MajorAndMinorConstruct/MinorConstructBody.prefab").WaitForCompletion().GetComponentInChildren<BoneMapper>().transform.localPosition += new Vector3(0, 3, 0);
-
         Import("RoR2/DLC1/VoidJailer/VoidJailerBody.prefab", "@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/voidjailer2.prefab");
         Import("RoR2/DLC1/Vermin/VerminBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/vermin1.prefab");
         Import("RoR2/Base/LemurianBruiser/LemurianBruiserBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/elderlemurian.prefab");
@@ -143,15 +146,22 @@ internal static class AnimationReplacements
         Import("RoR2/DLC1/Gup/GipBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/gip.prefab");
         Import("RoR2/Base/GreaterWisp/GreaterWispBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/greaterwisp.prefab");
         Import("RoR2/Base/HermitCrab/HermitCrabBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/hermitcrab.prefab");
+        Addressables.LoadAssetAsync<GameObject>("RoR2/Base/HermitCrab/HermitCrabBody.prefab").WaitForCompletion().GetComponentInChildren<BoneMapper>().scale = 1.3f;
+
         Import("RoR2/Base/Imp/ImpBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/imp.prefab");
         Import("RoR2/Base/Jellyfish/JellyfishBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/jellyfish.prefab");
         Import("RoR2/Base/Lemurian/LemurianBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/lemurian.prefab");
         Import("RoR2/Base/Wisp/WispBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/lesserwisp.prefab");
+        Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Wisp/WispBody.prefab").WaitForCompletion().GetComponentInChildren<BoneMapper>().scale = .8f;
         Import("RoR2/Base/LunarExploder/LunarExploderBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/lunarexploder.prefab");
+        Addressables.LoadAssetAsync<GameObject>("RoR2/Base/LunarExploder/LunarExploderBody.prefab").WaitForCompletion().GetComponentInChildren<BoneMapper>().scale = 2f;
         Import("RoR2/Base/LunarGolem/LunarGolemBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/lunargolem.prefab");
+        Addressables.LoadAssetAsync<GameObject>("RoR2/Base/LunarGolem/LunarGolemBody.prefab").WaitForCompletion().GetComponentInChildren<BoneMapper>().scale = 5f;
         Import("RoR2/Base/LunarWisp/LunarWispBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/lunarwisp.prefab");
+        Addressables.LoadAssetAsync<GameObject>("RoR2/Base/LunarWisp/LunarWispBody.prefab").WaitForCompletion().GetComponentInChildren<BoneMapper>().scale = 2f;
         Import("RoR2/Base/MiniMushroom/MiniMushroomBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/minimushroom.prefab");
         Import("RoR2/Base/Parent/ParentBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/Parent1.prefab");
+        Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Parent/ParentBody.prefab").WaitForCompletion().GetComponentInChildren<BoneMapper>().scale = 5f;
         Import("RoR2/Base/RoboBallBoss/RoboBallMiniBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/solusprobe.prefab");
         Import("RoR2/Base/RoboBallBoss/RoboBallBossBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/soluscontrolunit.prefab");
         Import("RoR2/Base/RoboBallBoss/SuperRoboBallBossBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/alloyworshipunit.prefab");
@@ -160,39 +170,34 @@ internal static class AnimationReplacements
         Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Golem/GolemBody.prefab").WaitForCompletion().GetComponentInChildren<BoneMapper>().transform.localPosition -= new Vector3(0, .8f, 0);
         Import("RoR2/DLC1/VoidBarnacle/VoidBarnacleBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/voidbarnacle.prefab");
         Import("RoR2/Base/Nullifier/NullifierBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/voidreaver.prefab");
+        Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Nullifier/NullifierBody.prefab").WaitForCompletion().GetComponentInChildren<BoneMapper>().scale = 4.8f;
         Import("RoR2/Base/Grandparent/GrandParentBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/grandparent.prefab");
         Import("RoR2/Base/ImpBoss/ImpBossBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/impoverlord.prefab");
         Import("RoR2/DLC1/EliteVoid/VoidInfestorBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/voidinfestor.prefab");
         Import("RoR2/Base/Scav/ScavBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/Scavenger.prefab");
+        Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Scav/ScavBody.prefab").WaitForCompletion().GetComponentInChildren<BoneMapper>().scale = 3.8f;
+
         Import("RoR2/Base/Titan/TitanBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/stonetitan.prefab");
+        Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Titan/TitanBody.prefab").WaitForCompletion().GetComponentInChildren<BoneMapper>().scale = 5.7f;
         Import("RoR2/DLC1/VoidMegaCrab/VoidMegaCrabBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/pussydevastator.prefab");
+        Addressables.LoadAssetAsync<GameObject>("RoR2/DLC1/VoidMegaCrab/VoidMegaCrabBody.prefab").WaitForCompletion().GetComponentInChildren<BoneMapper>().scale = 7f;
+
         Import("RoR2/DLC1/MajorAndMinorConstruct/MegaConstructBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/megaconstruct.prefab");
         Import("RoR2/Base/Vagrant/VagrantBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/vagrant.prefab");
         Import("RoR2/Base/MagmaWorm/MagmaWormBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/worm1.prefab");
         Import("RoR2/Base/ElectricWorm/ElectricWormBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/worm2.prefab");
         Import("RoR2/Base/Gravekeeper/GravekeeperBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/grovetender.prefab");
+        Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Gravekeeper/GravekeeperBody.prefab").WaitForCompletion().GetComponentInChildren<BoneMapper>().scale = 5.9f;
+
         Import("RoR2/Base/ClayBoss/ClayBossBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/dunestrider.prefab");
         Addressables.LoadAssetAsync<GameObject>("RoR2/Base/ClayBoss/ClayBossBody.prefab").WaitForCompletion().GetComponentInChildren<BoneMapper>().transform.localPosition += new Vector3(0, 5, 0);
+        Addressables.LoadAssetAsync<GameObject>("RoR2/Base/ClayBoss/ClayBossBody.prefab").WaitForCompletion().GetComponentInChildren<BoneMapper>().scale = 10f;
         Import("RoR2/DLC1/VoidRaidCrab/MiniVoidRaidCrabBodyPhase1.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/voidling1.prefab");
         Import("RoR2/DLC1/VoidRaidCrab/MiniVoidRaidCrabBodyPhase2.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/voidling2.prefab");
         Import("RoR2/DLC1/VoidRaidCrab/MiniVoidRaidCrabBodyPhase3.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/voidling3.prefab");
         Import("RoR2/Base/Engi/EngiWalkerTurretBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/notenemies/walkingturret.prefab");
         Addressables.LoadAssetAsync<GameObject>("RoR2/Base/ClayBoss/ClayBossBody.prefab").WaitForCompletion().GetComponentInChildren<BoneMapper>().scale = .9f;
         Import("RoR2/Base/Engi/EngiTurretBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/notenemies/turret.prefab");
-
-
-        DebugBones("RoR2/Base/Drones/EmergencyDroneBody.prefab");
-        DebugBones("RoR2/Base/Drones/EquipmentDroneBody.prefab");
-        DebugBones("RoR2/Base/Drones/Drone1Body.prefab");
-        DebugBones("RoR2/Base/Drones/Drone2Body.prefab");
-        DebugBones("RoR2/Base/Drones/Turret1Body.prefab");
-        DebugBones("RoR2/Base/Drones/FlameDroneBody.prefab");
-        DebugBones("RoR2/Base/Drones/MissileDroneBody.prefab");
-        DebugBones("RoR2/Base/Drones/MegaDroneBody.prefab");
-        DebugBones("RoR2/DLC1/DroneCommander/DroneCommanderBody.prefab");
-        DebugBones("RoR2/Base/Drones/BackupDroneBody.prefab");
-
-
         Import("RoR2/Base/Shopkeeper/ShopkeeperBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/notenemies/newt.prefab");
         Import("RoR2/Base/Drones/BackupDroneBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/notenemies/backupdrone.prefab");
         Import("RoR2/Base/Drones/Turret1Body.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/notenemies/buyableturret.prefab");
@@ -204,20 +209,18 @@ internal static class AnimationReplacements
         Import("RoR2/Base/Drones/Drone2Body.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/notenemies/healdrone.prefab");
         Import("RoR2/Base/Drones/MegaDroneBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/notenemies/megadrone.prefab");
         Import("RoR2/Base/Drones/MissileDroneBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/notenemies/missiledrone.prefab");
-
-
-
         Import("RoR2/Base/Nullifier/NullifierAllyBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/voidreaverfrien.prefab");
         Import("RoR2/Base/BeetleGland/BeetleGuardAllyBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/Beetle guardfrien.prefab");
         Import("RoR2/DLC1/VoidJailer/VoidJailerAllyBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/voidjailer2frien.prefab");
         Import("RoR2/DLC1/VoidMegaCrab/VoidMegaCrabAllyBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/pussydevastatorfrien.prefab");
+        Addressables.LoadAssetAsync<GameObject>("RoR2/DLC1/VoidMegaCrab/VoidMegaCrabAllyBody.prefab").WaitForCompletion().GetComponentInChildren<BoneMapper>().scale = 7f;
+
         //Import("", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/minorConstruct4frien.prefab");
         Import("RoR2/Base/RoboBallBuddy/RoboBallGreenBuddyBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/solusprobefrien1.prefab");
         Import("RoR2/Base/RoboBallBuddy/RoboBallRedBuddyBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/solusprobefrien2.prefab");
         //Import("", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/notenemies/.prefab");
         //Import("", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/notenemies/.prefab");
         //Import("", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/notenemies/.prefab");
-        //CustomEmotesAPI.ImportArmature(Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Beetle/BeetleBody.prefab").WaitForCompletion(), Assets.Load<GameObject>("@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/beetle.prefab"));
     }
     public static void DebugBones(string resource, int pos = 0)
     {
@@ -249,7 +252,8 @@ internal static class AnimationReplacements
     }
     internal static void Import(string prefab, string skeleton, bool hidemesh = true)
     {
-        CustomEmotesAPI.ImportArmature(Addressables.LoadAssetAsync<GameObject>(prefab).WaitForCompletion(), Assets.Load<GameObject>(skeleton), hideMeshes: hidemesh);
+        Assets.Load<GameObject>(skeleton).GetComponent<Animator>().runtimeAnimatorController = GameObject.Instantiate<GameObject>(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commando.prefab")).GetComponent<Animator>().runtimeAnimatorController;
+        AnimationReplacements.ApplyAnimationStuff(Addressables.LoadAssetAsync<GameObject>(prefab).WaitForCompletion(), Assets.Load<GameObject>(skeleton), 0, hidemesh, revertBonePositions: true);
     }
     internal static void ChangeAnims()
     {
@@ -470,7 +474,7 @@ internal static class AnimationReplacements
         GameObject animcontroller = Assets.Load<GameObject>(resource);
         ApplyAnimationStuff(bodyPrefab, animcontroller, pos);
     }
-    internal static void ApplyAnimationStuff(GameObject bodyPrefab, GameObject animcontroller, int pos = 0, bool hidemeshes = true, bool jank = false)
+    internal static void ApplyAnimationStuff(GameObject bodyPrefab, GameObject animcontroller, int pos = 0, bool hidemeshes = true, bool jank = false, bool revertBonePositions = false)
     {
         try
         {
@@ -607,6 +611,7 @@ internal static class AnimationReplacements
             DebugClass.Log($"Had issue when setting up BoneMapper settings 2: {e}");
             throw;
         }
+        test.revertTransform = revertBonePositions;
     }
 }
 public struct JoinSpot
@@ -805,6 +810,9 @@ public class BoneMapper : MonoBehaviour
     public List<EmoteLocation> emoteLocations = new List<EmoteLocation>();
     List<string> dontAnimateUs = new List<string>();
     public bool enableAnimatorOnDeath = true;
+    public bool revertTransform = false;
+    public bool oneFrameAnimatorLeeWay = false;
+    public CharacterBody mapperBody;
 
     public void PlayAnim(string s, int pos, int eventNum)
     {
@@ -859,6 +867,10 @@ public class BoneMapper : MonoBehaviour
                     {
                         foreach (var item in allMappers)
                         {
+                            if (!item.audioObjects[currentClip.syncPos])
+                            {
+                                DebugClass.Log($"The audioObject was null????????");
+                            }
                             item.audioObjects[currentClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
                         }
                         AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos][currEvent], CustomEmotesAPI.audioContainers[currentClip.syncPos]);
@@ -872,7 +884,7 @@ public class BoneMapper : MonoBehaviour
             }
             catch (Exception e)
             {
-                DebugClass.Log($"had issue turning off audio before new audio played: {e}\n Notable items for debugging: [currentClip: {currentClip}] [currentClip.syncPos: {currentClip.syncPos}] [currEvent: {currEvent}]");
+                DebugClass.Log($"had issue turning off audio before new audio played: {e}\n Notable items for debugging: [currentClip: {currentClip}] [currentClip.syncPos: {currentClip.syncPos}] [currEvent: {currEvent}] [stopEvents[currentClip.syncPos]: {stopEvents[currentClip.syncPos]}] [CustomEmotesAPI.audioContainers[currentClip.syncPos]: {CustomEmotesAPI.audioContainers[currentClip.syncPos]}] [uniqueSpot: {uniqueSpot}] [CustomAnimationClip.uniqueAnimations[currentClip.syncPos]: {CustomAnimationClip.uniqueAnimations[currentClip.syncPos]}]");
             }
         }
         catch (Exception)
@@ -1041,48 +1053,29 @@ public class BoneMapper : MonoBehaviour
             overrideMoveSpeed = false;
             if (parentGameObject && !preserveParent)
             {
-                Vector3 OHYEAHHHHHH = transform.parent.GetComponent<CharacterModel>().body.gameObject.transform.position;
-                OHYEAHHHHHH = (TeleportHelper.FindSafeTeleportDestination(transform.parent.GetComponent<CharacterModel>().body.gameObject.transform.position, transform.parent.GetComponent<CharacterModel>().body, RoR2Application.rng)) ?? OHYEAHHHHHH;
+                Vector3 OHYEAHHHHHH = mapperBody.gameObject.transform.position;
+                OHYEAHHHHHH = (TeleportHelper.FindSafeTeleportDestination(mapperBody.gameObject.transform.position, mapperBody, RoR2Application.rng)) ?? OHYEAHHHHHH;
                 Vector3 result = OHYEAHHHHHH;
                 RaycastHit raycastHit = default(RaycastHit);
                 Ray ray = new Ray(OHYEAHHHHHH + Vector3.up * 2f, Vector3.down);
                 float maxDistance = 4f;
-                if (Physics.SphereCast(ray, transform.parent.GetComponent<CharacterModel>().body.radius, out raycastHit, maxDistance, LayerIndex.world.mask))
+                if (Physics.SphereCast(ray, mapperBody.radius, out raycastHit, maxDistance, LayerIndex.world.mask))
                 {
                     result.y = ray.origin.y - raycastHit.distance;
                 }
                 float bodyPrefabFootOffset = Util.GetBodyPrefabFootOffset(bodyPrefab);
                 result.y += bodyPrefabFootOffset;
-                //CapsuleCollider capsule = transform.parent.GetComponent<CharacterModel>().body.gameObject.GetComponent<CapsuleCollider>();
-                if (!useSafePositionReset/* && capsule*/)
+                if (!useSafePositionReset)
                 {
-                    Rigidbody rigidbody = transform.parent.GetComponent<CharacterModel>().body.gameObject.GetComponent<Rigidbody>();
-                    /*
-                                        if (!useSafePositionReset && capsule)
-                                        {
-                                            Rigidbody rigidbody = transform.parent.GetComponent<CharacterModel>().body.gameObject.GetComponent<Rigidbody>();
-                                            RaycastHit hit;
-                                            transform.parent.GetComponent<CharacterModel>().body.gameObject.transform.position += new Vector3(0, 2, 0);
-                                            transform.parent.GetComponent<CharacterModel>().body.GetComponent<ModelLocator>().modelBaseTransform.position += new Vector3(0, 2, 0);
-                                            while (rigidbody.SweepTest(rigidbody.transform.forward, out hit, 0)
- */
-                    //var direction = new Vector3 { [capsule.direction] = 1 };
-                    //var offset = capsule.height / 2 - capsule.radius;
-                    //int num = 0;
-                    //int num2 = capsule.enabled ? 1 : 0;
-                    //do
-                    //{
-                    //} while (num > num2);
-                    //num = rigidbody.SweepTestAll(rigidbody.transform.forward, 0, QueryTriggerInteraction.Collide).Length;
-                    //num = Physics.OverlapCapsule(capsule.center - direction * offset, capsule.center + direction * offset, capsule.radius).Length;
+                    Rigidbody rigidbody = mapperBody.gameObject.GetComponent<Rigidbody>();
                     rigidbody.AddForce(new Vector3(0, 1, 0), ForceMode.VelocityChange);
-                    transform.parent.GetComponent<CharacterModel>().body.gameObject.transform.position += new Vector3(.1f, 2, .1f);
-                    transform.parent.GetComponent<CharacterModel>().body.GetComponent<ModelLocator>().modelBaseTransform.position += new Vector3(0, 10, 0);
+                    mapperBody.gameObject.transform.position += new Vector3(.1f, 2, .1f);
+                    mapperBody.GetComponent<ModelLocator>().modelBaseTransform.position += new Vector3(0, 10, 0);
                 }
                 else
                 {
-                    transform.parent.GetComponent<CharacterModel>().body.gameObject.transform.position = result;
-                    transform.parent.GetComponent<CharacterModel>().body.GetComponent<ModelLocator>().modelBaseTransform.position = result;
+                    mapperBody.gameObject.transform.position = result;
+                    mapperBody.GetComponent<ModelLocator>().modelBaseTransform.position = result;
                 }
                 parentGameObject = null;
             }
@@ -1100,10 +1093,10 @@ public class BoneMapper : MonoBehaviour
             }
             else
             {
-                transform.parent.GetComponent<CharacterModel>().body.GetComponent<ModelLocator>().modelBaseTransform.localEulerAngles = Vector3.zero;
-                if (transform.parent.GetComponent<CharacterModel>().body.GetComponent<CharacterDirection>())
+                mapperBody.GetComponent<ModelLocator>().modelBaseTransform.localEulerAngles = Vector3.zero;
+                if (mapperBody.GetComponent<CharacterDirection>())
                 {
-                    transform.parent.GetComponent<CharacterModel>().body.GetComponent<CharacterDirection>().enabled = true;
+                    mapperBody.GetComponent<CharacterDirection>().enabled = true;
                 }
                 if (ogScale != new Vector3(-69, -69, -69))
                 {
@@ -1112,18 +1105,18 @@ public class BoneMapper : MonoBehaviour
                 }
                 if (ogLocation != new Vector3(-69, -69, -69))
                 {
-                    transform.parent.GetComponent<CharacterModel>().body.GetComponent<ModelLocator>().modelBaseTransform.localPosition = ogLocation;
+                    mapperBody.GetComponent<ModelLocator>().modelBaseTransform.localPosition = ogLocation;
                     ogLocation = new Vector3(-69, -69, -69);
                 }
-                if (transform.parent.GetComponent<CharacterModel>().body.GetComponent<CapsuleCollider>())
+                if (mapperBody.GetComponent<Collider>())
                 {
-                    transform.parent.GetComponent<CharacterModel>().body.GetComponent<CapsuleCollider>().enabled = true;
+                    mapperBody.GetComponent<Collider>().enabled = true;
                 }
-                if (transform.parent.GetComponent<CharacterModel>().body.GetComponent<KinematicCharacterController.KinematicCharacterMotor>() && !transform.parent.GetComponent<CharacterModel>().body.GetComponent<KinematicCharacterController.KinematicCharacterMotor>().enabled)
+                if (mapperBody.GetComponent<KinematicCharacterController.KinematicCharacterMotor>() && !mapperBody.GetComponent<KinematicCharacterController.KinematicCharacterMotor>().enabled)
                 {
-                    Vector3 desired = transform.parent.GetComponent<CharacterModel>().body.gameObject.transform.position;
-                    transform.parent.GetComponent<CharacterModel>().body.GetComponent<KinematicCharacterController.KinematicCharacterMotor>().enabled = true;
-                    transform.parent.GetComponent<CharacterModel>().body.GetComponent<KinematicCharacterController.KinematicCharacterMotor>().SetPosition(desired);
+                    Vector3 desired = mapperBody.gameObject.transform.position;
+                    mapperBody.GetComponent<KinematicCharacterController.KinematicCharacterMotor>().enabled = true;
+                    mapperBody.GetComponent<KinematicCharacterController.KinematicCharacterMotor>().SetPosition(desired);
                 }
             }
             if (preserveProps)
@@ -1178,6 +1171,7 @@ public class BoneMapper : MonoBehaviour
     }
     void Start()
     {
+        mapperBody = GetComponentInParent<CharacterModel>().body;
         if (worldProp)
         {
             return;
@@ -1263,7 +1257,9 @@ public class BoneMapper : MonoBehaviour
                         s.sourceTransform = smr1.bones[i];
                         s.weight = 1;
                         //DebugClass.Log($"{smr2.name}--- i is equal to {x}  ------ {smr2.bones[x].name}");
-                        smr2.bones[x].gameObject.AddComponent<EmoteConstraint>().AddSource(ref smr2.bones[x], ref smr1.bones[i]);
+                        EmoteConstraint e = smr2.bones[x].gameObject.AddComponent<EmoteConstraint>();
+                        e.AddSource(ref smr2.bones[x], ref smr1.bones[i]);
+                        e.revertTransform = revertTransform;
                         //smr1bone.name = smr1bone.name.Remove(smr1bone.name.Length - "_CustomEmotesAPIBone".Length);
                     }
                 }
@@ -1288,6 +1284,7 @@ public class BoneMapper : MonoBehaviour
             }
             //a1.enabled = false;
         }
+        CustomEmotesAPI.MapperCreated(this);
     }
     public GameObject parentGameObject;
     bool positionLock, rotationLock, scaleLock;
@@ -1297,15 +1294,11 @@ public class BoneMapper : MonoBehaviour
         {
             NewAnimation(null);
         }
-        if (!transform.parent.GetComponent<CharacterModel>())
+        if (!transform.GetComponentInParent<CharacterModel>())
         {
             return;
         }
-        if (!transform.parent.GetComponent<CharacterModel>().body.GetComponent<KinematicCharacterController.KinematicCharacterMotor>())
-        {
-            return;
-        }
-        ogLocation = transform.parent.GetComponent<CharacterModel>().body.GetComponent<ModelLocator>().modelBaseTransform.localPosition;
+        ogLocation = mapperBody.GetComponent<ModelLocator>().modelBaseTransform.localPosition;
         ogScale = transform.parent.localScale;
         if (scaleAsBandit)
             scaleDiff = ogScale / scale;
@@ -1328,8 +1321,11 @@ public class BoneMapper : MonoBehaviour
         positionLock = lockPosition;
         rotationLock = lockRotation;
         scaleLock = lockScale;
-        transform.parent.GetComponent<CharacterModel>().body.GetComponent<CapsuleCollider>().enabled = !disableCollider;
-        transform.parent.GetComponent<CharacterModel>().body.GetComponent<KinematicCharacterController.KinematicCharacterMotor>().enabled = !lockPosition;
+        mapperBody.GetComponent<Collider>().enabled = !disableCollider;
+        if (mapperBody.GetComponent<KinematicCharacterController.KinematicCharacterMotor>())
+        {
+            mapperBody.GetComponent<KinematicCharacterController.KinematicCharacterMotor>().enabled = !lockPosition;
+        }
         if (disableCollider && currentEmoteSpot)
         {
             currentEmoteSpot.GetComponent<EmoteLocation>().validPlayers--;
@@ -1466,6 +1462,7 @@ public class BoneMapper : MonoBehaviour
                 if (!ragdolling)
                 {
                     a1.enabled = true;
+                    oneFrameAnimatorLeeWay = true;
                 }
                 a2.enabled = false;
                 if (a2.transform.parent.GetComponent<InverseKinematics>() && a2.name != "loader")
@@ -1517,7 +1514,7 @@ public class BoneMapper : MonoBehaviour
     {
         if (autoWalkSpeed != 0)
         {
-            CharacterModel model = transform.parent.GetComponent<CharacterModel>();
+            CharacterModel model = transform.GetComponentInParent<CharacterModel>();
             if (model)
             {
                 if (overrideMoveSpeed)
@@ -1547,14 +1544,27 @@ public class BoneMapper : MonoBehaviour
         {
             if (positionLock)
             {
-                transform.parent.GetComponent<CharacterModel>().body.gameObject.transform.position = parentGameObject.transform.position + new Vector3(0, 1, 0);
-                transform.parent.GetComponent<CharacterModel>().body.GetComponent<ModelLocator>().modelBaseTransform.position = parentGameObject.transform.position;
-                transform.parent.GetComponent<CharacterModel>().body.GetComponent<CharacterMotor>().velocity = Vector3.zero;
+                mapperBody.gameObject.transform.position = parentGameObject.transform.position + new Vector3(0, 1, 0);
+                mapperBody.GetComponent<ModelLocator>().modelBaseTransform.position = parentGameObject.transform.position;
+                CharacterMotor motor = mapperBody.GetComponent<CharacterMotor>();
+                Rigidbody rigidbody = mapperBody.GetComponent<Rigidbody>();
+                if (motor)
+                {
+                    motor.velocity = Vector3.zero;
+                }
+                else
+                {
+                    rigidbody.velocity = Vector3.zero;
+                }
             }
             if (rotationLock)
             {
-                transform.parent.GetComponent<CharacterModel>().body.GetComponent<CharacterDirection>().enabled = false;
-                transform.parent.GetComponent<CharacterModel>().body.GetComponent<ModelLocator>().modelBaseTransform.eulerAngles = parentGameObject.transform.eulerAngles;
+                CharacterDirection direction = mapperBody.GetComponent<CharacterDirection>();
+                if (direction)
+                {
+                    mapperBody.GetComponent<CharacterDirection>().enabled = false;
+                }
+                mapperBody.GetComponent<ModelLocator>().modelBaseTransform.eulerAngles = parentGameObject.transform.eulerAngles;
             }
             if (scaleLock)
             {
@@ -1609,13 +1619,14 @@ public class BoneMapper : MonoBehaviour
                 break;
             }
         }
+
         if (currentEmoteSpot.GetComponent<EmoteLocation>().owner.worldProp)
         {
-            new SyncSpotJoinedToHost(transform.parent.GetComponent<CharacterModel>().body.GetComponent<NetworkIdentity>().netId, currentEmoteSpot.transform.parent.GetComponent<NetworkIdentity>().netId, true, spot).Send(R2API.Networking.NetworkDestination.Server);
+            new SyncSpotJoinedToHost(mapperBody.GetComponent<NetworkIdentity>().netId, currentEmoteSpot.transform.GetComponentInParent<NetworkIdentity>().netId, true, spot).Send(R2API.Networking.NetworkDestination.Server);
         }
         else
         {
-            new SyncSpotJoinedToHost(transform.parent.GetComponent<CharacterModel>().body.GetComponent<NetworkIdentity>().netId, currentEmoteSpot.transform.parent.parent.GetComponent<CharacterModel>().body.GetComponent<NetworkIdentity>().netId, false, spot).Send(R2API.Networking.NetworkDestination.Server);
+            new SyncSpotJoinedToHost(mapperBody.GetComponent<NetworkIdentity>().netId, currentEmoteSpot.transform.parent.GetComponentInParent<CharacterModel>().body.GetComponent<NetworkIdentity>().netId, false, spot).Send(R2API.Networking.NetworkDestination.Server);
         }
     }
     public void RemoveProp(int propPos)
@@ -1640,13 +1651,18 @@ public class BoneMapper : MonoBehaviour
         //{
         //    if (overrideMoveSpeed)
         //    {
-        //        transform.parent.GetComponent<CharacterModel>().body.GetComponent<InputBankTest>().moveVector = transform.parent.GetComponent<CharacterModel>().body.GetComponent<CharacterDirection>().forward * autoWalkSpeed;
+        //        transform.GetComponentInParent<CharacterModel>().body.GetComponent<InputBankTest>().moveVector = transform.GetComponentInParent<CharacterModel>().body.GetComponent<CharacterDirection>().forward * autoWalkSpeed;
         //    }
         //    else
         //    {
-        //        transform.parent.GetComponent<CharacterModel>().body.GetComponent<CharacterMotor>().moveDirection = transform.parent.GetComponent<CharacterModel>().body.GetComponent<CharacterDirection>().forward * autoWalkSpeed;
+        //        transform.GetComponentInParent<CharacterModel>().body.GetComponent<CharacterMotor>().moveDirection = transform.GetComponentInParent<CharacterModel>().body.GetComponent<CharacterDirection>().forward * autoWalkSpeed;
         //    }
         //}
+    }
+    internal IEnumerator waitForTwoFramesThenDisableA1()
+    {
+        yield return new WaitForEndOfFrame(); //haha we only wait for one frame lmao
+        a1.enabled = false;
     }
     void AddAudioObject()
     {
@@ -1795,7 +1811,7 @@ public class BoneMapper : MonoBehaviour
         Transform RightLegIK = null;
         if (!jank)
         {
-            a1.enabled = false;
+            StartCoroutine(waitForTwoFramesThenDisableA1());
             for (int i = 0; i < smr2.bones.Length; i++)
             {
                 try
@@ -1847,7 +1863,7 @@ public class BoneMapper : MonoBehaviour
         }
         else
         {
-            a1.enabled = false;
+            StartCoroutine(waitForTwoFramesThenDisableA1());
         }
     }
 }

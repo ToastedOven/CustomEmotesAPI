@@ -84,8 +84,11 @@ public class EmoteLocation : MonoBehaviour
     }
     public void SetEmoterAndHideLocation(BoneMapper boneMapper)
     {
-        emoter = boneMapper;
-        SetVisible(false);
+        if (!emoter)
+        {
+            emoter = boneMapper;
+            SetVisible(false);
+        }
     }
     public IEnumerator setScale()
     {
@@ -122,6 +125,7 @@ public class EmoteLocation : MonoBehaviour
                 SetColor();
                 //new SyncCurrentEmoteSpot(other.GetComponent<NetworkIdentity>().netId, gameObject.GetComponent<NetworkIdentity>().netId).Send(R2API.Networking.NetworkDestination.Clients);
                 mapper.currentEmoteSpot = this.gameObject;
+                CustomEmotesAPI.JoinSpotEntered(mapper, owner);
             }
         }
     }

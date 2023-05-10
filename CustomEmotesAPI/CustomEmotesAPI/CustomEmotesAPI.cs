@@ -102,7 +102,7 @@ namespace EmotesAPI
             }
             return Input.GetKeyDown(entry.Value.MainKey);
         }
-        public const string VERSION = "1.10.2";
+        public const string VERSION = "2.0.1";
         internal static float Actual_MSX = 69;
         public static CustomEmotesAPI instance;
         public static List<GameObject> audioContainers = new List<GameObject>();
@@ -398,7 +398,7 @@ namespace EmotesAPI
         }
         public static void PlayAnimation(string animationName, BoneMapper mapper, int pos = -2)
         {
-            var identity = mapper.transform.parent.GetComponent<CharacterModel>().body.GetComponent<NetworkIdentity>();
+            var identity = mapper.mapperBody.GetComponent<NetworkIdentity>();
             new SyncAnimationToServer(identity.netId, animationName, pos).Send(R2API.Networking.NetworkDestination.Server);
         }
         public static BoneMapper localMapper = null;
@@ -422,6 +422,7 @@ namespace EmotesAPI
         public static event AnimationChanged animChanged;
         internal static void Changed(string newAnimation, BoneMapper mapper) //is a neat game made by a developer who endorses nsfw content while calling it a fine game for kids
         {
+            mapper.currentClipName = newAnimation;
             if (mapper == localMapper)
             {
                 EmoteWheel.dontPlayButton.GetComponentInChildren<TextMeshProUGUI>().text = $"Continue Playing Current Emote:\r\n{newAnimation}";
@@ -440,7 +441,7 @@ namespace EmotesAPI
                     }
                 }
             }
-            mapper.transform.parent.GetComponent<CharacterModel>().body.RecalculateStats();
+            mapper.mapperBody.RecalculateStats();
             if (animChanged != null)
             {
                 animChanged(newAnimation, mapper);
@@ -519,6 +520,24 @@ namespace EmotesAPI
         internal static void Joined(string joinedAnimation, BoneMapper joiner, BoneMapper host)
         {
             animJoined(joinedAnimation, joiner, host);
+        }
+        public delegate void BoneMapperCreated(BoneMapper mapper);
+        public static event BoneMapperCreated boneMapperCreated;
+        internal static void MapperCreated(BoneMapper mapper)
+        {
+            if (boneMapperCreated != null)
+            {
+                boneMapperCreated(mapper);
+            }
+        }
+        public delegate void BoneMapperEnteredJoinSpot(BoneMapper mover, BoneMapper joinSpotOwner);
+        public static event BoneMapperEnteredJoinSpot boneMapperEnteredJoinSpot;
+        internal static void JoinSpotEntered(BoneMapper mover, BoneMapper joinSpotOwner)
+        {
+            if (boneMapperEnteredJoinSpot != null)
+            {
+                boneMapperEnteredJoinSpot(mover, joinSpotOwner);
+            }
         }
 
         void Update()
@@ -629,6 +648,7 @@ namespace EmotesAPI
             mapper.a1.gameObject.SetActive(false);
             yield return new WaitForSeconds(5f);
             mapper.a1.enabled = true;
+            mapper.oneFrameAnimatorLeeWay = true;
             mapper.a1.gameObject.SetActive(true);
             DebugClass.Log($"reenabling");
 

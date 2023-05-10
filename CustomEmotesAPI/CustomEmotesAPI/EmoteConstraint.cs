@@ -11,6 +11,7 @@ public class EmoteConstraint : MonoBehaviour
     Vector3 originalPosition;
     Quaternion originalRotation;
     public bool constraintActive = false;
+    public bool revertTransform;
     bool firstTime = true;
     void Update()
     {
@@ -29,7 +30,7 @@ public class EmoteConstraint : MonoBehaviour
     public void DeactivateConstraints()
     {
         constraintActive = false;
-        if (firstTime)
+        if (firstTime || !revertTransform)
         {
             firstTime = false;
         }
