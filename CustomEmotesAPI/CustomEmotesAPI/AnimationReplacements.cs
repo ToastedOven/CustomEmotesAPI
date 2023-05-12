@@ -660,6 +660,7 @@ public class CustomAnimationClip : MonoBehaviour
     public static List<float> syncTimer = new List<float>();
     public static List<int> syncPlayerCount = new List<int>();
     public static List<List<bool>> uniqueAnimations = new List<List<bool>>();
+    public bool vulnerableEmote = false;
 
     internal CustomAnimationClip(AnimationClip[] _clip, bool _loop/*, bool _shouldSyncronize = false*/, string[] _wwiseEventName = null, string[] _wwiseStopEvent = null, HumanBodyBones[] rootBonesToIgnore = null, HumanBodyBones[] soloBonesToIgnore = null, AnimationClip[] _secondaryClip = null, bool dimWhenClose = false, bool stopWhenMove = false, bool stopWhenAttack = false, bool visible = true, bool syncAnim = false, bool syncAudio = false, int startPreference = -1, int joinPreference = -1, JoinSpot[] _joinSpots = null, bool safePositionReset = false, string customName = "NO_CUSTOM_NAME", Action<BoneMapper> _customPostEventCodeSync = null, Action<BoneMapper> _customPostEventCodeNoSync = null)
     {
@@ -1231,28 +1232,17 @@ public class BoneMapper : MonoBehaviour
         bool nuclear = true;
         if (nuclear)
         {
-            //foreach (var smr1bone in smr1.bones) //smr1 is the emote skeleton
-            //{
-            //    foreach (var smr2bone in smr2.bones) //smr2 is the main skinned mesh renderer, which will receive parent constraints
-            //    {
-            //        //DebugClass.Log($"--------------  {smr2bone.gameObject.name}   {smr1bone.gameObject.name}      {smr2bone.GetComponent<ParentConstraint>()}");
-            //        if (smr1bone.name == smr2bone.name/* + "_CustomEmotesAPIBone"*/ /*smr2bone.name != "head_jnt" && smr2bone.name != "head_jnt_end" && smr2bone.name != "arm_left_jnt" && smr2bone.name != "clavicle_right_jnt" && smr2bone.name != "spine_04_jnt"*/)
-            //        {
-            //            var s = new ConstraintSource();
-            //            s.sourceTransform = smr1bone;
-            //            s.weight = 1;
-            //            smr2bone.gameObject.AddComponent<EmoteConstraint>().AddSource(ref smr2bone, ref smr1bone);
-            //            //smr1bone.name = smr1bone.name.Remove(smr1bone.name.Length - "_CustomEmotesAPIBone".Length);
-            //        }
-            //    }
-            //}
+            int startingXPoint = 0;
             for (int i = 0; i < smr1.bones.Length; i++)
             {
-                for (int x = 0; x < smr2.bones.Length; x++)
+                for (int x = startingXPoint; x < smr2.bones.Length; x++)
                 {
+                    //DebugClass.Log($"comparing:    {smr1.bones[i].name}     {smr2.bones[x].name}");
                     //DebugClass.Log($"--------------  {smr2bone.gameObject.name}   {smr1bone.gameObject.name}      {smr2bone.GetComponent<ParentConstraint>()}");
                     if (smr1.bones[i].name == smr2.bones[x].name/* + "_CustomEmotesAPIBone"*/ /*smr2.bones[x].name != "head_jnt" && smr2.bones[x].name != "head_jnt_end" && smr2.bones[x].name != "arm_left_jnt" && smr2.bones[x].name != "clavicle_right_jnt" && smr2.bones[x].name != "spine_04_jnt"*/)
                     {
+                        startingXPoint = x;
+                        //DebugClass.Log($"they are equal!");
                         var s = new ConstraintSource();
                         s.sourceTransform = smr1.bones[i];
                         s.weight = 1;
@@ -1261,6 +1251,15 @@ public class BoneMapper : MonoBehaviour
                         e.AddSource(ref smr2.bones[x], ref smr1.bones[i]);
                         e.revertTransform = revertTransform;
                         //smr1bone.name = smr1bone.name.Remove(smr1bone.name.Length - "_CustomEmotesAPIBone".Length);
+                        break;
+                    }
+                    if (x == startingXPoint - 1)
+                    {
+                        break;
+                    }
+                    if (startingXPoint > 0 && x == smr2.bones.Length - 1)
+                    {
+                        x = -1;
                     }
                 }
             }
@@ -1448,7 +1447,7 @@ public class BoneMapper : MonoBehaviour
             {
                 if (a2.enabled)
                 {
-                    if (smr2.transform.parent.gameObject.name == "mdlVoidSurvivor" || smr2.transform.parent.gameObject.name == "mdlMage" || smr2.transform.parent.gameObject.name == "mdlJinx" || smr2.transform.parent.gameObject.name.StartsWith("mdlHouse"))
+                    if (smr2.transform.parent.gameObject.name == "mdlVoidSurvivor" || smr2.transform.parent.gameObject.name == "mdlMage" || smr2.transform.parent.gameObject.name == "mdlJinx" || smr2.transform.parent.gameObject.name.StartsWith("mdlHouse") || smr2.transform.parent.gameObject.name.StartsWith("mdlLemurian"))
                     {
                         smr2.transform.parent.gameObject.SetActive(false);
                         smr2.transform.parent.gameObject.SetActive(true);

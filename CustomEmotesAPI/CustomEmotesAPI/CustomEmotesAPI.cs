@@ -63,8 +63,8 @@ namespace EmotesAPI
             CreateNameTokenSpritePair("RAILGUNNER_BODY_NAME", Assets.Load<Sprite>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/railgunner.png"));
             //CreateNameTokenSpritePair("HERETIC_BODY_NAME", Assets.Load<Sprite>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/heretic.png"));
         }
-        internal static List<string> allClipNames = new List<string>();
-        internal static List<int> blacklistedClips = new List<int>();
+        public static List<string> allClipNames = new List<string>();
+        public static List<int> blacklistedClips = new List<int>();
         public static void BlackListEmote(string name)
         {
             for (int i = 0; i < allClipNames.Count; i++)
@@ -102,7 +102,7 @@ namespace EmotesAPI
             }
             return Input.GetKeyDown(entry.Value.MainKey);
         }
-        public const string VERSION = "2.0.1";
+        public const string VERSION = "2.1.0";
         internal static float Actual_MSX = 69;
         public static CustomEmotesAPI instance;
         public static List<GameObject> audioContainers = new List<GameObject>();
@@ -448,6 +448,7 @@ namespace EmotesAPI
             }
             if (newAnimation != "none")
             {
+
                 if (mapper == localMapper && Settings.HideJoinSpots.Value)
                 {
                     EmoteLocation.HideAllSpots();
@@ -517,7 +518,7 @@ namespace EmotesAPI
         }
         public delegate void AnimationJoined(string joinedAnimation, BoneMapper joiner, BoneMapper host);
         public static event AnimationJoined animJoined;
-        internal static void Joined(string joinedAnimation, BoneMapper joiner, BoneMapper host)
+        public static void Joined(string joinedAnimation, BoneMapper joiner, BoneMapper host)
         {
             animJoined(joinedAnimation, joiner, host);
         }
