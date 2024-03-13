@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
-
+[DefaultExecutionOrder(-2)]
 public class EmoteConstraint : MonoBehaviour
 {
     public Transform originalBone;
@@ -13,7 +13,8 @@ public class EmoteConstraint : MonoBehaviour
     public bool constraintActive = false;
     public bool revertTransform;
     bool firstTime = true;
-    void Update()
+    bool hasEverActivatedConstraints = false;
+    void LateUpdate()
     {
         if (constraintActive)
         {
@@ -25,12 +26,13 @@ public class EmoteConstraint : MonoBehaviour
     {
         originalPosition = originalBone.localPosition;
         originalRotation = originalBone.localRotation;
+        hasEverActivatedConstraints = true;
         constraintActive = true;
     }
     public void DeactivateConstraints()
     {
         constraintActive = false;
-        if (firstTime || !revertTransform)
+        if (firstTime || !revertTransform || !hasEverActivatedConstraints)
         {
             firstTime = false;
         }

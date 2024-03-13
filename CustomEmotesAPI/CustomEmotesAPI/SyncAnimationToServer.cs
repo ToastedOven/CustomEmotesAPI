@@ -47,7 +47,6 @@ public class SyncAnimationToServer : INetMessage
         //DebugClass.Log($"Recieved message to play {animation} on client. Playing on {bodyObject.GetComponent<ModelLocator>().modelTransform}");
 
         //bodyObject.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>().PlayAnim(animation, position);
-
         BoneMapper map = Util.FindNetworkObject(netId).GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>();
         int eventNum = -1;
         CustomAnimationClip clip = BoneMapper.animClips[animation];
@@ -59,8 +58,6 @@ public class SyncAnimationToServer : INetMessage
         catch (Exception)
         {
         }
-
-
         new SyncAnimationToClients(netId, animation, position, eventNum).Send(R2API.Networking.NetworkDestination.Clients);
     }
 

@@ -185,6 +185,7 @@ public class EmoteWheel : MonoBehaviour
             {
                 events.cursorOpenerForGamepadCount += 1;
                 events.cursorOpenerCount += 1;
+                CustomEmotesAPI.EmoteWheelOpened(joy.sprite);
             }
             transform.localPosition = v;
             if (CustomEmotesAPI.GetKeyPressed(Settings.SetCurrentEmoteToWheel) && selected != null && CustomEmotesAPI.allClipNames.Contains(CustomEmotesAPI.localMapper.currentClipName))

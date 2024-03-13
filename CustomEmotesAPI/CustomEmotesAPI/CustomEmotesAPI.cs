@@ -17,17 +17,23 @@ using BepInEx.Configuration;
 using UnityEngine.AddressableAssets;
 using TMPro;
 using System.Collections;
+using static UnityEngine.ParticleSystem.PlaybackState;
 
 namespace EmotesAPI
 {
     [BepInDependency("com.gemumoddo.MoistureUpset", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("com.bepis.r2api")]
     [BepInDependency("com.rune580.riskofoptions")]
-    [BepInPlugin("com.weliveinasociety.CustomEmotesAPI", "Custom Emotes API", VERSION)]
+    [BepInPlugin(PluginGUID, PluginName, VERSION)]
     [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.EveryoneNeedSameModVersion)]
     [R2APISubmoduleDependency("PrefabAPI", "ResourcesAPI", "NetworkingAPI")]
     public class CustomEmotesAPI : BaseUnityPlugin
     {
+        public const string PluginGUID = "com.weliveinasociety.CustomEmotesAPI";
+
+        public const string PluginName = "Custom Emotes API";
+
+        public const string VERSION = "2.3.1";
         public struct NameTokenWithSprite
         {
             public string nameToken;
@@ -102,7 +108,6 @@ namespace EmotesAPI
             }
             return Input.GetKeyDown(entry.Value.MainKey);
         }
-        public const string VERSION = "2.1.0";
         internal static float Actual_MSX = 69;
         public static CustomEmotesAPI instance;
         public static List<GameObject> audioContainers = new List<GameObject>();
@@ -130,23 +135,6 @@ namespace EmotesAPI
             {
                 WhosSteveJobs = Settings.DontTouchThis.Value;
             }
-            //On.RoR2.Networking.NetworkManagerSystem.OnServerAddPlayerInternal += (orig, self, con, id, reader) =>
-            //{
-            //    orig(self, con, id, reader);
-            //    if (NetworkServer.active)
-            //    {
-            //        new SyncEmoteLocations()
-            //    }
-            //};
-            //On.RoR2.CameraRigController.Update += (orig, self) =>
-            //{
-            //    orig(self);
-            //    if (self.target && self.target.transform.position != prevCamPosition)
-            //    {
-            //        prevCamPosition = self.target.transform.position;
-            //        DebugClass.Log($"--------------  {self.target.transform.position}");
-            //    }
-            //};
             On.RoR2.SceneCatalog.OnActiveSceneChanged += (orig, self, scene) =>
             {
                 orig(self, scene);
@@ -244,6 +232,7 @@ namespace EmotesAPI
                     }
                 }
             };
+            AddCustomAnimation(Assets.Load<AnimationClip>($"@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/lmao.anim"), false, visible: false);
             AddNonAnimatingEmote("none");
         }
         public static int RegisterWorldProp(GameObject worldProp, JoinSpot[] joinSpots)
@@ -461,9 +450,15 @@ namespace EmotesAPI
                 {
                     mapper.transform.parent.GetComponent<ChildLocator>().FindChild("Weapon").gameObject.SetActive(false);
                 }
-                if (mapper.transform.name == "nemmando8")
+                if (mapper.transform.name == "nemmando9")
                 {
                     mapper.transform.parent.GetComponent<ChildLocator>().FindChild("SwordModel").gameObject.SetActive(false);
+                    mapper.transform.parent.GetComponent<ChildLocator>().FindChild("GunModel").gameObject.SetActive(false);
+
+                }
+                if (mapper.transform.name == "executioner4")
+                {
+                    mapper.transform.parent.GetComponent<ChildLocator>().FindChild("GunModel").gameObject.SetActive(false);
                 }
                 if (mapper.transform.name == "medic3")
                 {
@@ -489,9 +484,14 @@ namespace EmotesAPI
                 {
                     mapper.transform.parent.GetComponent<ChildLocator>().FindChild("Weapon").gameObject.SetActive(true);
                 }
-                if (mapper.transform.name == "nemmando8")
+                if (mapper.transform.name == "nemmando9")
                 {
                     mapper.transform.parent.GetComponent<ChildLocator>().FindChild("SwordModel").gameObject.SetActive(true);
+                    mapper.transform.parent.GetComponent<ChildLocator>().FindChild("GunModel").gameObject.SetActive(true);
+                }
+                if (mapper.transform.name == "executioner4")
+                {
+                    mapper.transform.parent.GetComponent<ChildLocator>().FindChild("GunModel").gameObject.SetActive(true);
                 }
                 if (mapper.transform.name == "medic3")
                 {
@@ -540,6 +540,15 @@ namespace EmotesAPI
                 boneMapperEnteredJoinSpot(mover, joinSpotOwner);
             }
         }
+        public delegate void EmoteWheelPulledUp(Sprite wheelSprite, BoneMapper localMapper);
+        public static event EmoteWheelPulledUp emoteWheelPulledUp;
+        internal static void EmoteWheelOpened(Sprite wheel)
+        {
+            if (emoteWheelPulledUp != null)
+            {
+                emoteWheelPulledUp(wheel, localMapper);
+            }
+        }
 
         void Update()
         {
@@ -562,7 +571,7 @@ namespace EmotesAPI
                 {
                     if (localMapper)
                     {
-                        if (localMapper.currentEmoteSpot)
+                        if (localMapper.currentEmoteSpot || localMapper.reservedEmoteSpot)
                         {
                             localMapper.JoinEmoteSpot();
                         }
@@ -615,7 +624,10 @@ namespace EmotesAPI
             }
             AudioFunctions();
         }
-
+        public static void ReserveJoinSpot(GameObject joinSpot, BoneMapper mapper)
+        {
+            mapper.reservedEmoteSpot = joinSpot;
+        }
         void AudioFunctions()
         {
             for (int i = 0; i < CustomEmotesAPI.audioContainers.Count; i++)
@@ -648,7 +660,8 @@ namespace EmotesAPI
             DebugClass.Log($"{mapper.a1.gameObject.name}");
             mapper.a1.gameObject.SetActive(false);
             yield return new WaitForSeconds(5f);
-            mapper.a1.enabled = true;
+            if (mapper.a2.transform.parent.name == "mdlRocket")
+                mapper.a1.enabled = true;
             mapper.oneFrameAnimatorLeeWay = true;
             mapper.a1.gameObject.SetActive(true);
             DebugClass.Log($"reenabling");

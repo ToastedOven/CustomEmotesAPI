@@ -27,7 +27,7 @@ namespace EmotesAPI
 
             foreach (var assetName in assetBundle.GetAllAssetNames())
             {
-                string path = assetName.ToLower();
+                string path = assetName.ToLowerInvariant();
 
                 if (path.StartsWith("assets/"))
                     path = path.Remove(0, "assets/".Length);
@@ -41,12 +41,12 @@ namespace EmotesAPI
         {
             try
             {
-                assetName = assetName.ToLower();
+                assetName = assetName.ToLowerInvariant();
                 if (assetName.Contains(":"))
                 {
                     string[] path = assetName.Split(':');
 
-                    assetName = path[1].ToLower();
+                    assetName = path[1].ToLowerInvariant();
                 }
                 if (assetName.StartsWith("assets/"))
                     assetName = assetName.Remove(0, "assets/".Length);

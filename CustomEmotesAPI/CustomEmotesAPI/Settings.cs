@@ -28,7 +28,6 @@ namespace EmotesAPI
         public static ConfigEntry<bool> Holomancer;
         public static ConfigEntry<bool> Sett;
         public static ConfigEntry<bool> Tracer;
-        public static ConfigEntry<bool> House;
         public static ConfigEntry<bool> Henry;
         public static ConfigEntry<bool> Katarina;
         public static ConfigEntry<bool> Miner;
@@ -47,6 +46,7 @@ namespace EmotesAPI
         public static ConfigEntry<bool> TF2Medic;
         public static ConfigEntry<bool> Spearman;
         public static ConfigEntry<bool> VoidJailer;
+        public static ConfigEntry<bool> Baby;
         public static ConfigEntry<bool> DimmingSpheres;
         public static ConfigEntry<bool> HideJoinSpots;
         //public static ConfigEntry<bool> RemoveAutoWalk;
@@ -138,7 +138,6 @@ namespace EmotesAPI
             Holomancer = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Holomancer Support", false, "Support for Holomancer to animate");
             Sett = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Sett Support", true, "Support for Sett to animate");
             Tracer = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Tracer Support", true, "Support for Tracer to animate");
-            House = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "House Support", true, "Support for House to animate");
             Henry = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Henry Support", true, "Support for Henry to animate");
             Katarina = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Katarina Support", true, "Support for Katarina to animate");
             Miner = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Miner Support", true, "Support for Miner to animate");
@@ -158,6 +157,7 @@ namespace EmotesAPI
             TF2Medic = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "TF2Medic Support", true, "Support for TF2Medic to animate");
             Spearman = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Spearman Support", true, "Support for Spearman to animate");
             VoidJailer = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "VoidJailer Support", true, "Support for VoidJailer to animate");
+            Baby = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Driver Support", true, "Support for Driver to animate");
 
             DimmingSpheres = CustomEmotesAPI.instance.Config.Bind<bool>("Misc", "Dimming Spheres", true, "Turn off music dimming when near emotes that support dimming.");
             HideJoinSpots = CustomEmotesAPI.instance.Config.Bind<bool>("Misc", "Hide Join Spots When Animating", false, "Hides all join spots when you are performing an animation, this loses some visual clarity but offers a more C I N E M A T I C experience");
@@ -205,7 +205,6 @@ namespace EmotesAPI
             ModSettingsManager.AddOption(new CheckBoxOption(Holomancer, true));
             ModSettingsManager.AddOption(new CheckBoxOption(Sett, true));
             ModSettingsManager.AddOption(new CheckBoxOption(Tracer, true));
-            ModSettingsManager.AddOption(new CheckBoxOption(House, true));
             ModSettingsManager.AddOption(new CheckBoxOption(Henry, true));
             ModSettingsManager.AddOption(new CheckBoxOption(Katarina, true));
             ModSettingsManager.AddOption(new CheckBoxOption(Miner, true));
@@ -224,6 +223,7 @@ namespace EmotesAPI
             ModSettingsManager.AddOption(new CheckBoxOption(Pathfinder, true));
             ModSettingsManager.AddOption(new CheckBoxOption(Spearman, true));
             ModSettingsManager.AddOption(new CheckBoxOption(VoidJailer, true));
+            ModSettingsManager.AddOption(new CheckBoxOption(Baby, true));
             ModSettingsManager.AddOption(new CheckBoxOption(DimmingSpheres));
             ModSettingsManager.AddOption(new CheckBoxOption(HideJoinSpots));
             //ModSettingsManager.AddOption(new CheckBoxOption(RemoveAutoWalk, false));
@@ -253,23 +253,23 @@ namespace EmotesAPI
             picker.transform.SetAsLastSibling();
             picker.GetComponent<Canvas>().sortingOrder = 5;
         }
-        internal static void DebugBones(GameObject fab)
+        internal static void DebugBones(GameObject fab, int spot = 0)
         {
             var meshes = fab.GetComponentsInChildren<SkinnedMeshRenderer>();
             StringBuilder sb = new StringBuilder();
-            sb.Append($"rendererererer: {meshes[0]}\n");
-            sb.Append($"bone count: {meshes[0].bones.Length}\n");
+            sb.Append($"rendererererer: {meshes[spot]}\n");
+            sb.Append($"bone count: {meshes[spot].bones.Length}\n");
             sb.Append($"mesh count: {meshes.Length}\n");
-            sb.Append($"root bone: {meshes[0].rootBone.name}\n");
+            sb.Append($"root bone: {meshes[spot].rootBone.name}\n");
             sb.Append($"{fab.ToString()}:\n");
-            if (meshes[0].bones.Length == 0)
+            if (meshes[spot].bones.Length == 0)
             {
                 sb.Append("No bones");
             }
             else
             {
                 sb.Append("[");
-                foreach (var bone in meshes[0].bones)
+                foreach (var bone in meshes[spot].bones)
                 {
                     sb.Append($"'{bone.name}', ");
                 }

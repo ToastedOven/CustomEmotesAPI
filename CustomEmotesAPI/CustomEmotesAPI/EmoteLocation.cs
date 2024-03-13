@@ -11,12 +11,12 @@ using UnityEngine.Networking;
 public class EmoteLocation : MonoBehaviour
 {
     public static List<EmoteLocation> emoteLocations = new List<EmoteLocation>();
-    internal static bool visibile = true;
+    public static bool visibile = true;
     public int spot;
     public int validPlayers = 0;
-    internal BoneMapper owner;
-    internal BoneMapper emoter;
-    internal JoinSpot joinSpot;
+    public BoneMapper owner;
+    public BoneMapper emoter;
+    public JoinSpot joinSpot;
 
     public static void HideAllSpots()
     {
@@ -123,7 +123,6 @@ public class EmoteLocation : MonoBehaviour
             {
                 validPlayers++;
                 SetColor();
-                //new SyncCurrentEmoteSpot(other.GetComponent<NetworkIdentity>().netId, gameObject.GetComponent<NetworkIdentity>().netId).Send(R2API.Networking.NetworkDestination.Clients);
                 mapper.currentEmoteSpot = this.gameObject;
                 CustomEmotesAPI.JoinSpotEntered(mapper, owner);
             }
@@ -136,7 +135,10 @@ public class EmoteLocation : MonoBehaviour
             BoneMapper mapper = other.GetComponent<ModelLocator>().modelTransform.GetComponentInChildren<BoneMapper>();
             if (mapper)
             {
-                validPlayers--;
+                if (validPlayers != 0)
+                {
+                    validPlayers--;
+                }
                 SetColor();
                 if (mapper.currentEmoteSpot == this.gameObject)
                 {
