@@ -173,40 +173,40 @@ public class ScrollManager : MonoBehaviour
         gameObject.transform.parent.Find("Wheels").gameObject.SetActive(true);
         gameObject.SetActive(false);
     }
-    static bool first = true;
     public void UpdateButtonVisibility(string filter)
     {
-        if (first)
+        try
         {
-            DebugClass.Log($"Wanna see a cool NRE?");
-            first = false;
+            List<GameObject> validButtons = new List<GameObject>();
+            foreach (var item in buttons)
+            {
+                if (item.GetComponentInChildren<HGTextMeshProUGUI>().text.ToUpper().Contains(filter.ToUpper()))
+                {
+                    validButtons.Add(item);
+                }
+                else
+                {
+                    item.SetActive(false);
+                }
+            }
+            content.GetComponent<RectTransform>().sizeDelta = new Vector2(0, validButtons.Count * 10);
+            int spot = 0;
+            for (int i = 0; i < validButtons.Count; i++)
+            {
+                validButtons[i].SetActive(true);
+                validButtons[i].GetComponent<RectTransform>().localScale = new Vector3(.5f, .5f, .5f);
+                if (i % 2 == 0)
+                    validButtons[i].GetComponent<RectTransform>().anchoredPosition = new Vector2(-43, -14f + (content.GetComponent<RectTransform>().sizeDelta.y * .5f) + (spot * -18));
+                else
+                {
+                    validButtons[i].GetComponent<RectTransform>().anchoredPosition = new Vector2(43, -14f + (content.GetComponent<RectTransform>().sizeDelta.y * .5f) + (spot * -18));
+                    spot++;
+                }
+                validButtons[i].GetComponent<ButtonScript>().emoteInQuestion = emoteInQuestion;
+            }
         }
-        List<GameObject> validButtons = new List<GameObject>();
-        foreach (var item in buttons)
+        catch (System.Exception)
         {
-            if (item.GetComponentInChildren<HGTextMeshProUGUI>().text.ToUpper().Contains(filter.ToUpper()))
-            {
-                validButtons.Add(item);
-            }
-            else
-            {
-                item.SetActive(false);
-            }
-        }
-        content.GetComponent<RectTransform>().sizeDelta = new Vector2(0, validButtons.Count * 10);
-        int spot = 0;
-        for (int i = 0; i < validButtons.Count; i++)
-        {
-            validButtons[i].SetActive(true);
-            validButtons[i].GetComponent<RectTransform>().localScale = new Vector3(.5f, .5f, .5f);
-            if (i % 2 == 0)
-                validButtons[i].GetComponent<RectTransform>().anchoredPosition = new Vector2(-43, -14f + (content.GetComponent<RectTransform>().sizeDelta.y * .5f) + (spot * -18));
-            else
-            {
-                validButtons[i].GetComponent<RectTransform>().anchoredPosition = new Vector2(43, -14f + (content.GetComponent<RectTransform>().sizeDelta.y * .5f) + (spot * -18));
-                spot++;
-            }
-            validButtons[i].GetComponent<ButtonScript>().emoteInQuestion = emoteInQuestion;
         }
     }
     // Update is called once per frame

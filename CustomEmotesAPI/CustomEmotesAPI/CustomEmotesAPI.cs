@@ -33,7 +33,7 @@ namespace EmotesAPI
 
         public const string PluginName = "Custom Emotes API";
 
-        public const string VERSION = "2.3.1";
+        public const string VERSION = "2.4.1";
         public struct NameTokenWithSprite
         {
             public string nameToken;
@@ -657,14 +657,12 @@ namespace EmotesAPI
         }
         internal IEnumerator wackActive2(BoneMapper mapper)
         {
-            DebugClass.Log($"{mapper.a1.gameObject.name}");
             mapper.a1.gameObject.SetActive(false);
             yield return new WaitForSeconds(5f);
             if (mapper.a2.transform.parent.name == "mdlRocket")
                 mapper.a1.enabled = true;
             mapper.oneFrameAnimatorLeeWay = true;
             mapper.a1.gameObject.SetActive(true);
-            DebugClass.Log($"reenabling");
 
         }
     }

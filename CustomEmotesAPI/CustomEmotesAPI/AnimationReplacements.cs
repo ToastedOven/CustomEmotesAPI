@@ -666,7 +666,11 @@ internal static class AnimationReplacements
         catch (Exception e)
         {
             DebugClass.Log($"Had issue when setting up BoneMapper settings 2: {e}");
-            throw;
+            var nuts = Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/bandit.prefab");
+            test.scale = Vector3.Distance(nuts.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.Head).position, nuts.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.LeftFoot).position);
+            test.h = bodyPrefab.GetComponentInChildren<HealthComponent>();
+            test.model = modelTransform.gameObject;
+            //throw;
         }
         test.revertTransform = revertBonePositions;
     }
@@ -1357,7 +1361,7 @@ public class BoneMapper : MonoBehaviour
             //a1.enabled = false;
         }
         CustomEmotesAPI.MapperCreated(this);
-        DebugClass.Log(a2.transform.parent.name);
+        //DebugClass.Log(a2.transform.parent.name);
         if (a2.transform.parent.name == "mdlRocket" || a2.transform.parent.name == "Bastian" || startupFixJank) //put more jank here if ever needed
         {
             StartCoroutine(FixRootOnSurvivors());
@@ -1554,7 +1558,10 @@ public class BoneMapper : MonoBehaviour
                 //DebugClass.Log($"----------{a1}");
                 if (!ragdolling)
                 {
-                    //a1.enabled = true;
+                    if (smr2.transform.parent.gameObject.name == "mdlCHEF" || a2.transform.parent.name == "Bastian")
+                    {
+                        a1.enabled = true;
+                    }
                     oneFrameAnimatorLeeWay = true;
                 }
                 a2.enabled = false;
@@ -1599,7 +1606,10 @@ public class BoneMapper : MonoBehaviour
         }
         else
         {
-            //a1.enabled = false;
+            if (smr2.transform.parent.gameObject.name == "mdlCHEF" || a2.transform.parent.name == "Bastian")
+            {
+                a1.enabled = false;
+            }
             twopart = false;
         }
     }
@@ -1769,7 +1779,10 @@ public class BoneMapper : MonoBehaviour
     internal IEnumerator waitForTwoFramesThenDisableA1()
     {
         yield return new WaitForEndOfFrame(); //haha we only wait for one frame lmao
-        //a1.enabled = false;
+        if (smr2.transform.parent.gameObject.name == "mdlCHEF" || a2.transform.parent.name == "Bastian")
+        {
+            a1.enabled = false;
+        }
     }
     void AddAudioObject()
     {
