@@ -546,6 +546,7 @@ internal static class AnimationReplacements
             DebugClass.Log($"Had issue checking if avatar was humanoid: {e}");
             throw;
         }
+
         try
         {
             if (hidemeshes)
@@ -1362,7 +1363,7 @@ public class BoneMapper : MonoBehaviour
         }
         CustomEmotesAPI.MapperCreated(this);
         //DebugClass.Log(a2.transform.parent.name);
-        if (a2.transform.parent.name == "mdlRocket" || a2.transform.parent.name == "Bastian" || startupFixJank) //put more jank here if ever needed
+        if (a2.transform.parent.name == "mdlRocket" || a2.transform.parent.name == "Bastian" || startupFixJank || a2.transform.parent.name == "mdlAssassin") //put more jank here if ever needed
         {
             StartCoroutine(FixRootOnSurvivors());
         }
@@ -1377,6 +1378,7 @@ public class BoneMapper : MonoBehaviour
         PlayAnim("none", 0);
         smr2.transform.parent.gameObject.SetActive(false);
         smr2.transform.parent.gameObject.SetActive(true);
+        jank = false;
     }
     public void AssignParentGameObject(GameObject youAreTheFather, bool lockPosition, bool lockRotation, bool lockScale, bool scaleAsBandit = true, bool disableCollider = true)
     {
