@@ -30,7 +30,7 @@ internal static class AnimationReplacements
         On.RoR2.UI.HUD.Awake += (orig, self) =>
         {
             orig(self);
-            g = GameObject.Instantiate(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/emotewheel.prefab"));
+            g = GameObject.Instantiate(EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/emotewheel.prefab"));
             foreach (var item in g.GetComponentsInChildren<TextMeshProUGUI>())
             {
                 var money = self.moneyText.targetText;
@@ -116,7 +116,7 @@ internal static class AnimationReplacements
 
 
             var meshes = fab.GetComponentsInChildren<SkinnedMeshRenderer>();
-            meshes[0].sharedMesh = Assets.Load<Mesh>("@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/beetleMesh.mesh");
+            meshes[0].sharedMesh = EmotesAPI.Assets.Load<Mesh>("@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/beetleMesh.mesh");
 
 
             //var meshes = fab.GetComponentsInChildren<SkinnedMeshRenderer>();
@@ -252,8 +252,8 @@ internal static class AnimationReplacements
     }
     internal static void Import(string prefab, string skeleton, bool hidemesh = true)
     {
-        Assets.Load<GameObject>(skeleton).GetComponent<Animator>().runtimeAnimatorController = GameObject.Instantiate<GameObject>(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commando.prefab")).GetComponent<Animator>().runtimeAnimatorController;
-        AnimationReplacements.ApplyAnimationStuff(Addressables.LoadAssetAsync<GameObject>(prefab).WaitForCompletion(), Assets.Load<GameObject>(skeleton), 0, hidemesh, revertBonePositions: true);
+        EmotesAPI.Assets.Load<GameObject>(skeleton).GetComponent<Animator>().runtimeAnimatorController = GameObject.Instantiate<GameObject>(EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commando.prefab")).GetComponent<Animator>().runtimeAnimatorController;
+        AnimationReplacements.ApplyAnimationStuff(Addressables.LoadAssetAsync<GameObject>(prefab).WaitForCompletion(), EmotesAPI.Assets.Load<GameObject>(skeleton), 0, hidemesh, revertBonePositions: true);
     }
     internal static void ChangeAnims()
     {
@@ -317,7 +317,7 @@ internal static class AnimationReplacements
                         case "RobPaladinBody":
                             if (Settings.Paladin.Value)
                             {
-                                var skele = Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/animPaladin.prefab");
+                                var skele = EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/animPaladin.prefab");
                                 CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
                                 skele.GetComponentInChildren<BoneMapper>().scale = 1.5f;
                             }
@@ -325,7 +325,7 @@ internal static class AnimationReplacements
                         case "EnforcerBody":
                             if (Settings.Enforcer.Value)
                             {
-                                var skele = Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/enforcer.prefab");
+                                var skele = EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/enforcer.prefab");
                                 CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
                                 skele.GetComponentInChildren<BoneMapper>().scale = 1.2f;
                             }
@@ -333,49 +333,49 @@ internal static class AnimationReplacements
                         case "NemesisEnforcerBody":
                             if (Settings.Enforcer.Value)
                             {
-                                var skele = Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/nemforcer.prefab");
+                                var skele = EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/nemforcer.prefab");
                                 CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
                             }
                             break;
-                        case "CHEF":
+                        case "GnomeChefBody":
                             if (Settings.Chef.Value)
                             {
-                                var skele = Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/chef.prefab");
+                                var skele = EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/chef.prefab");
                                 CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele, true);
                             }
                             break;
                         case "HolomancerBody":
                             if (Settings.Holomancer.Value)
                             {
-                                var skele = Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/holomancer.prefab");
+                                var skele = EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/holomancer.prefab");
                                 CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
                             }
                             break;
                         case "SettBody":
                             if (Settings.Sett.Value)
                             {
-                                var skele = Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/Sett.prefab");
+                                var skele = EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/Sett.prefab");
                                 CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
                             }
                             break;
                         case "TracerBody":
                             if (Settings.Tracer.Value)
                             {
-                                var skele = Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/imalreadytracer.prefab");
+                                var skele = EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/imalreadytracer.prefab");
                                 CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
                             }
                             break;
                         case "HenryBody":
                             if (Settings.Henry.Value)
                             {
-                                var skele = Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/henry.prefab");
+                                var skele = EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/henry.prefab");
                                 CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
                             }
                             break;
                         case "AurelionSolBody":
                             if (Settings.SolSupport.Value)
                             {
-                                var skele = Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/solreordered4.prefab");
+                                var skele = EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/solreordered4.prefab");
                                 //var skele = Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/soltest2.prefab");
                                 CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
                             }
@@ -383,77 +383,92 @@ internal static class AnimationReplacements
                         case "Katarina":
                             if (Settings.Katarina.Value)
                             {
-                                var skele = Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/katarina.prefab");
+                                var skele = EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/katarina.prefab");
                                 CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
                             }
                             break;
                         case "MinerBody":
                             if (Settings.Miner.Value)
                             {
-                                var skele = Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/miner.prefab");
+                                var skele = EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/miner.prefab");
                                 CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele, true);
                             }
                             break;
                         case "PhoenixBody":
                             if (Settings.Phoenix.Value)
                             {
-                                var skele = Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/ppwright.prefab");
+                                var skele = EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/ppwright.prefab");
                                 CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
                             }
                             break;
                         case "ScoutBody":
                             if (Settings.Scout.Value)
                             {
-                                var skele = Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/scout.prefab");
-                                CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
+                                GameObject skele;
+                                bool newScout = false;
+                                foreach (var renderer in item.bodyPrefab.GetComponentsInChildren<SkinnedMeshRenderer>())
+                                {
+                                    if (renderer.name == "meshScout")
+                                    {
+                                        //skele = Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/new_scout.prefab");
+                                        //CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
+                                        newScout = true;
+                                        break;
+                                    }
+                                }
+                                if (!newScout)
+                                {
+                                    skele = EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/scout.prefab");
+                                    CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
+                                }
                             }
                             break;
                         case "JinxBody":
                             if (Settings.Jinx.Value)
                             {
-                                var skele = Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/jinx.prefab");
+                                var skele = EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/jinx.prefab");
                                 CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
                             }
                             break;
                         case "TF2SollyBody":
                             if (Settings.Soldier.Value)
                             {
-                                var skele = Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/soldier.prefab");
+                                var skele = EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/soldier.prefab");
                                 CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
                             }
                             break;
                         case "DragonScavengerBody":
                             if (Settings.Scavenger.Value)
                             {
-                                var skele = Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/PlayableScavenger.prefab");
+                                var skele = EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/PlayableScavenger.prefab");
                                 CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
                             }
                             break;
                         case "GokuBody":
                             if (Settings.Goku.Value)
                             {
-                                var skele = Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/goku1.prefab");
+                                var skele = EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/goku1.prefab");
                                 CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
                             }
                             break;
                         case "TrunksBody":
                             if (Settings.Trunks.Value)
                             {
-                                var skele = Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/trunks.prefab");
+                                var skele = EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/trunks.prefab");
                                 CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
                             }
                             break;
                         case "VegetaBody":
                             if (Settings.Vegeta.Value)
                             {
-                                var skele = Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/vegeta.prefab");
+                                var skele = EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/vegeta.prefab");
                                 CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
                             }
                             break;
                         case "NemCommandoBody":
                             if (Settings.Nemmando.Value)
                             {
-                                var skele = Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/nemmando9.prefab");
+                                var skele = EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/nemmando9.prefab");
                                 CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
                                 skele.GetComponent<BoneMapper>().scale = 1;
                             }
@@ -461,28 +476,28 @@ internal static class AnimationReplacements
                         case "AmpBody":
                             if (Settings.Amp.Value)
                             {
-                                var skele = Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/amp2.prefab");
+                                var skele = EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/amp2.prefab");
                                 CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
                             }
                             break;
                         case "PathfinderBody":
                             if (Settings.Pathfinder.Value)
                             {
-                                var skele = Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/pathfinder1.prefab");
+                                var skele = EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/pathfinder1.prefab");
                                 CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
                             }
                             break;
                         case "TF2MedicBody":
                             if (Settings.TF2Medic.Value)
                             {
-                                var skele = Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/medic3.prefab");
+                                var skele = EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/medic3.prefab");
                                 CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
                             }
                             break;
                         case "Executioner2Body":
                             if (Settings.Executioner.Value)
                             {
-                                var skele = Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/executioner4.prefab");
+                                var skele = EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/executioner4.prefab");
                                 CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
                                 skele.GetComponent<BoneMapper>().scale = 1;
                             }
@@ -490,21 +505,35 @@ internal static class AnimationReplacements
                         case "SpearmanBody":
                             if (Settings.Spearman.Value)
                             {
-                                var skele = Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/SpearManEmoteSkeleton.prefab");
+                                var skele = EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/SpearManEmoteSkeleton.prefab");
                                 CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
                             }
                             break;
                         case "VoidJailerSurvivor":
                             if (Settings.VoidJailer.Value)
                             {
-                                var skele = Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/voidjailer_emoteskeleton.prefab");
+                                var skele = EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/voidjailer_emoteskeleton.prefab");
                                 CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
                             }
                             break;
                         case "RobDriverBody":
                             if (Settings.Baby.Value)
                             {
-                                var skele = Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/baby.prefab");
+                                var skele = EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/baby.prefab");
+                                CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
+                            }
+                            break;
+                        case "RobHunkBody":
+                            if (Settings.Baby.Value)
+                            {
+                                var skele = EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/Hunk.prefab");
+                                CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
+                            }
+                            break;
+                        case "RobRavagerBody":
+                            if (Settings.Baby.Value)
+                            {
+                                var skele = EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/animRedGuy.prefab");
                                 CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
                             }
                             break;
@@ -528,11 +557,39 @@ internal static class AnimationReplacements
     }
     internal static void ApplyAnimationStuff(GameObject bodyPrefab, string resource, int pos = 0)
     {
-        GameObject animcontroller = Assets.Load<GameObject>(resource);
+        GameObject animcontroller = EmotesAPI.Assets.Load<GameObject>(resource);
         ApplyAnimationStuff(bodyPrefab, animcontroller, pos);
     }
     internal static void ApplyAnimationStuff(GameObject bodyPrefab, GameObject animcontroller, int pos = 0, bool hidemeshes = true, bool jank = false, bool revertBonePositions = false)
     {
+        //if (animcontroller.name.ToLower().Contains("sett"))
+        //{
+        //    //animcontroller = GameObject.Instantiate(animcontroller);
+        //    DebugClass.Log($"STOPPING EARLY FOR SETT===========================================================================");
+        //    Transform modelTransform2;
+        //    if (bodyPrefab.GetComponent<ModelLocator>())
+        //    {
+        //        modelTransform2 = bodyPrefab.GetComponent<ModelLocator>().modelTransform;
+        //    }
+        //    else
+        //    {
+        //        modelTransform2 = bodyPrefab.GetComponentInChildren<Animator>().transform;
+        //    }
+        //    //foreach (var item in animcontroller.GetComponentsInChildren<Component>())
+        //    //{
+        //    //    try
+        //    //    {
+        //    //        DebugClass.Log(item);
+
+        //    //        GameObject.Destroy(item.gameObject);
+        //    //    }
+        //    //    catch (Exception)
+        //    //    {
+        //    //    }
+        //    //}
+        //    animcontroller.transform.parent = modelTransform2;
+        //    return;
+        //}
         try
         {
             if (!animcontroller.GetComponentInChildren<Animator>().avatar.isHuman)
@@ -657,9 +714,12 @@ internal static class AnimationReplacements
         }
         try
         {
-            var nuts = Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/bandit.prefab");
+            var nuts = GameObject.Instantiate(EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/bandit.prefab"));
+            var nuts2 = GameObject.Instantiate(animcontroller); //fuck off unity, why are we changing core functionality, I used to not need to do this.
             float banditScale = Vector3.Distance(nuts.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.Head).position, nuts.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.LeftFoot).position);
-            float currScale = Vector3.Distance(animcontroller.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.Head).position, animcontroller.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.LeftFoot).position);
+            float currScale = Vector3.Distance(nuts2.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.Head).position, nuts2.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.LeftFoot).position);
+            GameObject.DestroyImmediate(nuts);
+            GameObject.DestroyImmediate(nuts2);
             test.scale = currScale / banditScale;
             test.h = bodyPrefab.GetComponentInChildren<HealthComponent>();
             test.model = modelTransform.gameObject;
@@ -667,14 +727,18 @@ internal static class AnimationReplacements
         catch (Exception e)
         {
             DebugClass.Log($"Had issue when setting up BoneMapper settings 2: {e}");
-            var nuts = Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/bandit.prefab");
+            var nuts = GameObject.Instantiate(EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/bandit.prefab"));
             test.scale = Vector3.Distance(nuts.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.Head).position, nuts.GetComponentInChildren<Animator>().GetBoneTransform(HumanBodyBones.LeftFoot).position);
+            GameObject.DestroyImmediate(nuts);
             test.h = bodyPrefab.GetComponentInChildren<HealthComponent>();
             test.model = modelTransform.gameObject;
             //throw;
         }
         test.revertTransform = revertBonePositions;
+        allMappers.Add(test);
     }
+
+    internal static List<BoneMapper> allMappers = new List<BoneMapper>();
 }
 public struct JoinSpot
 {
@@ -921,6 +985,13 @@ public class BoneMapper : MonoBehaviour
                     CustomAnimationClip.syncPlayerCount[currentClip.syncPos]--;
                     RemoveAudioObject();
                 }
+            }
+            catch (Exception e)
+            {
+                DebugClass.Log($"had issue turning off audio before new audio played step 1");
+            }
+            try
+            {
                 if (stopEvents[currentClip.syncPos][currEvent] != "")
                 {
                     audioObjects[currentClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
@@ -932,6 +1003,7 @@ public class BoneMapper : MonoBehaviour
 
                     if (CustomAnimationClip.syncPlayerCount[currentClip.syncPos] == 0 && currentClip.syncronizeAudio)
                     {
+                        AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos][currEvent], CustomEmotesAPI.audioContainers[currentClip.syncPos]);
                         foreach (var item in allMappers)
                         {
                             if (!item.audioObjects[currentClip.syncPos])
@@ -940,7 +1012,6 @@ public class BoneMapper : MonoBehaviour
                             }
                             item.audioObjects[currentClip.syncPos].transform.localPosition = new Vector3(0, -10000, 0);
                         }
-                        AkSoundEngine.PostEvent(stopEvents[currentClip.syncPos][currEvent], CustomEmotesAPI.audioContainers[currentClip.syncPos]);
                     }
                 }
                 if (uniqueSpot != -1 && CustomAnimationClip.uniqueAnimations[currentClip.syncPos][uniqueSpot])
@@ -951,7 +1022,7 @@ public class BoneMapper : MonoBehaviour
             }
             catch (Exception e)
             {
-                DebugClass.Log($"had issue turning off audio before new audio played: {e}\n Notable items for debugging: [currentClip: {currentClip}] [currentClip.syncPos: {currentClip.syncPos}] [currEvent: {currEvent}] [stopEvents[currentClip.syncPos]: {stopEvents[currentClip.syncPos]}] [CustomEmotesAPI.audioContainers[currentClip.syncPos]: {CustomEmotesAPI.audioContainers[currentClip.syncPos]}] [uniqueSpot: {uniqueSpot}] [CustomAnimationClip.uniqueAnimations[currentClip.syncPos]: {CustomAnimationClip.uniqueAnimations[currentClip.syncPos]}]");
+                DebugClass.Log($"had issue turning off audio before new audio played step 2: {e}\n Notable items for debugging: [currentClip: {currentClip}] [currentClip.syncPos: {currentClip.syncPos}] [currEvent: {currEvent}] [stopEvents[currentClip.syncPos]: {stopEvents[currentClip.syncPos]}] [CustomEmotesAPI.audioContainers[currentClip.syncPos]: {CustomEmotesAPI.audioContainers[currentClip.syncPos]}] [uniqueSpot: {uniqueSpot}] [CustomAnimationClip.uniqueAnimations[currentClip.syncPos]: {CustomAnimationClip.uniqueAnimations[currentClip.syncPos]}]");
             }
         }
         catch (Exception)
@@ -1378,7 +1449,10 @@ public class BoneMapper : MonoBehaviour
         PlayAnim("none", 0);
         smr2.transform.parent.gameObject.SetActive(false);
         smr2.transform.parent.gameObject.SetActive(true);
-        jank = false;
+        if (a2.transform.parent.name == "mdlAssassin")
+        {
+            jank = false;
+        }
     }
     public void AssignParentGameObject(GameObject youAreTheFather, bool lockPosition, bool lockRotation, bool lockScale, bool scaleAsBandit = true, bool disableCollider = true)
     {
@@ -1560,7 +1634,7 @@ public class BoneMapper : MonoBehaviour
                 //DebugClass.Log($"----------{a1}");
                 if (!ragdolling)
                 {
-                    if (smr2.transform.parent.gameObject.name == "mdlCHEF" || a2.transform.parent.name == "Bastian")
+                    if (smr2.transform.parent.gameObject.name == "mdlCHEF" || a2.transform.parent.name == "Bastian" || (jank && a2.transform.parent.name != "mdlAssassin"))
                     {
                         a1.enabled = true;
                     }
@@ -1608,7 +1682,7 @@ public class BoneMapper : MonoBehaviour
         }
         else
         {
-            if (smr2.transform.parent.gameObject.name == "mdlCHEF" || a2.transform.parent.name == "Bastian")
+            if (smr2.transform.parent.gameObject.name == "mdlCHEF" || a2.transform.parent.name == "Bastian" || (jank && a2.transform.parent.name != "mdlAssassin"))
             {
                 a1.enabled = false;
             }
@@ -1697,7 +1771,7 @@ public class BoneMapper : MonoBehaviour
     }
     public int SpawnJoinSpot(JoinSpot joinSpot)
     {
-        props.Add(GameObject.Instantiate(Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/emotejoiner/JoinVisual.prefab")));
+        props.Add(GameObject.Instantiate(EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/emotejoiner/JoinVisual.prefab")));
         props[props.Count - 1].transform.SetParent(transform);
         //Vector3 scal = transform.lossyScale;
         //props[props.Count - 1].transform.localPosition = new Vector3(joinSpot.position.x / scal.x, joinSpot.position.y / scal.y, joinSpot.position.z / scal.z);
@@ -1781,7 +1855,7 @@ public class BoneMapper : MonoBehaviour
     internal IEnumerator waitForTwoFramesThenDisableA1()
     {
         yield return new WaitForEndOfFrame(); //haha we only wait for one frame lmao
-        if (smr2.transform.parent.gameObject.name == "mdlCHEF" || a2.transform.parent.name == "Bastian")
+        if (smr2.transform.parent.gameObject.name == "mdlCHEF" || a2.transform.parent.name == "Bastian" || (jank && a2.transform.parent.name != "mdlAssassin"))
         {
             a1.enabled = false;
         }

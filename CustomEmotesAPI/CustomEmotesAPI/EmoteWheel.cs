@@ -29,7 +29,8 @@ public class EmoteWheel : MonoBehaviour
     internal Image joy;
 
     internal RoR2.UI.MPInput input = GameObject.Find("MPEventSystem Player0").GetComponent<RoR2.UI.MPInput>();
-    internal RoR2.UI.MPEventSystem events;
+    internal static RoR2.UI.MPEventSystem events;
+    internal static bool emoteWheelKeyDown = false;
 
     internal string[] leftPage = new string[8];
     internal string[] middlePage = new string[8];
@@ -81,9 +82,10 @@ public class EmoteWheel : MonoBehaviour
                 return;
             }
         }
+        emoteWheelKeyDown = false;
         if (RoR2.PauseManager.isPaused)
             return;
-
+        emoteWheelKeyDown = CustomEmotesAPI.GetKey(Settings.EmoteWheel);
         Vector3 v = new Vector3(0, 0, 0);
         if (transform.localPosition == v)
         {
@@ -179,7 +181,7 @@ public class EmoteWheel : MonoBehaviour
                 }
             }
         }
-        if (CustomEmotesAPI.GetKey(Settings.EmoteWheel))
+        if (emoteWheelKeyDown)
         {
             if (transform.localPosition != v)
             {

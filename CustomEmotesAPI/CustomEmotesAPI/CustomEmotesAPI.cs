@@ -18,6 +18,7 @@ using UnityEngine.AddressableAssets;
 using TMPro;
 using System.Collections;
 using static UnityEngine.ParticleSystem.PlaybackState;
+using MonoMod.RuntimeDetour;
 
 namespace EmotesAPI
 {
@@ -33,7 +34,8 @@ namespace EmotesAPI
 
         public const string PluginName = "Custom Emotes API";
 
-        public const string VERSION = "2.4.2";
+        public const string VERSION = "2.6.0";
+
         public struct NameTokenWithSprite
         {
             public string nameToken;
@@ -121,9 +123,6 @@ namespace EmotesAPI
             CustomEmotesAPI.LoadResource("customemotespackage");
             CustomEmotesAPI.LoadResource("fineilldoitmyself");
             CustomEmotesAPI.LoadResource("enemyskeletons");
-            //if (!BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("com.gemumoddo.MoistureUpset"))
-            //{
-            //}
             CustomEmotesAPI.LoadResource("moisture_animationreplacements"); // I don't remember what's in here that makes importing emotes work, don't @ me
             Settings.RunAll();
             Register.Init();
@@ -139,6 +138,7 @@ namespace EmotesAPI
             {
                 orig(self, scene);
                 AkSoundEngine.SetRTPCValue("Volume_Emotes", Settings.EmotesVolume.Value);
+
                 if (allClipNames != null)
                 {
                     ScrollManager.SetupButtons(allClipNames);
@@ -182,19 +182,30 @@ namespace EmotesAPI
             {
                 orig(self, newValue);
                 //Volume_MSX
-                if (self.GetFieldValue<string>("rtpcName") == "Volume_MSX" && WhosSteveJobs > 100)
+                try
                 {
-                    Actual_MSX = float.Parse(newValue, CultureInfo.InvariantCulture);
-                    BoneMapper.Current_MSX = Actual_MSX;
-                    Settings.DontTouchThis.Value = float.Parse(newValue, CultureInfo.InvariantCulture);
+                    if (AkSoundEngine.IsInitialized())
+                    {
+                        if (self.GetFieldValue<string>("rtpcName") == "Volume_MSX" && WhosSteveJobs > 100)
+                        {
+                            Actual_MSX = float.Parse(newValue, CultureInfo.InvariantCulture);
+                            BoneMapper.Current_MSX = Actual_MSX;
+                            Settings.DontTouchThis.Value = float.Parse(newValue, CultureInfo.InvariantCulture);
+                        }
+                    }
+                }
+                catch (System.Exception)
+                {
                 }
             };
-            On.RoR2.PlayerCharacterMasterController.FixedUpdate += (orig, self) =>
+            On.RoR2.PlayerCharacterMasterController.Update += (orig, self) =>
             {
+                bool emoteWheelOpen = EmoteWheel.emoteWheelKeyDown;
+                bool jumpWasClaimed = self.wasClaimed;
                 orig(self);
-                if (CustomEmotesAPI.GetKey(Settings.EmoteWheel))
+                if (emoteWheelOpen && self.wasClaimed)
                 {
-                    if (self.hasEffectiveAuthority && self.GetFieldValue<InputBankTest>("bodyInputs"))
+                    if (self.hasEffectiveAuthority)
                     {
                         bool newState = false;
                         bool newState2 = false;
@@ -216,18 +227,42 @@ namespace EmotesAPI
                             localUser = self.networkUser.localUser;
                             player = self.networkUser.inputPlayer;
                             cameraRigController = self.networkUser.cameraRigController;
-                            doIt = localUser != null && player != null && cameraRigController && !localUser.isUIFocused && cameraRigController.isControlAllowed;
+                            doIt = localUser != null && player != null && cameraRigController && !RoR2.PauseManager.isPaused;
                         }
                         if (doIt)
                         {
-                            newState = player.GetButton(7) && !CustomEmotesAPI.GetKey(Settings.EmoteWheel); //left click
-                            newState2 = player.GetButton(8) && !CustomEmotesAPI.GetKey(Settings.EmoteWheel); //right click
+                            newState = player.GetButton(7) && !emoteWheelOpen; //left click
+                            newState2 = player.GetButton(8) && !emoteWheelOpen; //right click
                             newState3 = player.GetButton(9);
                             newState4 = player.GetButton(10);
                             self.GetFieldValue<InputBankTest>("bodyInputs").skill1.PushState(newState);
                             self.GetFieldValue<InputBankTest>("bodyInputs").skill2.PushState(newState2);
                             BoneMapper.attacking = newState || newState2 || newState3 || newState4;
-                            BoneMapper.moving = self.GetFieldValue<InputBankTest>("bodyInputs").moveVector != Vector3.zero || player.GetButton(4);
+                            BoneMapper.moving = self.GetFieldValue<InputBankTest>("bodyInputs").moveVector != UnityEngine.Vector3.zero || player.GetButton(4);
+
+
+                            self.bodyInputs.jump.PushState(player.GetButton(4));
+                            UnityEngine.Vector2 vector3 = new UnityEngine.Vector2(player.GetAxis(0), player.GetAxis(1));
+                            UnityEngine.Vector2 vector4 = new UnityEngine.Vector2(player.GetAxis(12), player.GetAxis(13));
+                            self.bodyInputs.SetRawMoveStates(vector3 + vector4);
+                            float sqrMagnitude = vector3.sqrMagnitude;
+                            UnityEngine.Vector3 vector = UnityEngine.Vector3.zero;
+                            Transform transform = cameraRigController.transform;
+                            if (sqrMagnitude > 1f)
+                            {
+                                vector3 /= Mathf.Sqrt(sqrMagnitude);
+                            }
+                            if (self.bodyIsFlier)
+                            {
+                                vector = transform.right * vector3.x + transform.forward * vector3.y;
+                            }
+                            else
+                            {
+                                float y = transform.eulerAngles.y;
+                                vector = UnityEngine.Quaternion.Euler(0f, y, 0f) * new UnityEngine.Vector3(vector3.x, 0f, vector3.y);
+                            }
+                            self.bodyInputs.moveVector = vector;
+                            self.bodyInputs.jump.hasPressBeenClaimed = jumpWasClaimed;
                         }
                     }
                 }
@@ -235,6 +270,7 @@ namespace EmotesAPI
             AddCustomAnimation(Assets.Load<AnimationClip>($"@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/lmao.anim"), false, visible: false);
             AddNonAnimatingEmote("none");
         }
+
         public static int RegisterWorldProp(GameObject worldProp, JoinSpot[] joinSpots)
         {
             worldProp.AddComponent<NetworkIdentity>();
