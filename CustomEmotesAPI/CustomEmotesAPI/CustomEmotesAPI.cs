@@ -34,7 +34,7 @@ namespace EmotesAPI
 
         public const string PluginName = "Custom Emotes API";
 
-        public const string VERSION = "2.6.0";
+        public const string VERSION = "2.6.2";
 
         public struct NameTokenWithSprite
         {
@@ -143,6 +143,8 @@ namespace EmotesAPI
                 {
                     ScrollManager.SetupButtons(allClipNames);
                 }
+
+                AkSoundEngine.SetRTPCValue("Parent_Volume_MSX", Actual_MSX);
                 AkSoundEngine.SetRTPCValue("Volume_MSX", Actual_MSX);
                 for (int i = 0; i < CustomAnimationClip.syncPlayerCount.Count; i++)
                 {
@@ -151,6 +153,7 @@ namespace EmotesAPI
                 }
                 if (scene.name == "title" && WhosSteveJobs < 101)
                 {
+                    AkSoundEngine.SetRTPCValue("Parent_Volume_MSX", WhosSteveJobs);
                     AkSoundEngine.SetRTPCValue("Volume_MSX", WhosSteveJobs);
                     Actual_MSX = WhosSteveJobs;
                     WhosSteveJobs = 69420;
@@ -181,15 +184,18 @@ namespace EmotesAPI
             On.RoR2.AudioManager.VolumeConVar.SetString += (orig, self, newValue) =>
             {
                 orig(self, newValue);
-                //Volume_MSX
+                //Parent_Volume_MSX
                 try
                 {
                     if (AkSoundEngine.IsInitialized())
                     {
-                        if (self.GetFieldValue<string>("rtpcName") == "Volume_MSX" && WhosSteveJobs > 100)
+                        if (self.GetFieldValue<string>("rtpcName") == "Parent_Volume_MSX" && WhosSteveJobs > 100)
                         {
                             Actual_MSX = float.Parse(newValue, CultureInfo.InvariantCulture);
                             BoneMapper.Current_MSX = Actual_MSX;
+                            AkSoundEngine.SetRTPCValue("Parent_Volume_MSX", Actual_MSX);
+                            AkSoundEngine.SetRTPCValue("Volume_MSX", Actual_MSX);
+
                             Settings.DontTouchThis.Value = float.Parse(newValue, CultureInfo.InvariantCulture);
                         }
                     }

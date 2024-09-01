@@ -562,34 +562,6 @@ internal static class AnimationReplacements
     }
     internal static void ApplyAnimationStuff(GameObject bodyPrefab, GameObject animcontroller, int pos = 0, bool hidemeshes = true, bool jank = false, bool revertBonePositions = false)
     {
-        //if (animcontroller.name.ToLower().Contains("sett"))
-        //{
-        //    //animcontroller = GameObject.Instantiate(animcontroller);
-        //    DebugClass.Log($"STOPPING EARLY FOR SETT===========================================================================");
-        //    Transform modelTransform2;
-        //    if (bodyPrefab.GetComponent<ModelLocator>())
-        //    {
-        //        modelTransform2 = bodyPrefab.GetComponent<ModelLocator>().modelTransform;
-        //    }
-        //    else
-        //    {
-        //        modelTransform2 = bodyPrefab.GetComponentInChildren<Animator>().transform;
-        //    }
-        //    //foreach (var item in animcontroller.GetComponentsInChildren<Component>())
-        //    //{
-        //    //    try
-        //    //    {
-        //    //        DebugClass.Log(item);
-
-        //    //        GameObject.Destroy(item.gameObject);
-        //    //    }
-        //    //    catch (Exception)
-        //    //    {
-        //    //    }
-        //    //}
-        //    animcontroller.transform.parent = modelTransform2;
-        //    return;
-        //}
         try
         {
             if (!animcontroller.GetComponentInChildren<Animator>().avatar.isHuman)
@@ -1540,6 +1512,7 @@ public class BoneMapper : MonoBehaviour
         if (closestDimmingSource < 20f && Settings.DimmingSpheres.Value && Settings.EmotesVolume.Value > 0)
         {
             Current_MSX = Mathf.Lerp(Current_MSX, (closestDimmingSource / 20f) * CustomEmotesAPI.Actual_MSX, Time.deltaTime * 3);
+            AkSoundEngine.SetRTPCValue("Parent_Volume_MSX", Current_MSX);
             AkSoundEngine.SetRTPCValue("Volume_MSX", Current_MSX);
         }
         else if (Current_MSX != CustomEmotesAPI.Actual_MSX)
@@ -1549,6 +1522,7 @@ public class BoneMapper : MonoBehaviour
             {
                 Current_MSX = CustomEmotesAPI.Actual_MSX;
             }
+            AkSoundEngine.SetRTPCValue("Parent_Volume_MSX", Current_MSX);
             AkSoundEngine.SetRTPCValue("Volume_MSX", Current_MSX);
         }
     }
