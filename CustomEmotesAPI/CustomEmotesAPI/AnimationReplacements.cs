@@ -1513,7 +1513,6 @@ public class BoneMapper : MonoBehaviour
         var actualMSX = float.Parse(AudioManager.cvVolumeParentMsx.GetString());
         if (closestDimmingSource < 20f && Settings.DimmingSpheres.Value && Settings.EmotesVolume.Value > 0)
         {
-            DebugClass.Log("DimmingSphere: " + closestDimmingSource);
             Current_MSX = Mathf.Lerp(Current_MSX, (closestDimmingSource / 20f) * actualMSX, Time.deltaTime * 3);
             AkSoundEngine.SetRTPCValue("Volume_MSX", Current_MSX * currentMaster);
         }
