@@ -1509,21 +1509,22 @@ public class BoneMapper : MonoBehaviour
     }
     void SetRTPCInDimming(float closestDimmingSource)
     {
+        var currentMaster = float.Parse(AudioManager.cvVolumeMaster.GetString()) / 100f;
+        var actualMSX = float.Parse(AudioManager.cvVolumeParentMsx.GetString());
         if (closestDimmingSource < 20f && Settings.DimmingSpheres.Value && Settings.EmotesVolume.Value > 0)
         {
-            Current_MSX = Mathf.Lerp(Current_MSX, (closestDimmingSource / 20f) * CustomEmotesAPI.Actual_MSX, Time.deltaTime * 3);
-            AkSoundEngine.SetRTPCValue("Parent_Volume_MSX", Current_MSX);
-            AkSoundEngine.SetRTPCValue("Volume_MSX", Current_MSX);
+            DebugClass.Log("DimmingSphere: " + closestDimmingSource);
+            Current_MSX = Mathf.Lerp(Current_MSX, (closestDimmingSource / 20f) * actualMSX, Time.deltaTime * 3);
+            AkSoundEngine.SetRTPCValue("Volume_MSX", Current_MSX * currentMaster);
         }
-        else if (Current_MSX != CustomEmotesAPI.Actual_MSX)
+        else if (Current_MSX != actualMSX)
         {
-            Current_MSX = Mathf.Lerp(Current_MSX, CustomEmotesAPI.Actual_MSX, Time.deltaTime * 3);
-            if (Current_MSX + .01f > CustomEmotesAPI.Actual_MSX)
+            Current_MSX = Mathf.Lerp(Current_MSX, actualMSX, Time.deltaTime * 3);
+            if (Current_MSX + .01f > actualMSX)
             {
-                Current_MSX = CustomEmotesAPI.Actual_MSX;
+                Current_MSX = actualMSX;
             }
-            AkSoundEngine.SetRTPCValue("Parent_Volume_MSX", Current_MSX);
-            AkSoundEngine.SetRTPCValue("Volume_MSX", Current_MSX);
+            AkSoundEngine.SetRTPCValue("Volume_MSX", Current_MSX * currentMaster);
         }
     }
     void LocalFunctions()
