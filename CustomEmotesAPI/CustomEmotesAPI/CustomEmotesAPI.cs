@@ -166,28 +166,6 @@ namespace EmotesAPI
                 localMapper = null;
                 EmoteLocation.visibile = true;
             };
-            // On.RoR2.AudioManager.VolumeConVar.SetString += (orig, self, newValue) =>
-            // {
-            //     orig(self, newValue);
-            //     // Parent_Volume_MSX = Music Volume
-            //     // Volume_MSX = Master Volume * Music Volume
-            //     try
-            //     {
-            //         if (AkSoundEngine.IsInitialized())
-            //         {
-            //             DebugClass.Log($"{self.GetFieldValue<string>("rtpcName")}: {newValue}");
-            //             if (self.GetFieldValue<string>("rtpcName") == "Parent_Volume_MSX")
-            //             {
-            //                 Actual_MSX = float.Parse(newValue, CultureInfo.InvariantCulture);
-            //                 BoneMapper.Current_MSX = Actual_MSX;
-            //                 AkSoundEngine.SetRTPCValue("Parent_Volume_MSX", Actual_MSX);
-            //             }
-            //         }
-            //     }
-            //     catch (System.Exception)
-            //     {
-            //     }
-            // };
             On.RoR2.PlayerCharacterMasterController.Update += (orig, self) =>
             {
                 bool emoteWheelOpen = EmoteWheel.emoteWheelKeyDown;

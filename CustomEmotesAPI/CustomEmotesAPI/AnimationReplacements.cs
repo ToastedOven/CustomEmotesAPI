@@ -1509,6 +1509,8 @@ public class BoneMapper : MonoBehaviour
     }
     void SetRTPCInDimming(float closestDimmingSource)
     {
+        // Volume_MSX = Maser_Volume * Parent_Volume_MSX
+        // Volume_MSX is not stored as a user preference but calculated from factoring the master & music settings together
         var currentMaster = float.Parse(AudioManager.cvVolumeMaster.GetString()) / 100f;
         var actualMSX = float.Parse(AudioManager.cvVolumeParentMsx.GetString());
         if (closestDimmingSource < 20f && Settings.DimmingSpheres.Value && Settings.EmotesVolume.Value > 0)
