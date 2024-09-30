@@ -221,6 +221,11 @@ internal static class AnimationReplacements
         //Import("", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/notenemies/.prefab");
         //Import("", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/notenemies/.prefab");
         //Import("", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/notenemies/.prefab");
+        Import("RoR2/DLC2/Child/ChildBody.prefab", "@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/Child.prefab");
+        //Import("RoR2/DLC2/FalseSonBoss/FalseSonBossBody.prefab", "@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/CorrectSon.prefab");
+        Import("RoR2/DLC2/Halcyonite/HalcyoniteBody.prefab", "@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/Halcyonite1.prefab");
+        Import("RoR2/DLC2/Scorchling/ScorchlingBody.prefab", "@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/Scorchling.prefab");
+
     }
     public static void DebugBones(string resource, int pos = 0)
     {
@@ -314,14 +319,14 @@ internal static class AnimationReplacements
                 {
                     switch (item.bodyPrefab.name)
                     {
-                        case "RobPaladinBody":
-                            if (Settings.Paladin.Value)
-                            {
-                                var skele = EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/animPaladin.prefab");
-                                CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
-                                skele.GetComponentInChildren<BoneMapper>().scale = 1.5f;
-                            }
-                            break;
+                        //case "RobPaladinBody":
+                        //    if (Settings.Paladin.Value)
+                        //    {
+                        //        var skele = EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/animPaladin.prefab");
+                        //        CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
+                        //        skele.GetComponentInChildren<BoneMapper>().scale = 1.5f;
+                        //    }
+                        //    break;
                         case "EnforcerBody":
                             if (Settings.Enforcer.Value)
                             {
@@ -536,6 +541,15 @@ internal static class AnimationReplacements
                                 var skele = EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/animRedGuy.prefab");
                                 CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
                             }
+                            break;
+                        case "ChefBody":
+                            CustomEmotesAPI.ImportArmature(item.bodyPrefab, EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/CHEF2.prefab"));
+                            break;
+                        case "FalseSonBody":
+                            CustomEmotesAPI.ImportArmature(item.bodyPrefab, EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/CorrectSon.prefab"));
+                            break;
+                        case "SeekerBody":
+                            CustomEmotesAPI.ImportArmature(item.bodyPrefab, EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/Seeker.prefab"));
                             break;
                         default:
                             //DebugClass.Log($"----------{item.bodyPrefab.name}");
@@ -1597,7 +1611,7 @@ public class BoneMapper : MonoBehaviour
             {
                 if (a2.enabled)
                 {
-                    if (smr2.transform.parent.gameObject.name == "mdlVoidSurvivor" || smr2.transform.parent.gameObject.name == "mdlMage" || smr2.transform.parent.gameObject.name == "mdlJinx" || smr2.transform.parent.gameObject.name.StartsWith("mdlHouse") || smr2.transform.parent.gameObject.name.StartsWith("mdlLemurian") || smr2.transform.parent.gameObject.name.StartsWith("mdlRocket"))
+                    if (smr2.transform.parent.gameObject.name == "mdlVoidSurvivor" || smr2.transform.parent.gameObject.name == "mdlMage" || smr2.transform.parent.gameObject.name == "mdlJinx" || smr2.transform.parent.gameObject.name.StartsWith("mdlHouse") || smr2.transform.parent.gameObject.name.StartsWith("mdlLemurian") || smr2.transform.parent.gameObject.name.StartsWith("mdlRocket") || smr2.transform.parent.gameObject.name.StartsWith("mdlSeeker"))
                     {
                         smr2.transform.parent.gameObject.SetActive(false);
                         smr2.transform.parent.gameObject.SetActive(true);
