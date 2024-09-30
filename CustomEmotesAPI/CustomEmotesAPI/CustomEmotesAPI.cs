@@ -110,7 +110,6 @@ namespace EmotesAPI
             }
             return Input.GetKeyDown(entry.Value.MainKey);
         }
-        internal static float Actual_MSX = 69;
         public static CustomEmotesAPI instance;
         public static List<GameObject> audioContainers = new List<GameObject>();
         public static List<GameObject> activeAudioContainers = new List<GameObject>();
@@ -128,12 +127,7 @@ namespace EmotesAPI
             Register.Init();
 
             AnimationReplacements.RunAll();
-            float WhosSteveJobs = 69420;
             CreateBaseNameTokenPairs();
-            if (Settings.DontTouchThis.Value < 101)
-            {
-                WhosSteveJobs = Settings.DontTouchThis.Value;
-            }
             On.RoR2.SceneCatalog.OnActiveSceneChanged += (orig, self, scene) =>
             {
                 orig(self, scene);
@@ -144,19 +138,10 @@ namespace EmotesAPI
                     ScrollManager.SetupButtons(allClipNames);
                 }
 
-                AkSoundEngine.SetRTPCValue("Parent_Volume_MSX", Actual_MSX);
-                AkSoundEngine.SetRTPCValue("Volume_MSX", Actual_MSX);
                 for (int i = 0; i < CustomAnimationClip.syncPlayerCount.Count; i++)
                 {
                     CustomAnimationClip.syncTimer[i] = 0;
                     CustomAnimationClip.syncPlayerCount[i] = 0;
-                }
-                if (scene.name == "title" && WhosSteveJobs < 101)
-                {
-                    AkSoundEngine.SetRTPCValue("Parent_Volume_MSX", WhosSteveJobs);
-                    AkSoundEngine.SetRTPCValue("Volume_MSX", WhosSteveJobs);
-                    Actual_MSX = WhosSteveJobs;
-                    WhosSteveJobs = 69420;
                 }
                 foreach (var item in BoneMapper.allMappers)
                 {
@@ -180,29 +165,6 @@ namespace EmotesAPI
                 BoneMapper.allMappers.Clear();
                 localMapper = null;
                 EmoteLocation.visibile = true;
-            };
-            On.RoR2.AudioManager.VolumeConVar.SetString += (orig, self, newValue) =>
-            {
-                orig(self, newValue);
-                //Parent_Volume_MSX
-                try
-                {
-                    if (AkSoundEngine.IsInitialized())
-                    {
-                        if (self.GetFieldValue<string>("rtpcName") == "Parent_Volume_MSX" && WhosSteveJobs > 100)
-                        {
-                            Actual_MSX = float.Parse(newValue, CultureInfo.InvariantCulture);
-                            BoneMapper.Current_MSX = Actual_MSX;
-                            AkSoundEngine.SetRTPCValue("Parent_Volume_MSX", Actual_MSX);
-                            AkSoundEngine.SetRTPCValue("Volume_MSX", Actual_MSX);
-
-                            Settings.DontTouchThis.Value = float.Parse(newValue, CultureInfo.InvariantCulture);
-                        }
-                    }
-                }
-                catch (System.Exception)
-                {
-                }
             };
             On.RoR2.PlayerCharacterMasterController.Update += (orig, self) =>
             {

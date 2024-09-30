@@ -50,7 +50,6 @@ namespace EmotesAPI
         public static ConfigEntry<bool> DimmingSpheres;
         public static ConfigEntry<bool> HideJoinSpots;
         //public static ConfigEntry<bool> RemoveAutoWalk;
-        public static ConfigEntry<float> DontTouchThis;
 
         public static ConfigEntry<string> emote0;
         public static ConfigEntry<string> emote1;
@@ -187,8 +186,6 @@ namespace EmotesAPI
             emote21 = CustomEmotesAPI.instance.Config.Bind<string>("Data", "Bind for emotes21", "none", "Messing with this here is not reccomended, like at all");
             emote22 = CustomEmotesAPI.instance.Config.Bind<string>("Data", "Bind for emotes22", "none", "Messing with this here is not reccomended, like at all");
             emote23 = CustomEmotesAPI.instance.Config.Bind<string>("Data", "Bind for emotes23", "none", "Messing with this here is not reccomended, like at all");
-
-            DontTouchThis = CustomEmotesAPI.instance.Config.Bind<float>("Data", "Dont Touch This", 69420, "But like actually dont touch this");
 
             ModSettingsManager.AddOption(new GenericButtonOption("Customize Emote Wheel", "Controls", PressButton));
             ModSettingsManager.AddOption(new KeyBindOption(EmoteWheel));
