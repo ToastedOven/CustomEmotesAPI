@@ -19,6 +19,7 @@ using System.Net.NetworkInformation;
 using System.Text;
 using IL.RoR2.Projectile;
 using RoR2.Projectile;
+using System.Globalization;
 
 [assembly: SecurityPermission(SecurityAction.RequestMinimum, SkipVerification = true)]
 internal static class AnimationReplacements
@@ -1525,8 +1526,8 @@ public class BoneMapper : MonoBehaviour
     {
         // Volume_MSX = Maser_Volume * Parent_Volume_MSX
         // Volume_MSX is not stored as a user preference but calculated from factoring the master & music settings together
-        var currentMaster = float.Parse(AudioManager.cvVolumeMaster.GetString()) / 100f;
-        var actualMSX = float.Parse(AudioManager.cvVolumeParentMsx.GetString());
+        var currentMaster = float.Parse(AudioManager.cvVolumeMaster.GetString(), CultureInfo.InvariantCulture) / 100f;
+        var actualMSX = float.Parse(AudioManager.cvVolumeParentMsx.GetString(), CultureInfo.InvariantCulture);
         if (closestDimmingSource < 20f && Settings.DimmingSpheres.Value && Settings.EmotesVolume.Value > 0)
         {
             Current_MSX = Mathf.Lerp(Current_MSX, (closestDimmingSource / 20f) * actualMSX, Time.deltaTime * 3);
