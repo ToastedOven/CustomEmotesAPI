@@ -930,6 +930,8 @@ public class BoneMapper : MonoBehaviour
     public bool oneFrameAnimatorLeeWay = false;
     public CharacterBody mapperBody;
     public bool startupFixJank = false;
+    public static Dictionary<CharacterBody, BoneMapper> characterBodiesToBoneMappers = new Dictionary<CharacterBody, BoneMapper>();
+
 
     public void PlayAnim(string s, int pos, int eventNum)
     {
@@ -1314,6 +1316,14 @@ public class BoneMapper : MonoBehaviour
         }
         mapperBody = GetComponentInParent<CharacterModel>().body;
         allMappers.Add(this);
+        if (characterBodiesToBoneMappers.ContainsKey(mapperBody))
+        {
+            characterBodiesToBoneMappers[mapperBody] = this;
+        }
+        else
+        {
+            characterBodiesToBoneMappers.Add(mapperBody, this);
+        }
         foreach (var item in startEvents)
         {
             GameObject obj = new GameObject();
@@ -1870,6 +1880,7 @@ public class BoneMapper : MonoBehaviour
     {
         try
         {
+            characterBodiesToBoneMappers.Remove(mapperBody);
             currentClip.clip[0].ToString();
             NewAnimation(null);
             if (currentClip.syncronizeAnimation || currentClip.syncronizeAudio)

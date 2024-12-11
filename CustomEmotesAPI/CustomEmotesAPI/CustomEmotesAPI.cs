@@ -34,7 +34,7 @@ namespace EmotesAPI
 
         public const string PluginName = "Custom Emotes API";
 
-        public const string VERSION = "2.7.2";
+        public const string VERSION = "2.8.0";
 
         public struct NameTokenWithSprite
         {
@@ -169,9 +169,9 @@ namespace EmotesAPI
             On.RoR2.PlayerCharacterMasterController.Update += (orig, self) =>
             {
                 bool emoteWheelOpen = EmoteWheel.emoteWheelKeyDown;
-                bool jumpWasClaimed = self.wasClaimed;
+                bool jumpWasClaimed = self.jumpWasClaimed;
                 orig(self);
-                if (emoteWheelOpen && self.wasClaimed)
+                if (emoteWheelOpen && self.jumpWasClaimed)
                 {
                     if (self.hasEffectiveAuthority)
                     {
