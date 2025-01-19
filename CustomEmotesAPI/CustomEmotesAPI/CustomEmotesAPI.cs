@@ -19,6 +19,7 @@ using TMPro;
 using System.Collections;
 using static UnityEngine.ParticleSystem.PlaybackState;
 using MonoMod.RuntimeDetour;
+using System;
 
 namespace EmotesAPI
 {
@@ -34,8 +35,9 @@ namespace EmotesAPI
 
         public const string PluginName = "Custom Emotes API";
 
-        public const string VERSION = "2.8.0";
+        public const string VERSION = "2.9.0";
 
+        public GameObject lobbyBody;
         public struct NameTokenWithSprite
         {
             public string nameToken;
@@ -69,6 +71,7 @@ namespace EmotesAPI
             CreateNameTokenSpritePair("BANDIT2_BODY_NAME", Assets.Load<Sprite>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/bandit.png"));
             CreateNameTokenSpritePair("VOIDSURVIVOR_BODY_NAME", Assets.Load<Sprite>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/voidfiend.png"));
             CreateNameTokenSpritePair("RAILGUNNER_BODY_NAME", Assets.Load<Sprite>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/railgunner.png"));
+            //CreateNameTokenSpritePair("PB_BIDEN_BODY_NAME", Assets.Load<Sprite>("@CustomEmotesAPI_brynzaupdate:Assets/emotestuff/biden-emote-icon.png"));
             //CreateNameTokenSpritePair("HERETIC_BODY_NAME", Assets.Load<Sprite>("@CustomEmotesAPI_customemotespackage:assets/emotewheel/heretic.png"));
         }
         public static List<string> allClipNames = new List<string>();
@@ -120,6 +123,7 @@ namespace EmotesAPI
             R2API.Utils.CommandHelper.AddToConsoleWhenReady();
             DebugClass.SetLogger(base.Logger);
             CustomEmotesAPI.LoadResource("customemotespackage");
+            CustomEmotesAPI.LoadResource("brynzapackage");
             CustomEmotesAPI.LoadResource("fineilldoitmyself");
             CustomEmotesAPI.LoadResource("enemyskeletons");
             CustomEmotesAPI.LoadResource("moisture_animationreplacements"); // I don't remember what's in here that makes importing emotes work, don't @ me
@@ -166,6 +170,7 @@ namespace EmotesAPI
                 localMapper = null;
                 EmoteLocation.visibile = true;
             };
+            //On.RoR2.CharacterSelectSurvivorPreviewDisplayController.Refresh += Something;
             On.RoR2.PlayerCharacterMasterController.Update += (orig, self) =>
             {
                 bool emoteWheelOpen = EmoteWheel.emoteWheelKeyDown;
@@ -386,8 +391,9 @@ namespace EmotesAPI
         }
         public static void PlayAnimation(string animationName, int pos = -2)
         {
-            var identity = NetworkUser.readOnlyLocalPlayersList[0].master?.GetBody().gameObject.GetComponent<NetworkIdentity>();
-            new SyncAnimationToServer(identity.netId, animationName, pos).Send(R2API.Networking.NetworkDestination.Server);
+            if (PauseManager.isPaused || !Run.instance) return;
+                var identity = NetworkUser.readOnlyLocalPlayersList[0].master?.GetBody().gameObject.GetComponent<NetworkIdentity>();
+                new SyncAnimationToServer(identity.netId, animationName, pos).Send(R2API.Networking.NetworkDestination.Server);
         }
         public static void PlayAnimation(string animationName, BoneMapper mapper, int pos = -2)
         {
@@ -396,6 +402,8 @@ namespace EmotesAPI
         }
         public static BoneMapper localMapper = null;
         static BoneMapper nearestMapper = null;
+        
+
         public static CustomAnimationClip GetLocalBodyCustomAnimationClip()
         {
             if (localMapper)
@@ -451,7 +459,7 @@ namespace EmotesAPI
                     mapper.transform.parent.Find("ClayBruiserCannonMesh").gameObject.SetActive(false);
                 }
                 if (mapper.transform.name == "PlayableScavenger" || mapper.transform.name == "Scavenger")
-                {
+                {   
                     mapper.transform.parent.GetComponent<ChildLocator>().FindChild("Weapon").gameObject.SetActive(false);
                 }
                 if (mapper.transform.name == "nemmando9")
@@ -459,6 +467,26 @@ namespace EmotesAPI
                     mapper.transform.parent.GetComponent<ChildLocator>().FindChild("SwordModel").gameObject.SetActive(false);
                     mapper.transform.parent.GetComponent<ChildLocator>().FindChild("GunModel").gameObject.SetActive(false);
 
+                }
+                if (mapper.transform.name == "huntress")
+                {
+                    mapper.transform.parent.Find("HuntressArmature/ROOT/base/BowRoot/BowStringIKTarget/ArrowDisplay").gameObject.SetActive(false);
+                    mapper.transform.parent.Find("BowString").gameObject.SetActive(false);
+                    mapper.transform.parent.Find("BowMesh").gameObject.SetActive(false);
+                }
+                if (mapper.transform.name == "nemmerc")
+                {
+                    mapper.transform.parent.Find("Shotgun").gameObject.SetActive(false);
+                }
+                if(mapper.transform.name == "biden")
+                {
+                    mapper.transform.parent.Find("BidenArmature/Hips/Spine/Spine1/Spine2/LeftShoulder/LeftArm/LeftForeArm/LeftHand/LH_Holder").gameObject.SetActive(false);
+                    mapper.transform.parent.Find("BidenArmature/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm/RightHand/RH_Holder").gameObject.SetActive(false);
+                }
+                if (mapper.transform.name == "commando")
+                {
+                    mapper.transform.parent.Find("CommandoArmature/ROOT/base/stomach/chest/upper_arm.r/lower_arm.r/hand.r/gun.r/GunMesh").gameObject.SetActive(false);
+                    mapper.transform.parent.Find("CommandoArmature/ROOT/base/stomach/chest/upper_arm.l/lower_arm.l/hand.l/gun.l/GunMesh.001").gameObject.SetActive(false);
                 }
                 if (mapper.transform.name == "executioner4")
                 {
@@ -492,6 +520,26 @@ namespace EmotesAPI
                 {
                     mapper.transform.parent.GetComponent<ChildLocator>().FindChild("SwordModel").gameObject.SetActive(true);
                     mapper.transform.parent.GetComponent<ChildLocator>().FindChild("GunModel").gameObject.SetActive(true);
+                }
+                if (mapper.transform.name == "huntress")
+                {
+                    mapper.transform.parent.Find("HuntressArmature/ROOT/base/BowRoot/BowStringIKTarget/ArrowDisplay").gameObject.SetActive(true);
+                    mapper.transform.parent.Find("BowString").gameObject.SetActive(true);
+                    mapper.transform.parent.Find("BowMesh").gameObject.SetActive(true);
+                }
+                if (mapper.transform.name == "nemmerc")
+                {
+                    mapper.transform.parent.Find("Shotgun").gameObject.SetActive(true);
+                }
+                if (mapper.transform.name == "biden")
+                {
+                    mapper.transform.parent.Find("BidenArmature/Hips/Spine/Spine1/Spine2/LeftShoulder/LeftArm/LeftForeArm/LeftHand/LH_Holder").gameObject.SetActive(true);
+                    mapper.transform.parent.Find("BidenArmature/Hips/Spine/Spine1/Spine2/RightShoulder/RightArm/RightForeArm/RightHand/RH_Holder").gameObject.SetActive(true);
+                }
+                if (mapper.transform.name == "commando")
+                {
+                    mapper.transform.parent.Find("CommandoArmature/ROOT/base/stomach/chest/upper_arm.r/lower_arm.r/hand.r/gun.r/GunMesh").gameObject.SetActive(true);
+                    mapper.transform.parent.Find("CommandoArmature/ROOT/base/stomach/chest/upper_arm.l/lower_arm.l/hand.l/gun.l/GunMesh.001").gameObject.SetActive(true);
                 }
                 if (mapper.transform.name == "executioner4")
                 {
@@ -556,8 +604,26 @@ namespace EmotesAPI
 
         void Update()
         {
+            if (Input.GetKey(KeyCode.A) && Input.GetKey(KeyCode.M) && Input.GetKey(KeyCode.O) && Input.GetKey(KeyCode.N) && Input.GetKey(KeyCode.G) && Input.GetKey(KeyCode.U) && Input.GetKey(KeyCode.S))
+            {
+                foreach (var boneMapper in BoneMapper.allMappers)
+                {
+                    int rand = UnityEngine.Random.Range(0, allClipNames.Count);
+                    while (blacklistedClips.Contains(rand))
+                    {
+                        rand = UnityEngine.Random.Range(0, allClipNames.Count);
+                    }
+                    //foreach (var item in BoneMapper.allMappers)
+                    //{
+                    //    PlayAnimation(allClipNames[rand], item);
+                    //}
+                    PlayAnimation(allClipNames[rand]);
+                }
+            }
             if (GetKeyPressed(Settings.RandomEmote))
             {
+                
+
                 int rand = UnityEngine.Random.Range(0, allClipNames.Count);
                 while (blacklistedClips.Contains(rand))
                 {

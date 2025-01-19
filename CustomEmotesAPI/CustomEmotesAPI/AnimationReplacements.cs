@@ -271,14 +271,16 @@ internal static class AnimationReplacements
                 setup = true;
                 ApplyAnimationStuff(RoR2Content.Survivors.Croco, "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/acrid.prefab");
 
-                ApplyAnimationStuff(RoR2Content.Survivors.Mage, "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/artificer.prefab");
-                RoR2Content.Survivors.Mage.bodyPrefab.GetComponentInChildren<BoneMapper>().scale = .9f;
+                //ApplyAnimationStuff(RoR2Content.Survivors.Mage, "@CustomEmotesAPI_brynzapackage:assets/test/arti.prefab");
+                //ApplyAnimationStuff(RoR2Content.Survivors.Mage, "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/artificer.prefab");
+                //RoR2Content.Survivors.Mage.bodyPrefab.GetComponentInChildren<BoneMapper>().scale = .9f;
 
                 ApplyAnimationStuff(RoR2Content.Survivors.Captain, "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/captain.prefab");
                 RoR2Content.Survivors.Captain.bodyPrefab.GetComponentInChildren<BoneMapper>().scale = 1.1f;
 
-                ApplyAnimationStuff(RoR2Content.Survivors.Engi, "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/engi.prefab");
-                RoR2Content.Survivors.Engi.bodyPrefab.GetComponentInChildren<BoneMapper>().scale = 1f;
+                //ApplyAnimationStuff(RoR2Content.Survivors.Engi, "@CustomEmotesAPI_brynzapackage:assets/test/engi.prefab");
+                //ApplyAnimationStuff(RoR2Content.Survivors.Engi, "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/engi.prefab");
+                //RoR2Content.Survivors.Engi.bodyPrefab.GetComponentInChildren<BoneMapper>().scale = 1f;
 
                 ApplyAnimationStuff(RoR2Content.Survivors.Loader, "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/loader.prefab");
                 RoR2Content.Survivors.Loader.bodyPrefab.GetComponentInChildren<BoneMapper>().scale = 1.2f;
@@ -291,12 +293,12 @@ internal static class AnimationReplacements
 
                 ApplyAnimationStuff(RoR2Content.Survivors.Treebot, "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/rex.prefab");
 
+                //ApplyAnimationStuff(RoR2Content.Survivors.Commando, "@CustomEmotesAPI_brynzapackage:assets/test/commando.prefab");
+                //ApplyAnimationStuff(RoR2Content.Survivors.Commando, "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commandoFixed.prefab");
+                //RoR2Content.Survivors.Commando.bodyPrefab.GetComponentInChildren<BoneMapper>().scale = .85f;
 
-                ApplyAnimationStuff(RoR2Content.Survivors.Commando, "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commandoFixed.prefab");
-                RoR2Content.Survivors.Commando.bodyPrefab.GetComponentInChildren<BoneMapper>().scale = .85f;
-
-                ApplyAnimationStuff(RoR2Content.Survivors.Huntress, "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/huntress2022.prefab");
-                RoR2Content.Survivors.Huntress.bodyPrefab.GetComponentInChildren<BoneMapper>().scale = .9f;
+                //ApplyAnimationStuff(RoR2Content.Survivors.Huntress, "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/huntress2022.prefab");
+                //RoR2Content.Survivors.Huntress.bodyPrefab.GetComponentInChildren<BoneMapper>().scale = .9f;
 
                 ApplyAnimationStuff(RoR2Content.Survivors.Bandit2, "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/bandit.prefab");
 
@@ -543,6 +545,62 @@ internal static class AnimationReplacements
                                 CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
                             }
                             break;
+                        case "BidenBody":
+                            if (Settings.Biden.Value)
+                            {
+                                var skele = EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_brynzaupdate:Assets/test/biden.prefab");
+                                CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
+                                skele.GetComponentInChildren<BoneMapper>().scale = 0.85f;
+                            }
+                            break;
+                        case "ChirrBody":
+                            if (Settings.Chirr.Value)
+                            {
+                                var skele = EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_brynzaupdate:Assets/test/chrr.prefab");
+                                
+                                CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
+                                skele.GetComponentInChildren<BoneMapper>().scale = 2f;
+                                skele.transform.localScale *= 5;
+                                skele.transform.localPosition += new Vector3(0f, 1f, 0f);
+                            }
+                            break;
+                        case "NemMercBody":
+                            if (Settings.Nemmerc.Value)
+                            {
+                                var skele = EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_brynzaupdate:Assets/test/nemmerc.prefab");
+                                CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
+                            }
+                            break;
+
+                        /*
+                    case "ESFBody":
+                        if (Settings.ESF.Value)
+                        {
+                            var skele = EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_brynzaupdate:Assets/emotestuff/ESF.prefab");
+                            CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
+                        }
+                        break;
+                    case "RobBelmontBody":
+                        if (Settings.Belmont.Value)
+                        {
+                            var skele = EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_brynzaupdate:Assets/emotestuff/Belmont.prefab");
+                            CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
+                        }
+                        break;
+                    case "JohnnyBody":
+                        if (Settings.Johnny.Value)
+                        {
+                            var skele = EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_brynzaupdate:Assets/emotestuff/Johny.prefab");
+                            CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
+                        }
+                        break;
+                    case "RifterBody":
+                        if (Settings.Rifter.Value)
+                        {
+                            var skele = EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_brynzaupdate:Assets/emotestuff/Rifter.prefab");
+                            CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
+                        }
+                        break;*/
                         case "ChefBody":
                             CustomEmotesAPI.ImportArmature(item.bodyPrefab, EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/CHEF2.prefab"));
                             break;
@@ -551,6 +609,26 @@ internal static class AnimationReplacements
                             break;
                         case "SeekerBody":
                             CustomEmotesAPI.ImportArmature(item.bodyPrefab, EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/Seeker.prefab"));
+                            break;
+                        case "MageBody":
+                            CustomEmotesAPI.ImportArmature(item.bodyPrefab, EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_brynzapackage:Assets/test/arti.prefab"));
+                            break;
+                        case "CommandoBody":
+                            {
+                                var skele = EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_brynzapackage:Assets/test/commando.prefab");
+                            CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
+                                skele.GetComponentInChildren<BoneMapper>().scale = 0.85f;
+                            }
+                            break;
+                        case "HuntressBody":
+                            {
+                                var skele = EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_brynzapackage:Assets/test/huntress.prefab");
+                                CustomEmotesAPI.ImportArmature(item.bodyPrefab, skele);
+                                skele.GetComponentInChildren<BoneMapper>().scale = 0.9f;
+                            }
+                            break;
+                        case "EngiBody":
+                            CustomEmotesAPI.ImportArmature(item.bodyPrefab, EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_brynzapackage:Assets/test/engi.prefab"));
                             break;
                         default:
                             //DebugClass.Log($"----------{item.bodyPrefab.name}");
@@ -575,6 +653,15 @@ internal static class AnimationReplacements
         GameObject animcontroller = EmotesAPI.Assets.Load<GameObject>(resource);
         ApplyAnimationStuff(bodyPrefab, animcontroller, pos);
     }
+    //internal static void ApplyAnimationStuffBrynza(SurvivorDef index, GameObject resource, int pos = 0)
+    //{
+    //    ApplyAnimationStuffBrynza(index.bodyPrefab, resource, pos);
+    //}
+    //internal static void ApplyAnimationStuffBrynza(GameObject bodyPrefab, GameObject resource, int pos = 0)
+    //{
+    //    GameObject animcontroller = resource;
+    //    ApplyAnimationStuff(bodyPrefab, animcontroller, pos);
+    //}
     internal static void ApplyAnimationStuff(GameObject bodyPrefab, GameObject animcontroller, int pos = 0, bool hidemeshes = true, bool jank = false, bool revertBonePositions = false)
     {
         try
