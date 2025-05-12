@@ -47,6 +47,13 @@ namespace EmotesAPI
         public static ConfigEntry<bool> Spearman;
         public static ConfigEntry<bool> VoidJailer;
         public static ConfigEntry<bool> Baby;
+        public static ConfigEntry<bool> Biden;
+        public static ConfigEntry<bool> Chirr;
+        public static ConfigEntry<bool> Nemmerc;
+        //public static ConfigEntry<bool> ESF;
+        //public static ConfigEntry<bool> Belmont;
+        //public static ConfigEntry<bool> Johnny;
+        //public static ConfigEntry<bool> Rifter;
         public static ConfigEntry<bool> DimmingSpheres;
         public static ConfigEntry<bool> HideJoinSpots;
         //public static ConfigEntry<bool> RemoveAutoWalk;
@@ -149,7 +156,7 @@ namespace EmotesAPI
             Trunks = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Trunks Support", true, "Support for Trunks to animate");
             Vegeta = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Vegeta Support", true, "Support for Vegeta to animate");
 
-            Nemmando = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Nemmando Support", true, "Support for Nemmando to animate");
+            Nemmando = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Nemmando Support", true, "Support for Nemesis Commando to animate");
             Executioner = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Executioner Support", true, "Support for Executioner to animate");
             Amp = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Amp Support", true, "Support for Amp to animate");
             Pathfinder = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Pathfinder Support", true, "Support for Pathfinder to animate");
@@ -157,6 +164,13 @@ namespace EmotesAPI
             Spearman = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Spearman Support", true, "Support for Spearman to animate");
             VoidJailer = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "VoidJailer Support", true, "Support for VoidJailer to animate");
             Baby = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Driver Support", true, "Support for Driver to animate");
+            Biden = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Biden Support", true, "Support for Biden to animate");
+            Chirr = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Chirr Support", true, "Support for Chirr to animate");
+            Nemmerc = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Nemmerc Support", true, "Support for Nemesis Mercenary to animate");
+            //ESF = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "ESF Support", true, "Support for ESF to animate");
+            //Belmont = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Belmont Support", true, "Support for Belmont to animate");
+            //Johnny = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Johnny Support", true, "Support for Johnny to animate");
+            //Rifter = CustomEmotesAPI.instance.Config.Bind<bool>("Experimental", "Rifter Support", true, "Support for Rifter to animate");
 
             DimmingSpheres = CustomEmotesAPI.instance.Config.Bind<bool>("Misc", "Dimming Spheres", true, "Turn off music dimming when near emotes that support dimming.");
             HideJoinSpots = CustomEmotesAPI.instance.Config.Bind<bool>("Misc", "Hide Join Spots When Animating", false, "Hides all join spots when you are performing an animation, this loses some visual clarity but offers a more C I N E M A T I C experience");
@@ -221,6 +235,13 @@ namespace EmotesAPI
             ModSettingsManager.AddOption(new CheckBoxOption(Spearman, true));
             ModSettingsManager.AddOption(new CheckBoxOption(VoidJailer, true));
             ModSettingsManager.AddOption(new CheckBoxOption(Baby, true));
+            ModSettingsManager.AddOption(new CheckBoxOption(Biden, true));
+            ModSettingsManager.AddOption(new CheckBoxOption(Chirr, true));
+            ModSettingsManager.AddOption(new CheckBoxOption(Nemmerc, true));
+            //ModSettingsManager.AddOption(new CheckBoxOption(ESF, true));
+            //ModSettingsManager.AddOption(new CheckBoxOption(Belmont, true));
+            //ModSettingsManager.AddOption(new CheckBoxOption(Johnny, true));
+            //ModSettingsManager.AddOption(new CheckBoxOption(Rifter, true));
             ModSettingsManager.AddOption(new CheckBoxOption(DimmingSpheres));
             ModSettingsManager.AddOption(new CheckBoxOption(HideJoinSpots));
             //ModSettingsManager.AddOption(new CheckBoxOption(RemoveAutoWalk, false));

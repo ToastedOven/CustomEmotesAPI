@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="brynzapackage" />
     <None Remove="customemotespackage" />
     <None Remove="customemotespackage2" />
     <None Remove="enemyskeletons" />
@@ -13,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="brynzapackage" />
     <EmbeddedResource Include="customemotespackage" />
     <EmbeddedResource Include="customemotespackage2" />
     <EmbeddedResource Include="enemyskeletons" />
@@ -52,11 +54,5 @@
     </Reference>
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="cp &quot;/run/media/nunchuk/Windows/CustomEmotesAPI/CustomEmotesAPI/CustomEmotesAPI/bin/Debug/netstandard2.1/CustomEmotesAPI.dll&quot; &quot;/home/nunchuk/.local/share/com.kesomannen.gale/riskofrain2/profiles/Bigma Lalls/BepInEx/plugins/MetrosexualFruitcake-CustomEmotesAPI/CustomEmotesAPI.dll&quot;" />
-    <Exec Command="cp &quot;/run/media/nunchuk/Windows/CustomEmotesAPI/CustomEmotesAPI/CustomEmotesAPI/bin/Debug/netstandard2.1/CustomEmotesAPI.pdb&quot; &quot;/home/nunchuk/.local/share/com.kesomannen.gale/riskofrain2/profiles/Bigma Lalls/BepInEx/plugins/MetrosexualFruitcake-CustomEmotesAPI/CustomEmotesAPI.pdb&quot;" />
-    <Exec Command="cp &quot;/run/media/nunchuk/Windows/CustomEmotesAPI/CustomEmotesAPI/CustomEmotesAPI/bin/Debug/netstandard2.1/CustomEmotesAPI.dll&quot; &quot;/home/nunchuk/.local/share/com.kesomannen.gale/riskofrain2/profiles/MpModded/BepInEx/plugins/MetrosexualFruitcake-CustomEmotesAPI/CustomEmotesAPI.dll&quot;" />
-    <Exec Command="cp &quot;/run/media/nunchuk/Windows/CustomEmotesAPI/CustomEmotesAPI/CustomEmotesAPI/bin/Debug/netstandard2.1/CustomEmotesAPI.pdb&quot; &quot;/home/nunchuk/.local/share/com.kesomannen.gale/riskofrain2/profiles/MpModded/BepInEx/plugins/MetrosexualFruitcake-CustomEmotesAPI/CustomEmotesAPI.pdb&quot;" />
-  </Target>
 
 </Project>
