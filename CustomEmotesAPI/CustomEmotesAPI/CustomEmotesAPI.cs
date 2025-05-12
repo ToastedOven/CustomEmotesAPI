@@ -34,7 +34,7 @@ namespace EmotesAPI
 
         public const string PluginName = "Custom Emotes API";
 
-        public const string VERSION = "2.8.0";
+        public const string VERSION = "2.8.2";
 
         public struct NameTokenWithSprite
         {
@@ -548,7 +548,7 @@ namespace EmotesAPI
         public static event EmoteWheelPulledUp emoteWheelPulledUp;
         internal static void EmoteWheelOpened(Sprite wheel)
         {
-            if (emoteWheelPulledUp != null)
+            if (emoteWheelPulledUp != null && localMapper != null)
             {
                 emoteWheelPulledUp(wheel, localMapper);
             }

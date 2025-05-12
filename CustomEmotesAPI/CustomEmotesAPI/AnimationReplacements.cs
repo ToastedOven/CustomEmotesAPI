@@ -136,12 +136,12 @@ internal static class AnimationReplacements
         Import("RoR2/DLC1/FlyingVermin/FlyingVerminBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/flyingvermin1.prefab");
         Import("RoR2/Base/Bell/BellBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/brass contraption2.prefab");
         Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Bell/BellBody.prefab").WaitForCompletion().GetComponentInChildren<BoneMapper>().enableAnimatorOnDeath = false;
-        Import("RoR2/Base/Vulture/VultureBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/Vulture_emoteskeleton.prefab");
+        Import("RoR2/Base/Vulture/VultureBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/Vulture_emoteskeleton.prefab").scale = 2f;
         Import("RoR2/DLC1/MajorAndMinorConstruct/MinorConstructBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/minorConstruct4.prefab");
         Addressables.LoadAssetAsync<GameObject>("RoR2/DLC1/MajorAndMinorConstruct/MinorConstructBody.prefab").WaitForCompletion().GetComponentInChildren<BoneMapper>().transform.localPosition += new Vector3(0, 3, 0);
         Import("RoR2/DLC1/VoidJailer/VoidJailerBody.prefab", "@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/voidjailer2.prefab");
         Import("RoR2/DLC1/Vermin/VerminBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/vermin1.prefab");
-        Import("RoR2/Base/LemurianBruiser/LemurianBruiserBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/elderlemurian.prefab");
+        Import("RoR2/Base/LemurianBruiser/LemurianBruiserBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/elderlemurian.prefab").scale = 5f;
         Import("RoR2/DLC1/Gup/GupBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/gup.prefab");
         Import("RoR2/DLC1/Gup/GeepBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/geep.prefab");
         Import("RoR2/DLC1/Gup/GipBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/gip.prefab");
@@ -151,9 +151,9 @@ internal static class AnimationReplacements
 
         Import("RoR2/Base/Imp/ImpBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/imp.prefab");
         Import("RoR2/Base/Jellyfish/JellyfishBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/jellyfish.prefab");
-        Import("RoR2/Base/Lemurian/LemurianBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/lemurian.prefab");
+        Import("RoR2/Base/Lemurian/LemurianBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/lemurian.prefab").scale = .75f;
         Import("RoR2/Base/Wisp/WispBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/lesserwisp.prefab");
-        Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Wisp/WispBody.prefab").WaitForCompletion().GetComponentInChildren<BoneMapper>().scale = .8f;
+        Addressables.LoadAssetAsync<GameObject>("RoR2/Base/Wisp/WispBody.prefab").WaitForCompletion().GetComponentInChildren<BoneMapper>().scale = .9f;
         Import("RoR2/Base/LunarExploder/LunarExploderBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/lunarexploder.prefab");
         Addressables.LoadAssetAsync<GameObject>("RoR2/Base/LunarExploder/LunarExploderBody.prefab").WaitForCompletion().GetComponentInChildren<BoneMapper>().scale = 2f;
         Import("RoR2/Base/LunarGolem/LunarGolemBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/lunargolem.prefab");
@@ -201,7 +201,7 @@ internal static class AnimationReplacements
         Import("RoR2/Base/Engi/EngiTurretBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/notenemies/turret.prefab");
         Import("RoR2/Base/Shopkeeper/ShopkeeperBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/notenemies/newt.prefab");
         Import("RoR2/Base/Drones/BackupDroneBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/notenemies/backupdrone.prefab");
-        Import("RoR2/Base/Drones/Turret1Body.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/notenemies/buyableturret.prefab");
+        Import("RoR2/Base/Drones/Turret1Body.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/notenemies/buyableturret.prefab").scale = 1;
         Import("RoR2/DLC1/DroneCommander/DroneCommanderBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/notenemies/dronecommander.prefab");
         Import("RoR2/Base/Drones/EmergencyDroneBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/notenemies/emergency.prefab");
         Import("RoR2/Base/Drones/EquipmentDroneBody.prefab", "@CustomEmotesAPI_enemyskeletons:assets/myprioritiesarestraightnt/enemies/notenemies/equipmentdrone.prefab");
@@ -256,20 +256,21 @@ internal static class AnimationReplacements
         sb.Append("\n\n");
         DebugClass.Log(sb.ToString());
     }
-    internal static void Import(string prefab, string skeleton, bool hidemesh = true)
+    internal static BoneMapper Import(string prefab, string skeleton, bool hidemesh = true)
     {
         EmotesAPI.Assets.Load<GameObject>(skeleton).GetComponent<Animator>().runtimeAnimatorController = GameObject.Instantiate<GameObject>(EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/commando.prefab")).GetComponent<Animator>().runtimeAnimatorController;
-        AnimationReplacements.ApplyAnimationStuff(Addressables.LoadAssetAsync<GameObject>(prefab).WaitForCompletion(), EmotesAPI.Assets.Load<GameObject>(skeleton), 0, hidemesh, revertBonePositions: true);
+        return AnimationReplacements.ApplyAnimationStuff(Addressables.LoadAssetAsync<GameObject>(prefab).WaitForCompletion(), EmotesAPI.Assets.Load<GameObject>(skeleton), 0, hidemesh, revertBonePositions: true);
     }
     internal static void ChangeAnims()
     {
         On.RoR2.SurvivorCatalog.Init += (orig) =>
         {
             orig();
-            if (!setup)
+            if (!setup) 
             {
                 setup = true;
                 ApplyAnimationStuff(RoR2Content.Survivors.Croco, "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/acrid.prefab");
+                RoR2Content.Survivors.Croco.bodyPrefab.GetComponentInChildren<BoneMapper>().scale = 1.9f;
 
                 ApplyAnimationStuff(RoR2Content.Survivors.Mage, "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/artificer.prefab");
                 RoR2Content.Survivors.Mage.bodyPrefab.GetComponentInChildren<BoneMapper>().scale = .9f;
@@ -575,14 +576,14 @@ internal static class AnimationReplacements
         GameObject animcontroller = EmotesAPI.Assets.Load<GameObject>(resource);
         ApplyAnimationStuff(bodyPrefab, animcontroller, pos);
     }
-    internal static void ApplyAnimationStuff(GameObject bodyPrefab, GameObject animcontroller, int pos = 0, bool hidemeshes = true, bool jank = false, bool revertBonePositions = false)
+    internal static BoneMapper ApplyAnimationStuff(GameObject bodyPrefab, GameObject animcontroller, int pos = 0, bool hidemeshes = true, bool jank = false, bool revertBonePositions = false)
     {
         try
         {
             if (!animcontroller.GetComponentInChildren<Animator>().avatar.isHuman)
             {
                 DebugClass.Log($"{animcontroller}'s avatar isn't humanoid, please fix it in unity!");
-                return;
+                return null;
             }
         }
         catch (Exception e)
@@ -723,6 +724,7 @@ internal static class AnimationReplacements
         }
         test.revertTransform = revertBonePositions;
         allMappers.Add(test);
+        return test;
     }
 
     internal static List<BoneMapper> allMappers = new List<BoneMapper>();
