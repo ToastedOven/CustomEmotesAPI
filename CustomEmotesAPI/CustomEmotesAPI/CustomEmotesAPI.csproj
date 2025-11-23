@@ -20,6 +20,8 @@
     <EmbeddedResource Include="enemyskeletons" />
     <EmbeddedResource Include="fineilldoitmyself" />
     <EmbeddedResource Include="moisture_animationreplacements" />
+    <None Remove="dlc3emoteskeletons" />
+    <EmbeddedResource Include="dlc3emoteskeletons" />
   </ItemGroup>
 
   <ItemGroup>

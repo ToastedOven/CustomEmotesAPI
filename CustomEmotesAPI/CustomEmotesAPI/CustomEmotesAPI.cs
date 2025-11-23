@@ -35,7 +35,7 @@ namespace EmotesAPI
 
         public const string PluginName = "Custom Emotes API";
 
-        public const string VERSION = "2.10.5";
+        public const string VERSION = "2.11.0";
 
         public GameObject lobbyBody;
         public struct NameTokenWithSprite
@@ -125,6 +125,7 @@ namespace EmotesAPI
             CustomEmotesAPI.LoadResource("customemotespackage");
             CustomEmotesAPI.LoadResource("brynzapackage");
             CustomEmotesAPI.LoadResource("fineilldoitmyself");
+            CustomEmotesAPI.LoadResource("dlc3emoteskeletons");
             CustomEmotesAPI.LoadResource("enemyskeletons");
             CustomEmotesAPI.LoadResource("moisture_animationreplacements"); // I don't remember what's in here that makes importing emotes work, don't @ me
             Settings.RunAll();
@@ -501,6 +502,10 @@ namespace EmotesAPI
                 {
                     mapper.transform.parent.GetComponent<ChildLocator>().FindChild("spear").gameObject.SetActive(false);
                 }
+                if (mapper.transform.name == "droneTech")
+                {
+                    mapper.transform.parent.GetComponent<ChildLocator>().FindChild("Gun").GetParent().GetParent().GetParent().gameObject.SetActive(false);
+                }
             }
             else
             {
@@ -553,6 +558,10 @@ namespace EmotesAPI
                 if (mapper.transform.name == "SpearManEmoteSkeleton")
                 {
                     mapper.transform.parent.GetComponent<ChildLocator>().FindChild("spear").gameObject.SetActive(true);
+                }
+                if (mapper.transform.name == "droneTech")
+                {
+                    mapper.transform.parent.GetComponent<ChildLocator>().FindChild("Gun").GetParent().GetParent().GetParent().gameObject.SetActive(true);
                 }
             }
         }

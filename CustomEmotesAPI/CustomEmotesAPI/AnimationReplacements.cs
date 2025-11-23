@@ -227,6 +227,20 @@ internal static class AnimationReplacements
         Import("RoR2/DLC2/Halcyonite/HalcyoniteBody.prefab", "@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/Halcyonite1.prefab");
         Import("RoR2/DLC2/Scorchling/ScorchlingBody.prefab", "@CustomEmotesAPI_fineilldoitmyself:assets/fineilldoitmyself/Scorchling.prefab");
 
+        
+        Import("RoR2/DLC3/DefectiveUnit/DefectiveUnitBody.prefab", "@CustomEmotesAPI_dlc3emoteskeletons:assets/DLC3/defective.prefab");
+        Import("RoR2/DLC3/ExtractorUnit/ExtractorUnitBody.prefab", "@CustomEmotesAPI_dlc3emoteskeletons:assets/DLC3/extractor.prefab");
+        Import("RoR2/DLC3/IronHauler/IronHaulerBody.prefab", "@CustomEmotesAPI_dlc3emoteskeletons:assets/DLC3/ironHauler.prefab");
+        Import("RoR2/DLC3/SolusAmalgamator/SolusAmalgamatorBody.prefab", "@CustomEmotesAPI_dlc3emoteskeletons:assets/DLC3/amalgamator.prefab");
+        Import("RoR2/DLC3/SolusHeart/SolusHeartBody.prefab", "@CustomEmotesAPI_dlc3emoteskeletons:assets/DLC3/solusHeart.prefab");
+        Import("RoR2/DLC3/SolusWing/SolusWingBody.prefab", "@CustomEmotesAPI_dlc3emoteskeletons:assets/DLC3/solusWing.prefab");
+        Import("RoR2/DLC3/Tanker/TankerBody.prefab", "@CustomEmotesAPI_dlc3emoteskeletons:assets/DLC3/tanker.prefab");
+        // Import("RoR2/DLC3/Vendor/SolusVendorBody.prefab", "@CustomEmotesAPI_dlc3emoteskeletons:assets/DLC3/vendor.prefab");
+        Import("RoR2/DLC3/VultureHunter/VultureHunterBody.prefab", "@CustomEmotesAPI_dlc3emoteskeletons:assets/DLC3/vultureBoss.prefab");
+        Import("RoR2/DLC3/WorkerUnit/WorkerUnitBody.prefab", "@CustomEmotesAPI_dlc3emoteskeletons:assets/DLC3/worker.prefab");
+        
+        Import("RoR2/DLC3/Drone Tech/DroneTechBody.prefab", "@CustomEmotesAPI_dlc3emoteskeletons:assets/DLC3/droneTech.prefab");
+        Import("RoR2/DLC3/Drifter/DrifterBody.prefab", "@CustomEmotesAPI_dlc3emoteskeletons:assets/DLC3/drifter.prefab");
     }
     public static void DebugBones(string resource, int pos = 0)
     {
@@ -1704,7 +1718,7 @@ public class BoneMapper : MonoBehaviour
             {
                 if (a2.enabled)
                 {
-                    if (smr2.transform.parent.gameObject.name == "mdlVoidSurvivor" || smr2.transform.parent.gameObject.name == "mdlMage" || smr2.transform.parent.gameObject.name == "mdlJinx" || smr2.transform.parent.gameObject.name.StartsWith("mdlHouse") || smr2.transform.parent.gameObject.name.StartsWith("mdlLemurian") || smr2.transform.parent.gameObject.name.StartsWith("mdlRocket") || smr2.transform.parent.gameObject.name.StartsWith("mdlSeeker"))
+                    if (smr2.transform.parent.gameObject.name == "mdlVoidSurvivor" || smr2.transform.parent.gameObject.name == "mdlMage" || smr2.transform.parent.gameObject.name == "mdlJinx" || smr2.transform.parent.gameObject.name.StartsWith("mdlHouse") || smr2.transform.parent.gameObject.name.StartsWith("mdlLemurian") || smr2.transform.parent.gameObject.name.StartsWith("mdlRocket") || smr2.transform.parent.gameObject.name.StartsWith("mdlSeeker") || transform.name == "droneTech")
                     {
                         if (firstTimeEnding)
                         {
