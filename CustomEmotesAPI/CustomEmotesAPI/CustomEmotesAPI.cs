@@ -35,7 +35,7 @@ namespace EmotesAPI
 
         public const string PluginName = "Custom Emotes API";
 
-        public const string VERSION = "2.11.0";
+        public const string VERSION = "2.11.1";
 
         public GameObject lobbyBody;
         public struct NameTokenWithSprite
