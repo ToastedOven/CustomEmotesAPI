@@ -315,7 +315,7 @@ internal static class AnimationReplacements
                 //ApplyAnimationStuff(RoR2Content.Survivors.Huntress, "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/huntress2022.prefab");
                 //RoR2Content.Survivors.Huntress.bodyPrefab.GetComponentInChildren<BoneMapper>().scale = .9f;
 
-                ApplyAnimationStuff(RoR2Content.Survivors.Bandit2, "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/bandit.prefab");
+                // ApplyAnimationStuff(RoR2Content.Survivors.Bandit2, "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/bandit.prefab");
 
 
                 ApplyAnimationStuff(SurvivorCatalog.FindSurvivorDefFromBody(Addressables.LoadAssetAsync<GameObject>("RoR2/DLC1/VoidSurvivor/VoidSurvivorBody.prefab").WaitForCompletion()), "@CustomEmotesAPI_customemotespackage:assets/animationreplacements/voidsurvivor.prefab");
@@ -645,6 +645,9 @@ internal static class AnimationReplacements
                         case "EngiBody":
                             CustomEmotesAPI.ImportArmature(item.bodyPrefab, EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_brynzapackage:Assets/test/engi.prefab"));
                             break;
+                        case "Bandit2Body":
+                            CustomEmotesAPI.ImportArmature(item.bodyPrefab, EmotesAPI.Assets.Load<GameObject>("@CustomEmotesAPI_customemotespackage:assets/animationreplacements/bandit.prefab"));
+                            break;
                         default:
                             //DebugClass.Log($"----------{item.bodyPrefab.name}");
                             //Settings.DebugBones(item.bodyPrefab);
@@ -727,6 +730,7 @@ internal static class AnimationReplacements
 
         SkinnedMeshRenderer smr1;
         SkinnedMeshRenderer smr2;
+        SkinnedMeshRenderer[] originalSmrs;
         try
         {
             smr1 = animcontroller.GetComponentsInChildren<SkinnedMeshRenderer>()[pos];
@@ -738,7 +742,8 @@ internal static class AnimationReplacements
         }
         try
         {
-            smr2 = modelTransform.GetComponentsInChildren<SkinnedMeshRenderer>()[pos];
+            originalSmrs = GetOriginalSmrs(modelTransform, animcontroller);
+            smr2 = originalSmrs[pos];
         }
         catch (Exception e)
         {
@@ -760,10 +765,10 @@ internal static class AnimationReplacements
                         }
                     }
                 }
-                if (matchingBones < 1 && pos + 1 < modelTransform.GetComponentsInChildren<SkinnedMeshRenderer>().Length)
+                if (matchingBones < 1 && pos + 1 < originalSmrs.Length)
                 {
                     pos++;
-                    smr2 = modelTransform.GetComponentsInChildren<SkinnedMeshRenderer>()[pos];
+                    smr2 = originalSmrs[pos];
                     matchingBones = 0;
                 }
                 else
@@ -820,6 +825,26 @@ internal static class AnimationReplacements
     }
 
     internal static List<BoneMapper> allMappers = new List<BoneMapper>();
+    internal static SkinnedMeshRenderer[] GetOriginalSmrs(Transform modelTransform, GameObject animcontroller)
+    {
+        var active = new List<SkinnedMeshRenderer>();
+        foreach (var smr in modelTransform.GetComponentsInChildren<SkinnedMeshRenderer>())
+        {
+            if (!smr.transform.IsChildOf(animcontroller.transform))
+                active.Add(smr);
+        }
+        if (active.Count > 0)
+        {
+            return active.ToArray();
+        }
+        var all = new List<SkinnedMeshRenderer>();
+        foreach (var smr in modelTransform.GetComponentsInChildren<SkinnedMeshRenderer>(true))
+        {
+            if (!smr.transform.IsChildOf(animcontroller.transform))
+                all.Add(smr);
+        }
+        return all.ToArray();
+    }
 }
 public struct JoinSpot
 {
